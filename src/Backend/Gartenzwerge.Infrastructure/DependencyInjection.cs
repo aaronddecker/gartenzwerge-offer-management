@@ -1,4 +1,6 @@
+using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Infrastructure.Persistence;
+using Gartenzwerge.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         return services;
     }
