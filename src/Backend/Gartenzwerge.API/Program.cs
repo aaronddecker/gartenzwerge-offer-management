@@ -1,6 +1,9 @@
 using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Application.Customers.Services;
 using Gartenzwerge.Infrastructure;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Gartenzwerge.Application.Customers.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
+
+// Register FluentValidation validators.
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
 
 // Register application services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
