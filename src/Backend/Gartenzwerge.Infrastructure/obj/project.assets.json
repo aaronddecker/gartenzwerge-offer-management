@@ -1,0 +1,124 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "Gartenzwerge.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Gartenzwerge.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Gartenzwerge.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Gartenzwerge.Application.dll": {}
+        }
+      },
+      "Gartenzwerge.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Gartenzwerge.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Gartenzwerge.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Gartenzwerge.Application/1.0.0": {
+      "type": "project",
+      "path": "../Gartenzwerge.Application/Gartenzwerge.Application.csproj",
+      "msbuildProject": "../Gartenzwerge.Application/Gartenzwerge.Application.csproj"
+    },
+    "Gartenzwerge.Domain/1.0.0": {
+      "type": "project",
+      "path": "../Gartenzwerge.Domain/Gartenzwerge.Domain.csproj",
+      "msbuildProject": "../Gartenzwerge.Domain/Gartenzwerge.Domain.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "Gartenzwerge.Application >= 1.0.0",
+      "Gartenzwerge.Domain >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\addec\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Infrastructure\\Gartenzwerge.Infrastructure.csproj",
+      "projectName": "Gartenzwerge.Infrastructure",
+      "projectPath": "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Infrastructure\\Gartenzwerge.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\addec\\.nuget\\packages\\",
+      "outputPath": "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Infrastructure\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "P:\\addec\\AppData\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Application\\Gartenzwerge.Application.csproj": {
+              "projectPath": "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Application\\Gartenzwerge.Application.csproj"
+            },
+            "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Domain\\Gartenzwerge.Domain.csproj": {
+              "projectPath": "C:\\gartenzwerge-management\\src\\Backend\\Gartenzwerge.Domain\\Gartenzwerge.Domain.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.313/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

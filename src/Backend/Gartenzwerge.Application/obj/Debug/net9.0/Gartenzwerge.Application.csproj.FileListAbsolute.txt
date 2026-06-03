@@ -1,0 +1,16 @@
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\bin\Debug\net9.0\Gartenzwerge.Application.deps.json
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\bin\Debug\net9.0\Gartenzwerge.Application.dll
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\bin\Debug\net9.0\Gartenzwerge.Application.pdb
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\bin\Debug\net9.0\Gartenzwerge.Domain.dll
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\bin\Debug\net9.0\Gartenzwerge.Domain.pdb
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.csproj.AssemblyReference.cache
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.AssemblyInfoInputs.cache
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.AssemblyInfo.cs
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.csproj.CoreCompileInputs.cache
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.sourcelink.json
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzw.04260AC8.Up2Date
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.dll
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\refint\Gartenzwerge.Application.dll
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\Gartenzwerge.Application.pdb
+C:\gartenzwerge-management\src\Backend\Gartenzwerge.Application\obj\Debug\net9.0\ref\Gartenzwerge.Application.dll
