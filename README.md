@@ -22,6 +22,9 @@ The application is designed to support real business workflows such as customer 
 * Serilog logging
 * Unit tests
 * Swagger/OpenAPI documentation
+* Offered Service CRUD API
+* Offered Service validation
+* Offered Service unit tests
 
 ### Planned
 
@@ -187,6 +190,15 @@ PUT    /api/customers/{id}
 DELETE /api/customers/{id}
 ```
 
+### Offered Services
+
+```http
+GET    /api/offered-services
+GET    /api/offered-services/{id}
+POST   /api/offered-services
+PUT    /api/offered-services/{id}
+DELETE /api/offered-services/{id}
+```
 ---
 
 ## Example Customer Request
