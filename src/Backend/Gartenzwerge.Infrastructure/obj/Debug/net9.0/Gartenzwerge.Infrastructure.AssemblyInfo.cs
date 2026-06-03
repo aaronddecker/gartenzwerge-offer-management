@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Gartenzwerge.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0b76655dffe556734fb69dfdc1cb2f4f62e9dd07")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b46af6ca5e2495819c233b74aa8c77e3fad196d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Gartenzwerge.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Gartenzwerge.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
