@@ -4,6 +4,7 @@ using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Gartenzwerge.Application.Customers.Validators;
+using Gartenzwerge.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
