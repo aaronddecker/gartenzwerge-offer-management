@@ -1,9 +1,12 @@
 using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Application.Customers.Services;
+using Gartenzwerge.Application.Customers.Validators;
+using Gartenzwerge.Application.OfferedServices.Interfaces;
+using Gartenzwerge.Application.OfferedServices.Services;
+using Gartenzwerge.Application.OfferedServices.Validators;
 using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Gartenzwerge.Application.Customers.Validators;
 using Gartenzwerge.API.Middleware;
 using Serilog;
 
@@ -30,12 +33,16 @@ builder.Services.AddAuthorization();
 // Register FluentValidation validators.
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferedServiceRequestValidator>();
 
-// Register application services.
+// Register Customer services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // Register infrastructure services such as EF Core and repositories.
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Register OfferedService services.
+builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
 
 var app = builder.Build();
 

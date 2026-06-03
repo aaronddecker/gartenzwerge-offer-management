@@ -4,9 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Gartenzwerge.Infrastructure.Persistence.Configurations;
 
-public class ServiceConfiguration : IEntityTypeConfiguration<Service>
+/// <summary>
+/// Entity Framework Core configuration for offered services.
+/// </summary>
+public class OfferedServiceConfiguration : IEntityTypeConfiguration<OfferedService>
 {
-    public void Configure(EntityTypeBuilder<Service> builder)
+    public void Configure(EntityTypeBuilder<OfferedService> builder)
     {
         builder.HasKey(x => x.Id);
 

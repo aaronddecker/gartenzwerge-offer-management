@@ -1,4 +1,5 @@
 using Gartenzwerge.Application.Customers.Interfaces;
+using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Gartenzwerge.Infrastructure.Persistence;
 using Gartenzwerge.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Gartenzwerge.Infrastructure;
 
+/// <summary>
+/// Registers infrastructure-related services such as persistence and repositories.
+/// </summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
@@ -17,6 +21,7 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IOfferedServiceRepository, OfferedServiceRepository>();
 
         return services;
     }
