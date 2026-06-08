@@ -4,6 +4,9 @@ using Gartenzwerge.Application.Customers.Validators;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Gartenzwerge.Application.OfferedServices.Services;
 using Gartenzwerge.Application.OfferedServices.Validators;
+using Gartenzwerge.Application.Offers.Interfaces;
+using Gartenzwerge.Application.Offers.Services;
+using Gartenzwerge.Application.Offers.Validators;
 using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -34,6 +37,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferedServiceRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferRequestValidator>();
 
 // Register Customer services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -43,6 +47,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Register OfferedService services.
 builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
+
+// Register Offer services.
+builder.Services.AddScoped<IOfferService, OfferService>();
 
 var app = builder.Build();
 
