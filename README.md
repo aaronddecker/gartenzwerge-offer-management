@@ -25,6 +25,10 @@ The application is designed to support real business workflows such as customer 
 * Offered Service CRUD API
 * Offered Service validation
 * Offered Service unit tests
+* Offer CRUD API
+* Offer validation
+* Offer unit tests
+* Automatic offer number generation
 
 ### Planned
 
@@ -198,6 +202,15 @@ GET    /api/offered-services/{id}
 POST   /api/offered-services
 PUT    /api/offered-services/{id}
 DELETE /api/offered-services/{id}
+```
+### Offers
+
+```http
+GET    /api/offers
+GET    /api/offers/{id}
+POST   /api/offers
+PUT    /api/offers/{id}
+DELETE /api/offers/{id}
 ```
 ---
 
