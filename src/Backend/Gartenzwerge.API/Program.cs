@@ -7,6 +7,8 @@ using Gartenzwerge.Application.OfferedServices.Validators;
 using Gartenzwerge.Application.Offers.Interfaces;
 using Gartenzwerge.Application.Offers.Services;
 using Gartenzwerge.Application.Offers.Validators;
+using Gartenzwerge.Application.OfferItems.Interfaces;
+using Gartenzwerge.Application.OfferItems.Services;
 using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
