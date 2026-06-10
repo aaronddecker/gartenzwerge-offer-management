@@ -336,6 +336,22 @@ gartenzwerge-offer-management/
 └── .gitignore
 ```
 
+## Documentation
+
+Additional project documentation is available in the `docs` folder.
+
+- [API Endpoints](docs/api/endpoints.md)  
+  Documents the available REST API endpoints, request bodies, response codes and example payloads.
+
+- [Add Offer Item Flow](docs/business-processes/add-offer-item-flow.md)  
+  Explains the business and technical flow for adding an offer item to an existing offer, including price calculation and offer total recalculation.
+
+- [Architecture Documentation](docs/architecture/)  
+  Contains documentation about Clean Architecture, request flow and architectural decisions.
+
+- [Database Documentation](docs/database/)  
+  Contains documentation about entities, relationships and database-related concepts.
+
 ---
 
 ## Development Roadmap
