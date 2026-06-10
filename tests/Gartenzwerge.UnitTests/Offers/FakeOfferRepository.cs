@@ -27,6 +27,13 @@ public class FakeOfferRepository : IOfferRepository
         return Task.FromResult(offer);
     }
 
+    public Task<Offer?> GetByIdWithItemsAsync(Guid id)
+    {
+        var offer = _offers.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+
+        return Task.FromResult(offer);
+    }
+
     public Task<IReadOnlyList<Offer>> GetAllAsync()
     {
         IReadOnlyList<Offer> offers = _offers

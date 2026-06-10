@@ -13,6 +13,9 @@ public class OfferItemConfiguration : IEntityTypeConfiguration<OfferItem>
     {
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         builder.Property(x => x.Description)
             .HasMaxLength(500)
             .IsRequired();

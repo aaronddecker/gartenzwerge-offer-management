@@ -36,6 +36,14 @@ public class OfferRepository : IOfferRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<Offer?> GetByIdWithItemsAsync(Guid id)
+    {
+        return await _dbContext.Offers
+            .Include(x => x.Items)
+                .ThenInclude(x => x.OfferedService)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<IReadOnlyList<Offer>> GetAllAsync()
     {
         return await _dbContext.Offers

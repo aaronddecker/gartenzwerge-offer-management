@@ -14,6 +14,8 @@ public interface IOfferRepository
 
     Task<Offer?> GetByIdAsync(Guid id);
 
+    Task<Offer?> GetByIdWithItemsAsync(Guid id);
+
     Task<IReadOnlyList<Offer>> GetAllAsync();
 
     Task UpdateAsync(Offer offer);
