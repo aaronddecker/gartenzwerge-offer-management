@@ -347,9 +347,10 @@ Soft deletes an existing offer.
 
 ## Offer Items
 
-Offer item endpoints are used to add service positions to existing offers.
+Offer item endpoints are used to manage service positions within existing offers.
 
 An offer item belongs to exactly one offer and references one offered service.
+The offered service provides the base price and unit, while the offer item stores the selected quantity, unit price and calculated total price.
 
 ---
 
@@ -393,6 +394,7 @@ Total price: 45.00 €
 201 Created
 400 Bad Request
 404 Not Found
+500 Internal Server Error
 ```
 
 #### Example response
@@ -409,6 +411,136 @@ Total price: 45.00 €
   "totalPrice": 45.00
 }
 ```
+
+---
+
+### Get offer items by offer
+
+```http
+GET /api/offers/{offerId}/items
+```
+
+Returns all active offer items for an existing offer.
+
+Soft-deleted offer items are not included in the response.
+
+#### Server-side behavior
+
+* Loads the offer including its offer items
+* Filters out soft-deleted offer items
+* Returns the active offer items as DTOs
+
+#### Responses
+
+```http
+200 OK
+404 Not Found
+500 Internal Server Error
+```
+
+#### Example response
+
+```json
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "offerId": "00000000-0000-0000-0000-000000000000",
+    "offeredServiceId": "00000000-0000-0000-0000-000000000000",
+    "description": "Rasen mähen",
+    "quantity": 250,
+    "unit": "m²",
+    "unitPrice": 0.18,
+    "totalPrice": 45.00
+  }
+]
+```
+
+---
+
+### Update offer item
+
+```http
+PUT /api/offers/{offerId}/items/{itemId}
+```
+
+Updates the quantity of an existing offer item and recalculates its total price.
+
+#### Request body
+
+```json
+{
+  "quantity": 300
+}
+```
+
+#### Server-side behavior
+
+* Loads the offer including existing offer items
+* Finds the active offer item by ID
+* Updates the item quantity
+* Recalculates the item total price using `quantity * unitPrice`
+* Recalculates the offer total value from all active offer items
+
+#### Example calculation
+
+```text
+Quantity: 300 m²
+Unit price: 0.18 €
+Total price: 54.00 €
+```
+
+#### Responses
+
+```http
+200 OK
+400 Bad Request
+404 Not Found
+500 Internal Server Error
+```
+
+#### Example response
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "offerId": "00000000-0000-0000-0000-000000000000",
+  "offeredServiceId": "00000000-0000-0000-0000-000000000000",
+  "description": "Rasen mähen",
+  "quantity": 300,
+  "unit": "m²",
+  "unitPrice": 0.18,
+  "totalPrice": 54.00
+}
+```
+
+---
+
+### Delete offer item
+
+```http
+DELETE /api/offers/{offerId}/items/{itemId}
+```
+
+Soft-deletes an existing offer item and recalculates the offer total value.
+
+The item is not physically removed from the database. Instead, it is marked as deleted and excluded from future offer item queries and total calculations.
+
+#### Server-side behavior
+
+* Loads the offer including existing offer items
+* Finds the active offer item by ID
+* Marks the item as soft-deleted
+* Sets the deletion timestamp
+* Recalculates the offer total value from all remaining active offer items
+
+#### Responses
+
+```http
+204 No Content
+404 Not Found
+500 Internal Server Error
+```
+
 
 ---
 
