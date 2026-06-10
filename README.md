@@ -29,12 +29,15 @@ The application is designed to support real business workflows such as customer 
 * Offer validation
 * Offer unit tests
 * Automatic offer number generation
+* Offer Item creation endpoint
+* Basic offer item price calculation
+* Automatic offer total recalculation
 
 ### Planned
 
 * Service Management
-* Offer Management
-* Offer Item Management
+* Full Offer Item Management
+* Advanced Pricing Calculator
 * Pricing Calculator
 * Order Management
 * Authentication & Authorization
@@ -42,6 +45,8 @@ The application is designed to support real business workflows such as customer 
 * GitHub Actions CI/CD
 * Azure Deployment
 * OpenAI Integration
+* Offer Item Management
+* Pricing Calculator
 
 ---
 
@@ -53,6 +58,19 @@ The application is designed to support real business workflows such as customer 
 * View customers
 * Update customers
 * Soft delete customers
+
+### Offer Management 
+* Create offers for existing customers
+* View offers
+* Update offer metadata and status
+* Soft delete offers
+* Automatic offer number generation
+
+### Offer Item Management
+* Add offer items to existing offers
+* Link offer items to offered services
+* Calculate item totals based on quantity and unit price
+* Recalculate offer totals from all active offer items
 
 ### Validation
 
@@ -103,7 +121,7 @@ Contains the core business entities and domain concepts.
 Examples:
 
 * Customer
-* Service
+* OfferedService
 * Offer
 * OfferItem
 * Order
@@ -212,6 +230,10 @@ POST   /api/offers
 PUT    /api/offers/{id}
 DELETE /api/offers/{id}
 ```
+### Offer Items
+```http
+POST /api/offers/{offerId}/items
+```
 ---
 
 ## Example Customer Request
@@ -230,7 +252,21 @@ DELETE /api/offers/{id}
   "notes": "Test customer"
 }
 ```
-
+## Example Offer Request
+```json
+{ 
+	"customerId": "00000000-0000-0000-0000-000000000000",
+	"validUntil": "2026-12-31T00:00:00Z",
+	"notes": "Test offer for garden maintenance."
+}
+```
+## Example Offer Item Request
+```json
+{
+  "offeredServiceId": "00000000-0000-0000-0000-000000000000",
+  "quantity": 10
+}
+```
 ---
 
 ## Running the Backend Locally
@@ -320,21 +356,26 @@ gartenzwerge-offer-management/
 * Service CRUD API
 
 ### v0.3.0 – Offer Management
-
 * Create offers
-* Add offer items
-* Calculate offer totals
 * Manage offer status
+* Automatic offer number generation
+* Unit tests
 
-### v0.4.0 – Pricing Calculator
+### v0.4.0 – Offer Item Management
 
-* Lawn mowing price calculation
+* Add offer items to existing offers
+* Calculate offer item totals
+* Recalculate offer totals
+* Connect offer items to offered services
+
+### v0.5.0 – Advanced Pricing Calculator
+
+* Lawn mowing price tiers
 * Hedge cutting price calculation
 * Green waste disposal calculation
 * Travel cost calculation
 
-### v0.5.0 – Order Management
-
+### v0.6.0 – Order Management
 * Convert accepted offers into orders
 * Manage order status
 * Complete or cancel orders
