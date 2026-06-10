@@ -353,7 +353,29 @@ Additional project documentation is available in the `docs` folder.
   Contains documentation about entities, relationships and database-related concepts.
 
 ---
+## Development Workflow
 
+This project follows a small-step development workflow.
+
+Before committing changes:
+
+- Make sure the project builds successfully
+- Run the relevant tests
+- Test changed API endpoints through Swagger when applicable
+- Keep commits small and focused
+
+### Commit Message Convention
+
+Commit messages follow the Conventional Commits style:
+
+```text
+feat: add new user-visible functionality
+fix: fix a bug or incorrect behavior
+refactor: improve internal code structure without changing behavior
+docs: update documentation
+test: add or update tests
+chore: update tooling, configuration or maintenance tasks
+```
 ## Development Roadmap
 
 ### v0.1.0 – Customer Management Foundation
