@@ -1,6 +1,7 @@
 using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Application.Offers.DTOs;
 using Gartenzwerge.Application.Offers.Interfaces;
+using Gartenzwerge.Application.Common.Exceptions;
 using Gartenzwerge.Domain.Entities;
 using Gartenzwerge.Domain.Enums;
 
@@ -31,7 +32,7 @@ public class OfferService : IOfferService
 
         if (customer is null)
         {
-            throw new InvalidOperationException("Customer does not exist.");
+            throw new NotFoundException("Customer was not found.");
         }
 
         var offer = new Offer

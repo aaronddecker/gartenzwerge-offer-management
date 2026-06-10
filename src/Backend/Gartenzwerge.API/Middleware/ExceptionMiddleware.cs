@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Gartenzwerge.Application.Common.Exceptions;
 
 namespace Gartenzwerge.API.Middleware;
 
@@ -41,22 +42,35 @@ public class ExceptionMiddleware
                 exception,
                 "An unhandled exception occurred while processing the request.");
 
-            await HandleExceptionAsync(context);
+            await HandleExceptionAsync(context, exception);
         }
     }
 
     /// <summary>
-    /// Writes a standardized error response.
+    /// Writes an error response.
     /// </summary>
-    private static async Task HandleExceptionAsync(HttpContext context)
+    private static async Task HandleExceptionAsync(
+    HttpContext context,
+    Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        context.Response.StatusCode = exception switch
+        {
+            NotFoundException => (int)HttpStatusCode.NotFound,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
+
+        var message = exception switch
+        {
+            NotFoundException => exception.Message,
+            _ => "An unexpected error occurred."
+        };
 
         var response = new
         {
             statusCode = context.Response.StatusCode,
-            message = "An unexpected error occurred.",
+            message = message,
             traceId = context.TraceIdentifier
         };
 
