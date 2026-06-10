@@ -3,6 +3,7 @@ using Gartenzwerge.Application.Customers.DTOs;
 using Gartenzwerge.Application.Customers.Services;
 using Gartenzwerge.Application.Offers.DTOs;
 using Gartenzwerge.Application.Offers.Services;
+using Gartenzwerge.Application.Common.Exceptions;
 using Gartenzwerge.Domain.Enums;
 using Gartenzwerge.UnitTests.Customers;
 
@@ -78,8 +79,8 @@ public class OfferServiceTests
 
         // Assert
         await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage("Customer does not exist.");
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Customer was not found.");
     }
 
     [Fact]
