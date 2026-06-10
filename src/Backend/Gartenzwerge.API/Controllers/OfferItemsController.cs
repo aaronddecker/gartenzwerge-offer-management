@@ -61,4 +61,15 @@ public class OfferItemsController : ControllerBase
 
         return Ok(updatedItem);
     }
+
+    // DELETE /api/offers/{offerId}/items/{itemId}
+    [HttpDelete("{itemId:guid}")]
+    public async Task<IActionResult> DeleteItem(
+    Guid offerId,
+    Guid itemId)
+    {
+        await _offerItemService.DeleteItemAsync(offerId, itemId);
+
+        return NoContent();
+    }
 }

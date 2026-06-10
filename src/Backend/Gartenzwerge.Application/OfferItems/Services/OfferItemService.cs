@@ -145,4 +145,30 @@ public class OfferItemService : IOfferItemService
             TotalPrice = item.TotalPrice
         };
     }
+
+    public async Task DeleteItemAsync(Guid offerId, Guid itemId)
+    {
+        var offer = await _offerRepository.GetByIdWithItemsAsync(offerId);
+
+        if (offer is null)
+        {
+            throw new NotFoundException("Offer was not found.");
+        }
+
+        var item = offer.Items.FirstOrDefault(x => x.Id == itemId && !x.IsDeleted);
+
+        if (item is null)
+        {
+            throw new NotFoundException("Offer item was not found.");
+        }
+
+        item.IsDeleted = true;
+        item.DeletedAt = DateTime.UtcNow;
+
+        offer.TotalNet = offer.Items
+            .Where(x => !x.IsDeleted)
+            .Sum(x => x.TotalPrice);
+
+        await _offerRepository.UpdateAsync(offer);
+    }
 }

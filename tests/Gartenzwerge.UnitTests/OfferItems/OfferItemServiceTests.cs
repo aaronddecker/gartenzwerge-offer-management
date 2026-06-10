@@ -198,6 +198,72 @@ public class OfferItemServiceTests
             .WithMessage("Offer item was not found.");
     }
 
+    [Fact]
+    public async Task DeleteItemAsync_ShouldSoftDeleteOfferItemAndRecalculateTotalNet_WhenOfferItemExists()
+    {
+        // Arrange
+        var context = CreateTestContext();
+
+        var offer = await CreateOfferAsync(context.OfferRepository);
+        var offeredService = await CreateOfferedServiceAsync(context.OfferedServiceRepository);
+
+        var createdItem = await context.Service.AddItemAsync(offer.Id, new CreateOfferItemRequest
+        {
+            OfferedServiceId = offeredService.Id,
+            Quantity = 250
+        });
+
+        createdItem.Should().NotBeNull();
+
+        // Act
+        await context.Service.DeleteItemAsync(offer.Id, createdItem!.Id);
+
+        // Assert
+        offer.Items.Should().ContainSingle();
+
+        var deletedItem = offer.Items.Single();
+
+        deletedItem.IsDeleted.Should().BeTrue();
+        deletedItem.DeletedAt.Should().NotBeNull();
+        offer.TotalNet.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_ShouldThrowNotFoundException_WhenOfferDoesNotExist()
+    {
+        // Arrange
+        var context = CreateTestContext();
+
+        // Act
+        var act = async () => await context.Service.DeleteItemAsync(
+            Guid.NewGuid(),
+            Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Offer was not found.");
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_ShouldThrowNotFoundException_WhenOfferItemDoesNotExist()
+    {
+        // Arrange
+        var context = CreateTestContext();
+
+        var offer = await CreateOfferAsync(context.OfferRepository);
+
+        // Act
+        var act = async () => await context.Service.DeleteItemAsync(
+            offer.Id,
+            Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Offer item was not found.");
+    }
+
     private static Task<Offer> CreateOfferAsync(FakeOfferRepository repository)
     {
         return repository.AddAsync(new Offer

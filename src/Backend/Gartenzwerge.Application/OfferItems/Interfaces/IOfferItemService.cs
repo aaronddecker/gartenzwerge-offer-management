@@ -19,4 +19,6 @@ public interface IOfferItemService
     Guid offerId,
     Guid itemId,
     UpdateOfferItemRequest request);
+
+    Task DeleteItemAsync(Guid offerId, Guid itemId);
 }
