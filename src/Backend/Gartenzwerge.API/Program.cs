@@ -53,6 +53,9 @@ builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
 // Register Offer services.
 builder.Services.AddScoped<IOfferService, OfferService>();
 
+// Register OfferItem services
+builder.Services.AddScoped<IOfferItemService, OfferItemService>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
