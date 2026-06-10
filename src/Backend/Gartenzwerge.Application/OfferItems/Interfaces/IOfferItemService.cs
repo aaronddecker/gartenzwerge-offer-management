@@ -14,4 +14,9 @@ public interface IOfferItemService
     Task<OfferItemDto?> AddItemAsync(Guid offerId, CreateOfferItemRequest request);
 
     Task<IReadOnlyList<OfferItemDto>> GetItemsByOfferIdAsync(Guid offerId);
+
+    Task<OfferItemDto> UpdateItemAsync(
+    Guid offerId,
+    Guid itemId,
+    UpdateOfferItemRequest request);
 }

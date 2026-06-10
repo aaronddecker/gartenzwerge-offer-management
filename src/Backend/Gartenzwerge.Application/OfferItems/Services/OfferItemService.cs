@@ -103,4 +103,46 @@ public class OfferItemService : IOfferItemService
         })
         .ToList();
     }
+
+    // Updates the quantity of an existing offer item and recalculates prices accordingly.
+    public async Task<OfferItemDto> UpdateItemAsync(
+    Guid offerId,
+    Guid itemId,
+    UpdateOfferItemRequest request)
+    {
+        var offer = await _offerRepository.GetByIdWithItemsAsync(offerId);
+
+        if (offer is null)
+        {
+            throw new NotFoundException("Offer was not found.");
+        }
+
+        var item = offer.Items.FirstOrDefault(x => x.Id == itemId && !x.IsDeleted);
+
+        if (item is null)
+        {
+            throw new NotFoundException("Offer item was not found.");
+        }
+
+        item.Quantity = request.Quantity;
+        item.TotalPrice = item.Quantity * item.UnitPrice;
+
+        offer.TotalNet = offer.Items
+            .Where(x => !x.IsDeleted)
+            .Sum(x => x.TotalPrice);
+
+        await _offerRepository.UpdateAsync(offer);
+
+        return new OfferItemDto
+        {
+            Id = item.Id,
+            OfferId = item.OfferId,
+            OfferedServiceId = item.OfferedServiceId,
+            Description = item.Description,
+            Quantity = item.Quantity,
+            Unit = item.OfferedService?.Unit ?? string.Empty,
+            UnitPrice = item.UnitPrice,
+            TotalPrice = item.TotalPrice
+        };
+    }
 }

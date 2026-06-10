@@ -46,4 +46,19 @@ public class OfferItemsController : ControllerBase
 
         return Ok(items);
     }
+
+    // PUT /api/offers/{offerId}/items/{itemId}
+    [HttpPut("{itemId:guid}")]
+    public async Task<ActionResult<OfferItemDto>> UpdateItem(
+    Guid offerId,
+    Guid itemId,
+    UpdateOfferItemRequest request)
+    {
+        var updatedItem = await _offerItemService.UpdateItemAsync(
+            offerId,
+            itemId,
+            request);
+
+        return Ok(updatedItem);
+    }
 }
