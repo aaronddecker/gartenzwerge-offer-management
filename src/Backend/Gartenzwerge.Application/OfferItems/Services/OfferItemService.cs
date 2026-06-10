@@ -2,6 +2,7 @@ using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Gartenzwerge.Application.Offers.Interfaces;
 using Gartenzwerge.Application.OfferItems.DTOs;
 using Gartenzwerge.Application.OfferItems.Interfaces;
+using Gartenzwerge.Application.Common.Exceptions;
 using Gartenzwerge.Domain.Entities;
 
 namespace Gartenzwerge.Application.OfferItems.Services;
@@ -31,14 +32,14 @@ public class OfferItemService : IOfferItemService
 
         if (offer is null)
         {
-            return null;
+            throw new NotFoundException("Offer was not found.");
         }
 
         var offeredService = await _offeredServiceRepository.GetByIdAsync(request.OfferedServiceId);
 
         if (offeredService is null)
         {
-            return null;
+            throw new NotFoundException("Offered service was not found.");
         }
 
         var unitPrice = offeredService.BasePrice;
