@@ -20,6 +20,7 @@ public class OfferItemsController : ControllerBase
         _offerItemService = offerItemService;
     }
 
+    // POST /api/offers/{offerId}/items
     [HttpPost]
     public async Task<ActionResult<OfferItemDto>> AddItem(
     Guid offerId,
@@ -35,5 +36,14 @@ public class OfferItemsController : ControllerBase
         return Created(
             $"/api/offers/{offerId}/items/{offerItem.Id}",
             offerItem);
+    }
+
+    // GET /api/offers/{offerId}/items
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<OfferItemDto>>> GetItems(Guid offerId)
+    {
+        var items = await _offerItemService.GetItemsByOfferIdAsync(offerId);
+
+        return Ok(items);
     }
 }

@@ -133,4 +133,50 @@ public class OfferItemServiceTests
             .ThrowAsync<NotFoundException>()
             .WithMessage("Offered service was not found.");
     }
+
+    // Test: Retrieving offer items by offer ID should return the correct items when the offer exists
+    [Fact]
+    public async Task GetItemsByOfferIdAsync_ShouldReturnItems_WhenOfferExists()
+    {
+        // Arrange
+        var offerRepository = new FakeOfferRepository();
+        var offeredServiceRepository = new FakeOfferedServiceRepository();
+
+        var offer = await offerRepository.AddAsync(new Offer
+        {
+            CustomerId = Guid.NewGuid(),
+            OfferNumber = "O-TEST-001",
+            ValidUntil = DateTime.UtcNow.AddDays(14)
+        });
+
+        var offeredService = await offeredServiceRepository.AddAsync(new OfferedService
+        {
+            Name = "Rasen mähen",
+            Description = "Mowing lawn areas based on square meters.",
+            Unit = "m²",
+            BasePrice = 0.18m,
+            IsActive = true
+        });
+
+        var service = new OfferItemService(
+            offerRepository,
+            offeredServiceRepository);
+
+        await service.AddItemAsync(offer.Id, new CreateOfferItemRequest
+        {
+            OfferedServiceId = offeredService.Id,
+            Quantity = 250
+        });
+
+        // Act
+        var result = await service.GetItemsByOfferIdAsync(offer.Id);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result[0].Description.Should().Be("Rasen mähen");
+        result[0].Quantity.Should().Be(250);
+        result[0].Unit.Should().Be("m²");
+        result[0].UnitPrice.Should().Be(0.18m);
+        result[0].TotalPrice.Should().Be(45.00m);
+    }
 }

@@ -12,4 +12,6 @@ namespace Gartenzwerge.Application.OfferItems.Interfaces;
 public interface IOfferItemService
 {
     Task<OfferItemDto?> AddItemAsync(Guid offerId, CreateOfferItemRequest request);
+
+    Task<IReadOnlyList<OfferItemDto>> GetItemsByOfferIdAsync(Guid offerId);
 }

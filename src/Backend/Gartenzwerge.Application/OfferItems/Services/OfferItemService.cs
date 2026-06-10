@@ -50,6 +50,7 @@ public class OfferItemService : IOfferItemService
         {
             OfferId = offer.Id,
             OfferedServiceId = offeredService.Id,
+            OfferedService = offeredService,
             Description = description,
             Quantity = request.Quantity,
             UnitPrice = unitPrice,
@@ -75,5 +76,31 @@ public class OfferItemService : IOfferItemService
             UnitPrice = offerItem.UnitPrice,
             TotalPrice = offerItem.TotalPrice
         };
+    }
+
+    // Retrieves all non-deleted offer items for a given offer.
+    public async Task<IReadOnlyList<OfferItemDto>> GetItemsByOfferIdAsync(Guid offerId)
+    {
+        var offer = await _offerRepository.GetByIdWithItemsAsync(offerId);
+
+        if (offer is null)
+        {
+            throw new NotFoundException("Offer was not found.");
+        }
+
+        return offer.Items
+        .Where(x => !x.IsDeleted)
+        .Select(x => new OfferItemDto
+        {
+            Id = x.Id,
+            OfferId = x.OfferId,
+            OfferedServiceId = x.OfferedServiceId,
+            Description = x.Description,
+            Quantity = x.Quantity,
+            Unit = x.OfferedService?.Unit ?? string.Empty,
+            UnitPrice = x.UnitPrice,
+            TotalPrice = x.TotalPrice
+        })
+        .ToList();
     }
 }
