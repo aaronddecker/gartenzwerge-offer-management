@@ -590,6 +590,7 @@ The item is not physically removed from the database. Instead, it is marked as d
 
 
 ---
+
 ## Orders
 
 Order endpoints are used to create and manage customer orders.
@@ -693,6 +694,7 @@ PUT /api/orders/{id}
 
 Updates an existing order.
 
+
 #### Request body
 
 ```json
@@ -735,6 +737,33 @@ Updates an existing order.
 }
 ```
 
+---
+
+### Delete order
+
+```http
+DELETE /api/orders/{id}
+```
+
+Soft-deletes an existing order.
+
+The order is not physically removed from the database. Instead, it is marked as deleted and excluded from future order queries.
+
+#### Server-side behavior
+
+* Loads the order by ID
+* Verifies that the order exists
+* Marks the order as soft-deleted
+* Sets the deletion timestamp
+* Persists the updated order state
+
+#### Responses
+
+```http
+204 No Content
+404 Not Found
+500 Internal Server Error
+```
 ---
 
 ## Current Limitations

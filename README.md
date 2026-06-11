@@ -83,6 +83,7 @@ The application is designed to support real business workflows such as customer 
 * View all orders
 * View a single order by id
 * Update order status, planned date and notes
+* Soft delete orders
 * Automatically set `completedAt` when an order is completed
 * Clear `completedAt` when an order is reopened
 
@@ -264,6 +265,7 @@ GET    /api/orders
 GET    /api/orders/{id}
 POST   /api/offers/{offerId}/order
 PUT    /api/orders/{id}
+DELETE /api/orders/{id}
 ```
 
 ---
@@ -284,6 +286,7 @@ PUT    /api/orders/{id}
   "notes": "Test customer"
 }
 ```
+
 ## Example Offer Request
 ```json
 { 
@@ -292,6 +295,7 @@ PUT    /api/orders/{id}
 	"notes": "Test offer for garden maintenance."
 }
 ```
+
 ## Example Offer Item Request
 ```json
 {
@@ -385,6 +389,7 @@ Additional project documentation is available in the `docs` folder.
   Contains documentation about entities, relationships and database-related concepts.
 
 ---
+
 ## Development Workflow
 
 This project follows a small-step development workflow.
@@ -408,6 +413,7 @@ docs: update documentation
 test: add or update tests
 chore: update tooling, configuration or maintenance tasks
 ```
+
 ## Development Roadmap
 
 ### v0.1.0 – Customer Management Foundation
