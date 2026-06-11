@@ -379,8 +379,9 @@ Additional project documentation is available in the `docs` folder.
 - [API Endpoints](docs/api/endpoints.md)  
   Documents the available REST API endpoints, request bodies, response codes and example payloads.
 
-- [Add Offer Item Flow](docs/business-processes/add-offer-item-flow.md)  
-  Explains the business and technical flow for adding an offer item to an existing offer, including price calculation and offer total recalculation.
+- [Business Process Documentation](docs/business-processes/)  
+  Contains documentation about important business workflows, such as adding offer items, creating orders from accepted offers and other process-specific application flows.
+
 
 - [Architecture Documentation](docs/architecture/)  
   Contains documentation about Clean Architecture, request flow and architectural decisions.
