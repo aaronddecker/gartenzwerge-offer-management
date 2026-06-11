@@ -28,11 +28,6 @@ public class OfferItemsController : ControllerBase
     {
         var offerItem = await _offerItemService.AddItemAsync(offerId, request);
 
-        if (offerItem is null)
-        {
-            return NotFound();
-        }
-
         return Created(
             $"/api/offers/{offerId}/items/{offerItem.Id}",
             offerItem);

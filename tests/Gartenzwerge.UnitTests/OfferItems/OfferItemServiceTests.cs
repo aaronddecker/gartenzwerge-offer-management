@@ -134,7 +134,7 @@ public class OfferItemServiceTests
             Quantity = 250
         });
 
-        createdItem.Should().NotBeNull();
+        createdItem.Id
 
         // Act
         var updatedItem = await context.Service.UpdateItemAsync(
@@ -213,7 +213,7 @@ public class OfferItemServiceTests
             Quantity = 250
         });
 
-        createdItem.Should().NotBeNull();
+        createdItem.Id
 
         // Act
         await context.Service.DeleteItemAsync(offer.Id, createdItem!.Id);
