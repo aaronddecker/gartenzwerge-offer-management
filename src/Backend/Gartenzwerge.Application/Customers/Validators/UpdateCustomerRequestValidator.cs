@@ -36,5 +36,14 @@ public class UpdateCustomerRequestValidator : AbstractValidator<UpdateCustomerRe
 
         RuleFor(x => x.Notes)
             .MaximumLength(1000);
+
+        RuleFor(x => x.Company)
+            .MaximumLength(150);
+
+        RuleFor(x => x.Street)
+            .MaximumLength(150);
+
+        RuleFor(x => x.HouseNumber)
+            .MaximumLength(20);
     }
 }

@@ -11,7 +11,7 @@ public class UpdateOfferRequestValidator : AbstractValidator<UpdateOfferRequest>
     public UpdateOfferRequestValidator()
     {
         RuleFor(x => x.ValidUntil)
-            .GreaterThan(DateTime.UtcNow)
+            .Must(validUntil => validUntil > DateTime.UtcNow)
             .WithMessage("The offer validity date must be in the future.");
 
         RuleFor(x => x.Status)
