@@ -58,12 +58,14 @@ public class ExceptionMiddleware
         context.Response.StatusCode = exception switch
         {
             NotFoundException => (int)HttpStatusCode.NotFound,
+            ConflictException => (int)HttpStatusCode.Conflict,
             _ => (int)HttpStatusCode.InternalServerError
         };
 
         var message = exception switch
         {
             NotFoundException => exception.Message,
+            ConflictException => exception.Message,
             _ => "An unexpected error occurred."
         };
 

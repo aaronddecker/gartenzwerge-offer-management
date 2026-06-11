@@ -1,5 +1,6 @@
-namespace Gartenzwerge.Application.Common.Exceptions;
+using Gartenzwerge.Application.Common.Exceptions;
 
+namespace Gartenzwerge.Application.Common.Exceptions;
 /// <summary>
 /// Represents an application-level error when a requested resource could not be found.
 /// </summary>

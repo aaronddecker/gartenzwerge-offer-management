@@ -1,8 +1,9 @@
 using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
+using Gartenzwerge.Application.Offers.Interfaces;
+using Gartenzwerge.Application.Orders.Interfaces;
 using Gartenzwerge.Infrastructure.Persistence;
 using Gartenzwerge.Infrastructure.Repositories;
-using Gartenzwerge.Application.Offers.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IOfferedServiceRepository, OfferedServiceRepository>();
         services.AddScoped<IOfferRepository, OfferRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         return services;
     }
