@@ -14,4 +14,6 @@ public interface IOrderService
     Task<OrderDto> GetByIdAsync(Guid id);
 
     Task<OrderDto> UpdateAsync(Guid id, UpdateOrderRequest request);
+
+    Task DeleteAsync(Guid id);
 }

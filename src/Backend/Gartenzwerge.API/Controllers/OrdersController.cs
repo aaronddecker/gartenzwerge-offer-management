@@ -57,4 +57,13 @@ public class OrdersController : ControllerBase
 
         return Ok(updatedOrder);
     }
+
+    // DELETE /api/orders/{id}
+    [HttpDelete("orders/{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _orderService.DeleteAsync(id);
+
+        return NoContent();
+    }
 }

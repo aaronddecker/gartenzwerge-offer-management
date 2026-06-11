@@ -260,7 +260,10 @@ DELETE /api/offers/{offerId}/items/{itemId}
 ### Orders
 
 ```http
+GET    /api/orders
+GET    /api/orders/{id}
 POST   /api/offers/{offerId}/order
+PUT    /api/orders/{id}
 ```
 
 ---

@@ -390,4 +390,52 @@ public class OrderServiceTests
             .ThrowAsync<NotFoundException>()
             .WithMessage("Order was not found.");
     }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldSoftDeleteOrder_WhenOrderExists()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var order = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.Planned,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Order to delete"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        // Act
+        await service.DeleteAsync(order.Id);
+
+        // Assert
+        order.IsDeleted.Should().BeTrue();
+        order.DeletedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        // Act
+        var act = async () => await service.DeleteAsync(Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Order was not found.");
+    }
 }

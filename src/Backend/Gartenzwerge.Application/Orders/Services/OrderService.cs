@@ -121,4 +121,19 @@ public class OrderService : IOrderService
             Notes = order.Notes
         };
     }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+
+        if (order is null)
+        {
+            throw new NotFoundException("Order was not found.");
+        }
+
+        order.IsDeleted = true;
+        order.DeletedAt = DateTime.UtcNow;
+
+        await _orderRepository.UpdateAsync(order);
+    }
 }
