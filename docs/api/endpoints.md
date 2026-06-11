@@ -590,6 +590,78 @@ The item is not physically removed from the database. Instead, it is marked as d
 
 
 ---
+## Orders
+
+Order endpoints are used to create and manage customer orders.
+
+An order is created from an accepted offer.
+Each offer can only be converted into one order.
+
+---
+
+### Create order from offer
+
+```http
+POST /api/offers/{offerId}/order
+```
+
+Creates a new order from an existing accepted offer.
+
+#### Request body
+
+```json
+{
+  "plannedDate": "2026-08-01T09:00:00Z",
+  "notes": "First order created from accepted offer."
+}
+```
+
+`plannedDate` is optional, but if provided, it must be in the future.
+
+#### Server-side behavior
+
+* Loads the offer by ID
+* Verifies that the offer exists
+* Verifies that the offer status is `Accepted`
+* Checks that no order already exists for the offer
+* Creates a new order with status `Planned`
+* Copies the `OfferId` and `CustomerId` from the offer
+* Stores the optional planned date and notes
+
+#### Responses
+
+```http
+201 Created
+400 Bad Request
+404 Not Found
+409 Conflict
+500 Internal Server Error
+```
+
+#### Conflict cases
+
+```text
+Only accepted offers can be converted into orders.
+```
+
+```text
+An order already exists for this offer.
+```
+
+#### Example response
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "offerId": "00000000-0000-0000-0000-000000000000",
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "status": 1,
+  "plannedDate": "2026-08-01T09:00:00Z",
+  "completedAt": null,
+  "notes": "First order created from accepted offer."
+}
+```
+---
 
 ## Current Limitations
 
@@ -607,7 +679,6 @@ Not implemented yet:
 
 * Advanced pricing rules
 * Tiered pricing
-* Creating orders from accepted offers
 * Authentication and authorization
 * User roles and permissions
 * PDF generation for offers
