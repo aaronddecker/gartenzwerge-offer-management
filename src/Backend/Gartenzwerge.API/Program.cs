@@ -9,6 +9,7 @@ using Gartenzwerge.Application.Offers.Services;
 using Gartenzwerge.Application.Offers.Validators;
 using Gartenzwerge.Application.OfferItems.Interfaces;
 using Gartenzwerge.Application.OfferItems.Services;
+using Gartenzwerge.Application.OfferItems.Validators;
 using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -40,6 +41,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferedServiceRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferItemRequestValidator>();
 
 // Register Customer services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
