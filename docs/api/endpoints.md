@@ -25,6 +25,42 @@ If a request contains invalid input, the API returns:
 ```http
 400 Bad Request
 ```
+
+Typical validation rules include:
+
+* Required fields must not be empty
+* IDs must not be `00000000-0000-0000-0000-000000000000`
+* Quantities must be greater than `0`
+* Prices must not be negative
+* Validity dates such as `validUntil` must be in the future
+* Email fields must contain a valid email address if provided
+* Text fields must not exceed their configured maximum length
+
+Example invalid request:
+
+```json
+{
+  "firstName": "",
+  "lastName": "Mustermann",
+  "email": "not-an-email"
+}
+```
+
+Example response:
+
+```json
+{
+  "errors": {
+    "FirstName": [
+      "'First Name' must not be empty."
+    ],
+    "Email": [
+      "'Email' is not a valid email address."
+    ]
+  }
+}
+```
+
 ---
 
 ## Customers
@@ -557,13 +593,22 @@ The item is not physically removed from the database. Instead, it is marked as d
 
 ## Current Limitations
 
-The current API already supports adding offer items, but full offer item management is not implemented yet.
+The current API supports customer management, offered service management, offer management and basic offer item management.
+
+Implemented offer item features:
+
+* Add offer items to offers
+* Get offer items by offer
+* Update offer item quantities
+* Soft-delete offer items
+* Recalculate offer totals after item changes
 
 Not implemented yet:
 
-* Get offer items by offer
-* Update offer items
-* Delete offer items
 * Advanced pricing rules
 * Tiered pricing
+* Creating orders from accepted offers
 * Authentication and authorization
+* User roles and permissions
+* PDF generation for offers
+
