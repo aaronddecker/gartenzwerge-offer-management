@@ -16,6 +16,17 @@ http://localhost:5041/swagger
 
 ---
 
+## Validation
+
+Incoming API requests are validated automatically using FluentValidation.
+
+If a request contains invalid input, the API returns:
+
+```http
+400 Bad Request
+```
+---
+
 ## Customers
 
 Customer endpoints are used to manage customer master data.
