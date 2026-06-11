@@ -148,4 +148,246 @@ public class OrderServiceTests
             .ThrowAsync<ConflictException>()
             .WithMessage("An order already exists for this offer.");
     }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnAllOrders()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var firstOrder = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.Planned,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "First test order"
+        });
+
+        var secondOrder = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.InProgress,
+            PlannedDate = DateTime.UtcNow.AddDays(14),
+            Notes = "Second test order"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        // Act
+        var result = await service.GetAllAsync();
+
+        // Assert
+        result.Should().HaveCount(2);
+
+        result.Should().Contain(x => x.Id == firstOrder.Id);
+        result.Should().Contain(x => x.Id == secondOrder.Id);
+
+        result.Should().Contain(x => x.Status == OrderStatus.Planned);
+        result.Should().Contain(x => x.Status == OrderStatus.InProgress);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnOrder_WhenOrderExists()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var order = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.Planned,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Test order"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        // Act
+        var result = await service.GetByIdAsync(order.Id);
+
+        // Assert
+        result.Id.Should().Be(order.Id);
+        result.OfferId.Should().Be(order.OfferId);
+        result.CustomerId.Should().Be(order.CustomerId);
+        result.Status.Should().Be(order.Status);
+        result.PlannedDate.Should().Be(order.PlannedDate);
+        result.Notes.Should().Be(order.Notes);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        // Act
+        var act = async () => await service.GetByIdAsync(Guid.NewGuid());
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Order was not found.");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateOrder_WhenOrderExists()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var order = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.Planned,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Initial notes"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        var request = new UpdateOrderRequest
+        {
+            Status = OrderStatus.InProgress,
+            PlannedDate = DateTime.UtcNow.AddDays(14),
+            Notes = "Updated notes"
+        };
+
+        // Act
+        var result = await service.UpdateAsync(order.Id, request);
+
+        // Assert
+        result.Id.Should().Be(order.Id);
+        result.Status.Should().Be(OrderStatus.InProgress);
+        result.PlannedDate.Should().Be(request.PlannedDate);
+        result.Notes.Should().Be("Updated notes");
+        result.CompletedAt.Should().BeNull();
+
+        order.Status.Should().Be(OrderStatus.InProgress);
+        order.PlannedDate.Should().Be(request.PlannedDate);
+        order.Notes.Should().Be("Updated notes");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldSetCompletedAt_WhenStatusIsCompleted()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var order = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.InProgress,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Order in progress"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        var request = new UpdateOrderRequest
+        {
+            Status = OrderStatus.Completed,
+            PlannedDate = order.PlannedDate,
+            Notes = "Order completed"
+        };
+
+        // Act
+        var result = await service.UpdateAsync(order.Id, request);
+
+        // Assert
+        result.Status.Should().Be(OrderStatus.Completed);
+        result.CompletedAt.Should().NotBeNull();
+
+        order.Status.Should().Be(OrderStatus.Completed);
+        order.CompletedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldClearCompletedAt_WhenStatusIsNotCompleted()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var order = await orderRepository.AddAsync(new Order
+        {
+            OfferId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            Status = OrderStatus.Completed,
+            CompletedAt = DateTime.UtcNow.AddDays(-1),
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Completed order"
+        });
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        var request = new UpdateOrderRequest
+        {
+            Status = OrderStatus.InProgress,
+            PlannedDate = order.PlannedDate,
+            Notes = "Order reopened"
+        };
+
+        // Act
+        var result = await service.UpdateAsync(order.Id, request);
+
+        // Assert
+        result.Status.Should().Be(OrderStatus.InProgress);
+        result.CompletedAt.Should().BeNull();
+
+        order.Status.Should().Be(OrderStatus.InProgress);
+        order.CompletedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
+    {
+        // Arrange
+        var orderRepository = new FakeOrderRepository();
+        var offerRepository = new FakeOfferRepository();
+
+        var service = new OrderService(
+            orderRepository,
+            offerRepository);
+
+        var request = new UpdateOrderRequest
+        {
+            Status = OrderStatus.InProgress,
+            PlannedDate = DateTime.UtcNow.AddDays(7),
+            Notes = "Trying to update a non-existing order"
+        };
+
+        // Act
+        var act = async () => await service.UpdateAsync(
+            Guid.NewGuid(),
+            request);
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage("Order was not found.");
+    }
 }

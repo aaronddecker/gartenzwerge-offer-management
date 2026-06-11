@@ -56,15 +56,69 @@ public class OrderService : IOrderService
 
         var createdOrder = await _orderRepository.AddAsync(order);
 
+        return MapToDto(createdOrder);
+    }
+
+    public async Task<IReadOnlyList<OrderDto>> GetAllAsync()
+    {
+        var orders = await _orderRepository.GetAllAsync();
+
+        return orders
+            .Select(MapToDto)
+            .ToList();
+    }
+
+    public async Task<OrderDto> GetByIdAsync(Guid id)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+
+        if (order is null)
+        {
+            throw new NotFoundException("Order was not found.");
+        }
+
+        return MapToDto(order);
+    }
+
+    public async Task<OrderDto> UpdateAsync(Guid id, UpdateOrderRequest request)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+
+        if (order is null)
+        {
+            throw new NotFoundException("Order was not found.");
+        }
+
+        order.Status = request.Status;
+        order.PlannedDate = request.PlannedDate;
+        order.Notes = request.Notes;
+
+        if (request.Status == OrderStatus.Completed && order.CompletedAt is null)
+        {
+            order.CompletedAt = DateTime.UtcNow;
+        }
+
+        if (request.Status != OrderStatus.Completed)
+        {
+            order.CompletedAt = null;
+        }
+
+        await _orderRepository.UpdateAsync(order);
+
+        return MapToDto(order);
+    }
+
+    private static OrderDto MapToDto(Order order)
+    {
         return new OrderDto
         {
-            Id = createdOrder.Id,
-            OfferId = createdOrder.OfferId,
-            CustomerId = createdOrder.CustomerId,
-            Status = createdOrder.Status,
-            PlannedDate = createdOrder.PlannedDate,
-            CompletedAt = createdOrder.CompletedAt,
-            Notes = createdOrder.Notes
+            Id = order.Id,
+            OfferId = order.OfferId,
+            CustomerId = order.CustomerId,
+            Status = order.Status,
+            PlannedDate = order.PlannedDate,
+            CompletedAt = order.CompletedAt,
+            Notes = order.Notes
         };
     }
 }
