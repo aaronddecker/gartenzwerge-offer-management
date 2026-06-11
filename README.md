@@ -11,42 +11,41 @@ The application is designed to support real business workflows such as customer 
 🚧 Active Development
 
 ### Completed
-
-* Customer CRUD API
-* PostgreSQL integration
-* Entity Framework Core persistence
-* Repository Pattern
-* Service Layer
-* FluentValidation request validation
-* Global exception handling
-* Serilog logging
-* Unit tests
-* Swagger/OpenAPI documentation
-* Offered Service CRUD API
-* Offered Service validation
-* Offered Service unit tests
-* Offer CRUD API
-* Offer validation
-* Offer unit tests
-* Automatic offer number generation
-* Offer Item creation endpoint
-* Basic offer item price calculation
-* Automatic offer total recalculation
+- Customer CRUD API
+- Offered Service CRUD API
+- Offer CRUD API
+- Offer Item Management
+	- Add offer items
+	- Get offer items by offer
+	- Update offer item quantities
+	- Soft delete offer items
+	- Automatic item total calculation
+	- Automatic offer total recalculation
+- Create orders from accepted offers
+- Order Management Foundation
+- Create orders from accepted offers
+- View and update orders
+- PostgreSQL integration
+- Entity Framework Core persistence
+- Repository Pattern
+- Service Layer
+- FluentValidation request validation
+- Global exception handling
+- Serilog logging
+- Unit tests
+- Swagger/OpenAPI documentation
+- Docker Compose setup for local PostgreSQL
 
 ### Planned
 
-* Service Management
-* Full Offer Item Management
-* Advanced Pricing Calculator
-* Pricing Calculator
-* Order Management
-* Authentication & Authorization
-* Docker & Docker Compose
-* GitHub Actions CI/CD
-* Azure Deployment
-* OpenAI Integration
-* Offer Item Management
-* Pricing Calculator
+- Full Order Management
+	- Get orders
+- Advanced Pricing Calculator
+- Authentication & Authorization
+- GitHub Actions CI/CD
+- Azure Deployment
+- Frontend with React and TypeScript
+- OpenAI Integration
 
 ---
 
@@ -67,16 +66,36 @@ The application is designed to support real business workflows such as customer 
 * Automatic offer number generation
 
 ### Offer Item Management
+
 * Add offer items to existing offers
+* View offer items by offer
+* Update offer item quantities
+* Soft delete offer items
 * Link offer items to offered services
 * Calculate item totals based on quantity and unit price
 * Recalculate offer totals from all active offer items
+
+### Order Management
+
+* Create an order from an accepted offer
+* Prevent creating orders from non-accepted offers
+* Prevent duplicate orders for the same offer
+* View all orders
+* View a single order by id
+* Update order status, planned date and notes
+* Soft delete orders
+* Automatically set `completedAt` when an order is completed
+* Clear `completedAt` when an order is reopened
 
 ### Validation
 
 * Request validation using FluentValidation
 * Required field validation
+* Empty GUID validation
 * Email format validation
+* Quantity validation
+* Price validation
+* Future date validation
 * Maximum length validation
 
 ### Error Handling
@@ -231,9 +250,24 @@ PUT    /api/offers/{id}
 DELETE /api/offers/{id}
 ```
 ### Offer Items
+
 ```http
-POST /api/offers/{offerId}/items
+POST   /api/offers/{offerId}/items
+GET    /api/offers/{offerId}/items
+PUT    /api/offers/{offerId}/items/{itemId}
+DELETE /api/offers/{offerId}/items/{itemId}
 ```
+
+### Orders
+
+```http
+GET    /api/orders
+GET    /api/orders/{id}
+POST   /api/offers/{offerId}/order
+PUT    /api/orders/{id}
+DELETE /api/orders/{id}
+```
+
 ---
 
 ## Example Customer Request
@@ -252,6 +286,7 @@ POST /api/offers/{offerId}/items
   "notes": "Test customer"
 }
 ```
+
 ## Example Offer Request
 ```json
 { 
@@ -260,6 +295,7 @@ POST /api/offers/{offerId}/items
 	"notes": "Test offer for garden maintenance."
 }
 ```
+
 ## Example Offer Item Request
 ```json
 {
@@ -343,8 +379,9 @@ Additional project documentation is available in the `docs` folder.
 - [API Endpoints](docs/api/endpoints.md)  
   Documents the available REST API endpoints, request bodies, response codes and example payloads.
 
-- [Add Offer Item Flow](docs/buisness-processes/add-offer-item-flow.md)  
-  Explains the business and technical flow for adding an offer item to an existing offer, including price calculation and offer total recalculation.
+- [Business Process Documentation](docs/business-processes/)  
+  Contains documentation about important business workflows, such as adding offer items, creating orders from accepted offers and other process-specific application flows.
+
 
 - [Architecture Documentation](docs/architecture/)  
   Contains documentation about Clean Architecture, request flow and architectural decisions.
@@ -353,6 +390,7 @@ Additional project documentation is available in the `docs` folder.
   Contains documentation about entities, relationships and database-related concepts.
 
 ---
+
 ## Development Workflow
 
 This project follows a small-step development workflow.
@@ -376,6 +414,7 @@ docs: update documentation
 test: add or update tests
 chore: update tooling, configuration or maintenance tasks
 ```
+
 ## Development Roadmap
 
 ### v0.1.0 – Customer Management Foundation
@@ -406,17 +445,18 @@ chore: update tooling, configuration or maintenance tasks
 * Recalculate offer totals
 * Connect offer items to offered services
 
-### v0.5.0 – Advanced Pricing Calculator
+### v0.5.0 – Request Validation
 
 * Lawn mowing price tiers
 * Hedge cutting price calculation
 * Green waste disposal calculation
 * Travel cost calculation
 
-### v0.6.0 – Order Management
+### v0.6.0 – Order Management Foundation
 * Convert accepted offers into orders
-* Manage order status
-* Complete or cancel orders
+* Prevent duplicate orders
+* Add order validation
+* Unit tests
 
 ### v1.0.0 – Full Business Workflow
 

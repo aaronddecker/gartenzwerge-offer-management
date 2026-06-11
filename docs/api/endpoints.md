@@ -25,6 +25,42 @@ If a request contains invalid input, the API returns:
 ```http
 400 Bad Request
 ```
+
+Typical validation rules include:
+
+* Required fields must not be empty
+* IDs must not be `00000000-0000-0000-0000-000000000000`
+* Quantities must be greater than `0`
+* Prices must not be negative
+* Validity dates such as `validUntil` must be in the future
+* Email fields must contain a valid email address if provided
+* Text fields must not exceed their configured maximum length
+
+Example invalid request:
+
+```json
+{
+  "firstName": "",
+  "lastName": "Mustermann",
+  "email": "not-an-email"
+}
+```
+
+Example response:
+
+```json
+{
+  "errors": {
+    "FirstName": [
+      "'First Name' must not be empty."
+    ],
+    "Email": [
+      "'Email' is not a valid email address."
+    ]
+  }
+}
+```
+
 ---
 
 ## Customers
@@ -555,15 +591,198 @@ The item is not physically removed from the database. Instead, it is marked as d
 
 ---
 
+## Orders
+
+Order endpoints are used to create and manage customer orders.
+
+An order is created from an accepted offer.
+Each offer can only be converted into one order.
+
+---
+
+### Get all orders
+
+```http
+GET /api/orders
+```
+
+Returns all non-deleted orders.
+
+#### Responses
+
+```http
+200 OK
+500 Internal Server Error
+```
+
+---
+
+### Get order by id
+
+```http
+GET /api/orders/{id}
+```
+
+Returns a single order by id.
+
+#### Responses
+
+```http
+200 OK
+404 Not Found
+500 Internal Server Error
+```
+
+---
+
+### Create order from offer
+
+```http
+POST /api/offers/{offerId}/order
+```
+
+Creates a new order from an existing accepted offer.
+
+#### Request body
+
+```json
+{
+  "plannedDate": "2026-08-01T09:00:00Z",
+  "notes": "First order created from accepted offer."
+}
+```
+
+`plannedDate` is optional, but if provided, it must be in the future.
+
+#### Server-side behavior
+
+* Loads the offer by ID
+* Verifies that the offer exists
+* Verifies that the offer status is `Accepted`
+* Checks that no order already exists for the offer
+* Creates a new order with status `Planned`
+* Copies the `OfferId` and `CustomerId` from the offer
+* Stores the optional planned date and notes
+
+#### Responses
+
+```http
+201 Created
+400 Bad Request
+404 Not Found
+409 Conflict
+500 Internal Server Error
+```
+
+#### Conflict cases
+
+```text
+Only accepted offers can be converted into orders.
+```
+
+```text
+An order already exists for this offer.
+```
+
+---
+
+### Update order
+
+```http
+PUT /api/orders/{id}
+```
+
+Updates an existing order.
+
+
+#### Request body
+
+```json
+{
+  "status": 2,
+  "plannedDate": "2026-08-05T09:00:00Z",
+  "notes": "Order is now in progress."
+}
+```
+
+#### Server-side behavior
+
+* Loads the order by ID
+* Updates the order status
+* Updates the planned date
+* Updates the notes
+* Sets `completedAt` automatically when the status is `Completed`
+* Clears `completedAt` when the status is changed away from `Completed`
+
+#### Responses
+
+```http
+200 OK
+400 Bad Request
+404 Not Found
+500 Internal Server Error
+```
+
+#### Example response
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "offerId": "00000000-0000-0000-0000-000000000000",
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "status": 2,
+  "plannedDate": "2026-08-05T09:00:00Z",
+  "completedAt": null,
+  "notes": "Order is now in progress."
+}
+```
+
+---
+
+### Delete order
+
+```http
+DELETE /api/orders/{id}
+```
+
+Soft-deletes an existing order.
+
+The order is not physically removed from the database. Instead, it is marked as deleted and excluded from future order queries.
+
+#### Server-side behavior
+
+* Loads the order by ID
+* Verifies that the order exists
+* Marks the order as soft-deleted
+* Sets the deletion timestamp
+* Persists the updated order state
+
+#### Responses
+
+```http
+204 No Content
+404 Not Found
+500 Internal Server Error
+```
+---
+
 ## Current Limitations
 
-The current API already supports adding offer items, but full offer item management is not implemented yet.
+The current API supports customer management, offered service management, offer management and basic offer item management.
+
+Implemented offer item features:
+
+* Add offer items to offers
+* Get offer items by offer
+* Update offer item quantities
+* Soft-delete offer items
+* Recalculate offer totals after item changes
 
 Not implemented yet:
 
-* Get offer items by offer
-* Update offer items
-* Delete offer items
 * Advanced pricing rules
 * Tiered pricing
 * Authentication and authorization
+* User roles and permissions
+* PDF generation for offers
+

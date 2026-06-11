@@ -134,12 +134,11 @@ public class OfferItemServiceTests
             Quantity = 250
         });
 
-        createdItem.Should().NotBeNull();
 
         // Act
         var updatedItem = await context.Service.UpdateItemAsync(
             offer.Id,
-            createdItem!.Id,
+            createdItem.Id,
             new UpdateOfferItemRequest
             {
                 Quantity = 300
@@ -212,8 +211,6 @@ public class OfferItemServiceTests
             OfferedServiceId = offeredService.Id,
             Quantity = 250
         });
-
-        createdItem.Should().NotBeNull();
 
         // Act
         await context.Service.DeleteItemAsync(offer.Id, createdItem!.Id);

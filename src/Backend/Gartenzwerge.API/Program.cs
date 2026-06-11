@@ -3,13 +3,12 @@ using Gartenzwerge.Application.Customers.Services;
 using Gartenzwerge.Application.Customers.Validators;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Gartenzwerge.Application.OfferedServices.Services;
-using Gartenzwerge.Application.OfferedServices.Validators;
 using Gartenzwerge.Application.Offers.Interfaces;
 using Gartenzwerge.Application.Offers.Services;
-using Gartenzwerge.Application.Offers.Validators;
 using Gartenzwerge.Application.OfferItems.Interfaces;
 using Gartenzwerge.Application.OfferItems.Services;
-using Gartenzwerge.Application.OfferItems.Validators;
+using Gartenzwerge.Application.Orders.Interfaces;
+using Gartenzwerge.Application.Orders.Services;
 using Gartenzwerge.Infrastructure;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -39,24 +38,17 @@ builder.Services.AddAuthorization();
 // Register FluentValidation validators.
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferedServiceRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateOfferItemRequestValidator>();
 
-// Register Customer services.
+// Register application services.
+// Register application services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
+builder.Services.AddScoped<IOfferService, OfferService>();
+builder.Services.AddScoped<IOfferItemService, OfferItemService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Register infrastructure services such as EF Core and repositories.
 builder.Services.AddInfrastructure(builder.Configuration);
-
-// Register OfferedService services.
-builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
-
-// Register Offer services.
-builder.Services.AddScoped<IOfferService, OfferService>();
-
-// Register OfferItem services
-builder.Services.AddScoped<IOfferItemService, OfferItemService>();
 
 var app = builder.Build();
 

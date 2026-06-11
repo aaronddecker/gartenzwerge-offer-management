@@ -26,7 +26,7 @@ public class OfferItemService : IOfferItemService
         _offeredServiceRepository = offeredServiceRepository;
     }
 
-    public async Task<OfferItemDto?> AddItemAsync(Guid offerId, CreateOfferItemRequest request)
+    public async Task<OfferItemDto> AddItemAsync(Guid offerId, CreateOfferItemRequest request)
     {
         var offer = await _offerRepository.GetByIdWithItemsAsync(offerId);
 

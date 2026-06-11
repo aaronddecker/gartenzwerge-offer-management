@@ -72,24 +72,27 @@ The id of the offer to which the new item should be added.
 ```mermaid
 flowchart TD
     A[Client sends POST request] --> B[OfferItemsController]
-    B --> C[OfferItemService.AddItemAsync]
+    B --> C[CreateOfferItemRequestValidator]
+    C --> D[OfferItemService.AddItemAsync]
 
-    C --> D[Load Offer with existing Items]
-    D --> E{Offer found?}
+    D --> E[Load Offer with existing Items]
+    E --> F{Offer found?}
 
-    E -->|No| F[Return 404 Not Found]
-    E -->|Yes| G[Load OfferedService]
+    F -->|No| G[Throw NotFoundException]
+    F -->|Yes| H[Load OfferedService]
 
-    G --> H{OfferedService found?}
-    H -->|No| F
-    H -->|Yes| I[Read BasePrice and Unit from OfferedService]
+    H --> I{OfferedService found?}
+    I -->|No| G
+    I -->|Yes| J[Read BasePrice and Unit from OfferedService]
 
-    I --> J[Calculate TotalPrice = Quantity * UnitPrice]
-    J --> K[Create new OfferItem entity]
-    K --> L[Add OfferItem to Offer.Items]
-    L --> M[Recalculate Offer.TotalNet from all active items]
-    M --> N[Save changes using OfferRepository]
-    N --> O[Return 201 Created with OfferItemDto]
+    J --> K[Calculate TotalPrice = Quantity * UnitPrice]
+    K --> L[Create new OfferItem entity]
+    L --> M[Add OfferItem to Offer.Items]
+    M --> N[Recalculate Offer.TotalNet from all active items]
+    N --> O[Save changes using OfferRepository]
+    O --> P[Return 201 Created with OfferItemDto]
+
+    G --> Q[ExceptionMiddleware maps to 404 Not Found]
 ```
 
 ---
@@ -113,8 +116,26 @@ IOfferItemService
 ```
 
 ---
+### 2. Request body is validated
 
-### 2. Service loads the offer
+The `CreateOfferItemRequestValidator` validates the request body.
+
+Validation rules:
+
+* `offeredServiceId` must not be empty
+* `quantity` must be greater than `0`
+
+If validation fails, the API returns:
+
+```http
+400 Bad Request
+```
+
+This happens before the application service logic is executed.
+
+---
+
+### 3. Service loads the offer
 
 The `OfferItemService` loads the offer including existing offer items.
 
@@ -124,9 +145,9 @@ This is necessary because the offer total must be recalculated from all active i
 IOfferRepository.GetByIdWithItemsAsync(offerId)
 ```
 
-If the offer does not exist, the service returns `null`.
+If the offer does not exist, the service throws a `NotFoundException`.
 
-The controller maps this result to:
+The global exception middleware maps this exception to:
 
 ```http
 404 Not Found
@@ -134,12 +155,20 @@ The controller maps this result to:
 
 ---
 
-### 3. Service loads the offered service
+### 4. Service loads the offered service
 
 The selected offered service is loaded by its id.
 
 ```text
 IOfferedServiceRepository.GetByIdAsync(offeredServiceId)
+```
+
+If the offered service does not exist, the service throws a `NotFoundException`.
+
+The global exception middleware maps this exception to:
+
+```http
+404 Not Found
 ```
 
 The offered service provides the server-side price information:
@@ -150,9 +179,10 @@ The offered service provides the server-side price information:
 
 The client does not send `UnitPrice` or `TotalPrice`.
 
+
 ---
 
-### 4. Service calculates the item price
+### 5. Service calculates the item price
 
 The item price is calculated by the backend.
 
@@ -171,7 +201,7 @@ TotalPrice: 45.00 €
 
 ---
 
-### 5. Service creates the OfferItem entity
+### 6. Service creates the OfferItem entity
 
 The service creates a new `OfferItem` entity using:
 
@@ -186,7 +216,7 @@ This entity represents the internal business state that will be persisted.
 
 ---
 
-### 6. Service adds the item to the offer
+### 7. Service adds the item to the offer
 
 The new item is added to the offer's item collection.
 
@@ -203,7 +233,7 @@ One OfferItem belongs to exactly one Offer.
 
 ---
 
-### 7. Service recalculates the offer total
+### 8. Service recalculates the offer total
 
 The offer total is recalculated from all active offer items.
 
@@ -215,7 +245,7 @@ This is safer than adding only the new item price to the old total because futur
 
 ---
 
-### 8. Repository saves the changes
+### 9. Repository saves the changes
 
 The updated offer is saved through the repository.
 
@@ -330,15 +360,26 @@ Recalculating the total from all active items keeps the offer consistent, especi
 
 ---
 
-## Current Limitations
+## Related Offer Item Management Features
 
-The current implementation supports adding offer items.
+The current implementation supports core offer item management.
+
+Implemented:
+
+* Adding offer items to existing offers
+* Listing all active offer items of an offer
+* Updating offer item quantities
+* Soft deleting offer items
+* Calculating offer item totals
+* Recalculating offer totals after item changes
+* Validating offer item requests
+* Returning `404 Not Found` through `NotFoundException` when the offer or offered service does not exist
 
 Not implemented yet:
 
-* Listing all items of an offer
-* Updating offer items
-* Soft deleting offer items
 * Advanced pricing rules
 * Tiered pricing for different service types
-* Separate error responses for offer-not-found and service-not-found
+* Discount handling
+* Tax calculation
+* Dedicated pricing calculator
+
