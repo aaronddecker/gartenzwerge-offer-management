@@ -22,6 +22,9 @@ The application is designed to support real business workflows such as customer 
 	- Automatic item total calculation
 	- Automatic offer total recalculation
 - Create orders from accepted offers
+- Order Management Foundation
+- Create orders from accepted offers
+- View and update orders
 - PostgreSQL integration
 - Entity Framework Core persistence
 - Repository Pattern
@@ -37,8 +40,6 @@ The application is designed to support real business workflows such as customer 
 
 - Full Order Management
 	- Get orders
-	- Update order status
-	- Complete or cancel orders
 - Advanced Pricing Calculator
 - Authentication & Authorization
 - GitHub Actions CI/CD
@@ -79,7 +80,11 @@ The application is designed to support real business workflows such as customer 
 * Create an order from an accepted offer
 * Prevent creating orders from non-accepted offers
 * Prevent duplicate orders for the same offer
-* Start new orders with planned status
+* View all orders
+* View a single order by id
+* Update order status, planned date and notes
+* Automatically set `completedAt` when an order is completed
+* Clear `completedAt` when an order is reopened
 
 ### Validation
 

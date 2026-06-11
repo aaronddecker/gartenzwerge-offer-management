@@ -599,6 +599,41 @@ Each offer can only be converted into one order.
 
 ---
 
+### Get all orders
+
+```http
+GET /api/orders
+```
+
+Returns all non-deleted orders.
+
+#### Responses
+
+```http
+200 OK
+500 Internal Server Error
+```
+
+---
+
+### Get order by id
+
+```http
+GET /api/orders/{id}
+```
+
+Returns a single order by id.
+
+#### Responses
+
+```http
+200 OK
+404 Not Found
+500 Internal Server Error
+```
+
+---
+
 ### Create order from offer
 
 ```http
@@ -648,6 +683,44 @@ Only accepted offers can be converted into orders.
 An order already exists for this offer.
 ```
 
+---
+
+### Update order
+
+```http
+PUT /api/orders/{id}
+```
+
+Updates an existing order.
+
+#### Request body
+
+```json
+{
+  "status": 2,
+  "plannedDate": "2026-08-05T09:00:00Z",
+  "notes": "Order is now in progress."
+}
+```
+
+#### Server-side behavior
+
+* Loads the order by ID
+* Updates the order status
+* Updates the planned date
+* Updates the notes
+* Sets `completedAt` automatically when the status is `Completed`
+* Clears `completedAt` when the status is changed away from `Completed`
+
+#### Responses
+
+```http
+200 OK
+400 Bad Request
+404 Not Found
+500 Internal Server Error
+```
+
 #### Example response
 
 ```json
@@ -655,12 +728,13 @@ An order already exists for this offer.
   "id": "00000000-0000-0000-0000-000000000000",
   "offerId": "00000000-0000-0000-0000-000000000000",
   "customerId": "00000000-0000-0000-0000-000000000000",
-  "status": 1,
-  "plannedDate": "2026-08-01T09:00:00Z",
+  "status": 2,
+  "plannedDate": "2026-08-05T09:00:00Z",
   "completedAt": null,
-  "notes": "First order created from accepted offer."
+  "notes": "Order is now in progress."
 }
 ```
+
 ---
 
 ## Current Limitations
