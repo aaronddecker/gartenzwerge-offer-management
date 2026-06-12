@@ -1,4 +1,8 @@
+using Gartenzwerge.Infrastructure.Identity;
 using Gartenzwerge.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Gartenzwerge.Infrastructure.Persistence;
@@ -9,7 +13,7 @@ namespace Gartenzwerge.Infrastructure.Persistence;
 /// The context exposes DbSets for all aggregate roots and applies
 /// entity configurations from the Infrastructure assembly.
 /// </summary>
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
