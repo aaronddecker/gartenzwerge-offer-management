@@ -1,6 +1,7 @@
 using Gartenzwerge.Application.Orders.DTOs;
 using Gartenzwerge.Application.Orders.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gartenzwerge.API.Controllers;
 
@@ -9,6 +10,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;

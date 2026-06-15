@@ -1,6 +1,7 @@
 using Gartenzwerge.Application.Customers.DTOs;
 using Gartenzwerge.Application.Customers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gartenzwerge.API.Controllers;
 
@@ -12,6 +13,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/customers")]
+[Authorize]
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
