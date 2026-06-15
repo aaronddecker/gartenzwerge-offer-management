@@ -59,6 +59,7 @@ public class ExceptionMiddleware
         {
             NotFoundException => (int)HttpStatusCode.NotFound,
             ConflictException => (int)HttpStatusCode.Conflict,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
             _ => (int)HttpStatusCode.InternalServerError
         };
 
@@ -66,6 +67,7 @@ public class ExceptionMiddleware
         {
             NotFoundException => exception.Message,
             ConflictException => exception.Message,
+            UnauthorizedException => exception.Message,
             _ => "An unexpected error occurred."
         };
 

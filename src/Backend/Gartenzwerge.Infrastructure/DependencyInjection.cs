@@ -2,9 +2,11 @@ using Gartenzwerge.Application.Customers.Interfaces;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Gartenzwerge.Application.Offers.Interfaces;
 using Gartenzwerge.Application.Orders.Interfaces;
+using Gartenzwerge.Application.Auth.Interfaces;
 using Gartenzwerge.Infrastructure.Persistence;
 using Gartenzwerge.Infrastructure.Repositories;
 using Gartenzwerge.Infrastructure.Identity;
+using Gartenzwerge.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IOfferedServiceRepository, OfferedServiceRepository>();
         services.AddScoped<IOfferRepository, OfferRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IAuthService, AuthService>();
 
         services.AddIdentityCore<ApplicationUser>(options =>
         {
