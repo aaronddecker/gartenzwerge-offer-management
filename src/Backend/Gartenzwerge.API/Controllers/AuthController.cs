@@ -1,6 +1,8 @@
 using Gartenzwerge.Application.Auth.DTOs;
 using Gartenzwerge.Application.Auth.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Gartenzwerge.API.Controllers;
 
@@ -30,5 +32,21 @@ public class AuthController : ControllerBase
     {
         var response = await _authService.LoginAsync(request);
         return Ok(response);
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public ActionResult<object> Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        var displayName = User.FindFirstValue(ClaimTypes.Name);
+
+        return Ok(new
+        {
+            userId,
+            email,
+            displayName
+        });
     }
 }
