@@ -37,6 +37,7 @@ The application is designed to support real business workflows such as customer 
   * JWT bearer authentication setup
   * Protected `/api/auth/me` endpoint
   * Swagger JWT authorization support
+  * Protected business endpoints with JWT authentication
 * PostgreSQL integration
 * Entity Framework Core persistence
 * Repository Pattern
@@ -52,7 +53,6 @@ The application is designed to support real business workflows such as customer 
 ### Planned
 
 * Authorization & User Roles
-* Protect existing business endpoints with authentication
 * Full Order Management
 
   * Dedicated complete/cancel order endpoints
@@ -150,6 +150,7 @@ Implemented:
 * Swagger JWT authorization support
 * Request validation for register and login requests
 * Unit tests for authentication request validators
+* Protected business endpoints with JWT authentication
 
 ## Architecture
 
@@ -512,13 +513,13 @@ chore: update tooling, configuration or maintenance tasks
 * Swagger JWT authorization support
 * Auth request validation
 * Unit tests
+* Protected business endpoints with JWT authentication
 
 ### v0.8.0 – Authorization & User Roles
 
 * User roles such as Admin or Employee
 * Role-based endpoint protection
 * Authorization policies
-* Protect existing business endpoints
 
 ### v0.9.0 – Frontend Foundation
 

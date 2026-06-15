@@ -1,6 +1,7 @@
 using Gartenzwerge.Application.OfferedServices.DTOs;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Gartenzwerge.API.Controllers;
 
@@ -12,6 +13,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/offered-services")]
+[Authorize]
 public class OfferedServicesController : ControllerBase
 {
     private readonly IOfferedServiceService _offeredServiceService;

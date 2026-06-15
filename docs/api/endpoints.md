@@ -198,6 +198,38 @@ Authorization: Bearer <token>
   "displayName": "Test User"
 }
 ```
+---
+
+## Protected Business Endpoints
+
+Most business endpoints require authentication.
+
+Authenticated requests must include a valid JWT bearer token.
+
+```http
+Authorization: Bearer <token>
+```
+
+Protected endpoint groups:
+
+* Customers
+* Offered Services
+* Offers
+* Offer Items
+* Orders
+
+Public endpoint groups:
+
+* Register user
+* Login user
+
+The `/api/auth/me` endpoint is also protected and can be used to verify that a JWT token is valid.
+
+If a protected endpoint is called without a valid token, the API returns:
+
+```http
+401 Unauthorized
+```
 
 ## Customers
 
@@ -913,6 +945,7 @@ Implemented authentication features:
 * Generate JWT tokens
 * Validate JWT bearer tokens
 * Retrieve the currently authenticated user through `/api/auth/me`
+* Protect business endpoints with JWT authentication
 * Test JWT-protected endpoints through Swagger authorization
 
 Implemented offer item features:
@@ -934,7 +967,6 @@ Implemented order features:
 Not implemented yet:
 
 * Authorization with roles and permissions
-* Protecting existing business endpoints with authentication
 * User roles such as Admin or Employee
 * Refresh tokens
 * Password reset flow
