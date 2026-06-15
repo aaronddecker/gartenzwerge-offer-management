@@ -63,6 +63,142 @@ Example response:
 
 ---
 
+## Authentication
+
+Authentication endpoints are used to register users, authenticate existing users and retrieve information about the currently authenticated user.
+
+The API uses ASP.NET Core Identity for user management and JWT bearer tokens for authentication.
+
+Authenticated requests must include the JWT token in the `Authorization` header.
+
+```http
+Authorization: Bearer <token>
+```
+
+Swagger also supports JWT authentication through the `Authorize` button.
+
+---
+
+### Register user
+
+```http
+POST /api/auth/register
+```
+
+Creates a new application user and returns a JWT token.
+
+#### Request body
+
+```json
+{
+  "email": "test@gartenzwerge.de",
+  "displayName": "Test User",
+  "password": "Test1234"
+}
+```
+
+#### Server-side behavior
+
+* Validates the request body
+* Checks whether a user with the same email already exists
+* Creates a new Identity user
+* Hashes the password using ASP.NET Core Identity
+* Returns an authentication response with a JWT token
+
+#### Responses
+
+```http
+200 OK
+400 Bad Request
+409 Conflict
+500 Internal Server Error
+```
+
+#### Conflict cases
+
+```text
+A user with this email already exists.
+```
+
+---
+
+### Login user
+
+```http
+POST /api/auth/login
+```
+
+Authenticates an existing user and returns a JWT token.
+
+#### Request body
+
+```json
+{
+  "email": "test@gartenzwerge.de",
+  "password": "Test1234"
+}
+```
+
+#### Server-side behavior
+
+* Validates the request body
+* Looks up the user by email
+* Checks the password using ASP.NET Core Identity
+* Returns an authentication response with a JWT token
+
+#### Responses
+
+```http
+200 OK
+400 Bad Request
+401 Unauthorized
+500 Internal Server Error
+```
+
+#### Unauthorized cases
+
+```text
+Invalid email or password.
+```
+
+The same error message is returned for unknown emails and wrong passwords to avoid leaking whether an email address exists.
+
+---
+
+### Get current authenticated user
+
+```http
+GET /api/auth/me
+```
+
+Returns information about the currently authenticated user.
+
+This endpoint requires a valid JWT bearer token.
+
+#### Authorization header
+
+```http
+Authorization: Bearer <token>
+```
+
+#### Responses
+
+```http
+200 OK
+401 Unauthorized
+500 Internal Server Error
+```
+
+#### Example response
+
+```json
+{
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "email": "test@gartenzwerge.de",
+  "displayName": "Test User"
+}
+```
+
 ## Customers
 
 Customer endpoints are used to manage customer master data.
@@ -768,7 +904,16 @@ The order is not physically removed from the database. Instead, it is marked as 
 
 ## Current Limitations
 
-The current API supports customer management, offered service management, offer management and basic offer item management.
+The current API supports authentication foundation, customer management, offered service management, offer management, offer item management and core order management.
+
+Implemented authentication features:
+
+* Register users
+* Login users
+* Generate JWT tokens
+* Validate JWT bearer tokens
+* Retrieve the currently authenticated user through `/api/auth/me`
+* Test JWT-protected endpoints through Swagger authorization
 
 Implemented offer item features:
 
@@ -778,11 +923,23 @@ Implemented offer item features:
 * Soft-delete offer items
 * Recalculate offer totals after item changes
 
+Implemented order features:
+
+* Create orders from accepted offers
+* Get all orders
+* Get order by id
+* Update order status, planned date and notes
+* Soft-delete orders
+
 Not implemented yet:
 
+* Authorization with roles and permissions
+* Protecting existing business endpoints with authentication
+* User roles such as Admin or Employee
+* Refresh tokens
+* Password reset flow
+* Email confirmation
 * Advanced pricing rules
 * Tiered pricing
-* Authentication and authorization
-* User roles and permissions
 * PDF generation for offers
 
