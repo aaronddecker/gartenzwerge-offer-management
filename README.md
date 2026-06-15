@@ -11,41 +11,60 @@ The application is designed to support real business workflows such as customer 
 🚧 Active Development
 
 ### Completed
-- Customer CRUD API
-- Offered Service CRUD API
-- Offer CRUD API
-- Offer Item Management
-	- Add offer items
-	- Get offer items by offer
-	- Update offer item quantities
-	- Soft delete offer items
-	- Automatic item total calculation
-	- Automatic offer total recalculation
-- Create orders from accepted offers
-- Order Management Foundation
-- Create orders from accepted offers
-- View and update orders
-- PostgreSQL integration
-- Entity Framework Core persistence
-- Repository Pattern
-- Service Layer
-- FluentValidation request validation
-- Global exception handling
-- Serilog logging
-- Unit tests
-- Swagger/OpenAPI documentation
-- Docker Compose setup for local PostgreSQL
+
+* Customer CRUD API
+* Offered Service CRUD API
+* Offer CRUD API
+* Offer Item Management
+
+  * Add offer items
+  * Get offer items by offer
+  * Update offer item quantities
+  * Soft delete offer items
+  * Automatic item total calculation
+  * Automatic offer total recalculation
+* Order Management Foundation
+
+  * Create orders from accepted offers
+  * Prevent duplicate orders
+  * View and update orders
+  * Soft delete orders
+* Authentication Foundation
+
+  * User registration with ASP.NET Core Identity
+  * User login with password validation
+  * JWT token generation
+  * JWT bearer authentication setup
+  * Protected `/api/auth/me` endpoint
+  * Swagger JWT authorization support
+* PostgreSQL integration
+* Entity Framework Core persistence
+* Repository Pattern
+* Service Layer
+* FluentValidation request validation
+* Global exception handling
+* Serilog logging
+* Unit tests
+* Swagger/OpenAPI documentation
+* Docker Compose setup for local PostgreSQL
+
 
 ### Planned
 
-- Full Order Management
-	- Get orders
-- Advanced Pricing Calculator
-- Authentication & Authorization
-- GitHub Actions CI/CD
-- Azure Deployment
-- Frontend with React and TypeScript
-- OpenAI Integration
+* Authorization & User Roles
+* Protect existing business endpoints with authentication
+* Full Order Management
+
+  * Dedicated complete/cancel order endpoints
+  * Order scheduling
+  * Employee/user assignment
+* Advanced Pricing Calculator
+* Frontend with React and TypeScript
+* Dockerized full-stack setup
+* GitHub Actions CI pipeline
+* Deployment
+* AI-assisted offer creation
+
 
 ---
 
@@ -117,6 +136,20 @@ The application is designed to support real business workflows such as customer 
 * Testable service layer through repository abstractions
 
 ---
+
+### Authentication Foundation
+
+Implemented:
+
+* User registration with ASP.NET Core Identity
+* User login with password validation
+* Secure password hashing through ASP.NET Core Identity
+* JWT token generation
+* JWT bearer authentication setup
+* Protected `/api/auth/me` endpoint
+* Swagger JWT authorization support
+* Request validation for register and login requests
+* Unit tests for authentication request validators
 
 ## Architecture
 
@@ -267,6 +300,16 @@ POST   /api/offers/{offerId}/order
 PUT    /api/orders/{id}
 DELETE /api/orders/{id}
 ```
+
+### Authentication
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/me
+```
+
+`/api/auth/me` requires a valid JWT bearer token.
 
 ---
 
@@ -458,14 +501,76 @@ chore: update tooling, configuration or maintenance tasks
 * Add order validation
 * Unit tests
 
-### v1.0.0 – Full Business Workflow
+### v0.7.0 – Authentication Foundation
 
-* Authentication
-* Frontend
-* Dockerized full-stack setup
-* CI/CD
-* Deployment
-* AI-assisted offer creation
+* User registration with ASP.NET Core Identity
+* User login with password validation
+* Secure password hashing
+* JWT token generation
+* JWT bearer authentication setup
+* Protected `/api/auth/me` endpoint
+* Swagger JWT authorization support
+* Auth request validation
+* Unit tests
+
+### v0.8.0 – Authorization & User Roles
+
+* User roles such as Admin or Employee
+* Role-based endpoint protection
+* Authorization policies
+* Protect existing business endpoints
+
+### v0.9.0 – Frontend Foundation
+
+* React + TypeScript frontend setup
+* Vite project structure
+* Routing
+* API client setup
+* Basic layout
+
+### v0.10.0 – Customer and Service UI
+
+* Customer management UI
+* Offered service management UI
+* Form validation
+* API integration
+
+### v0.11.0 – Offer Management UI
+
+* Offer overview
+* Offer detail view
+* Offer item management
+* Offer total display
+
+### v0.12.0 – Order Management UI
+
+* Order overview
+* Order detail view
+* Update order status
+* Display completed orders
+
+### v0.13.0 – Fullstack Business Workflow MVP
+
+* End-to-end workflow from customer to offer to order
+* Backend and frontend connected
+* Local full-stack setup documented
+
+### v0.14.0 – CI Pipeline
+
+* GitHub Actions workflow
+* Automated build
+* Automated tests on pull requests
+
+### v1.0.0 – Full Business Workflow MVP
+
+* Authentication and authorization
+* Frontend for core business workflows
+* Backend and frontend working together
+* Dockerized local setup
+* CI pipeline
+* Complete README setup instructions
+* Stable portfolio-ready MVP
+
 
 ---
 

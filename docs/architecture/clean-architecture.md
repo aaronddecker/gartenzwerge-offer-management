@@ -101,6 +101,10 @@ Examples:
 * Creating orders from accepted offers
 * Updating orders
 * Soft deleting orders
+* Registering users
+* Logging in users
+* Validating authentication requests
+
 
 The Application layer contains:
 
@@ -126,6 +130,17 @@ IOrderRepository
 
 NotFoundException
 ConflictException
+
+IAuthService
+
+RegisterRequest
+LoginRequest
+AuthResponse
+
+RegisterRequestValidator
+LoginRequestValidator
+
+UnauthorizedException
 ```
 
 Business rules belong here.
@@ -137,6 +152,9 @@ Examples:
 * Offer totals are recalculated from active offer items.
 * `completedAt` is set when an order is completed.
 * `completedAt` is cleared when an order is reopened.
+* Duplicate user registration is prevented by checking existing email addresses.
+* Invalid login attempts return the same error message for unknown emails and wrong passwords.
+
 
 ---
 
@@ -158,20 +176,29 @@ Examples:
 * `AppDbContext`
 * Database configuration
 * Dependency injection for persistence
+* ASP.NET Core Identity
+* `ApplicationUser`
+* Identity database schema
+* JWT token generation
+* `AuthService`
 
-The Infrastructure layer implements repository interfaces defined in the Application layer.
+
+Authentication-related technical details also live in the Infrastructure layer.
 
 Example:
 
 ```text
 Application:
-IOrderRepository
+IAuthService
 
 Infrastructure:
-OrderRepository
+AuthService
+ASP.NET Core Identity
+JWT token generation
 ```
 
-This means the Application layer defines what it needs, while the Infrastructure layer defines how it is done.
+This keeps the Application layer independent from ASP.NET Core Identity and JWT implementation details.
+
 
 ---
 
@@ -192,6 +219,8 @@ Examples:
 * `OffersController`
 * `OfferItemsController`
 * `OrdersController`
+* `AuthController`
+
 
 The API layer is responsible for:
 
@@ -203,6 +232,8 @@ The API layer is responsible for:
 * Configuring Swagger
 * Configuring middleware
 * Registering dependencies
+* Configuring JWT bearer authentication
+* Configuring Swagger JWT authorization
 
 Controllers should stay thin.
 
@@ -252,6 +283,40 @@ AppDbContext
 PostgreSQL
 ```
 
+Authentication example:
+
+```text
+POST /api/auth/login
+ ↓
+AuthController
+ ↓
+LoginRequestValidator
+ ↓
+IAuthService
+ ↓
+AuthService
+ ↓
+UserManager<ApplicationUser>
+ ↓
+ASP.NET Core Identity
+ ↓
+JWT token response
+```
+
+Authenticated request example:
+
+```text
+GET /api/auth/me
+ ↓
+JWT Bearer Authentication Middleware
+ ↓
+[Authorize]
+ ↓
+AuthController
+ ↓
+Current user information
+```
+
 ---
 
 ## Repository Pattern
@@ -286,6 +351,8 @@ Examples:
 * Offer request validation
 * Offer item request validation
 * Order request validation
+* Register request validation
+* Login request validation
 
 Invalid request bodies return:
 
@@ -304,15 +371,18 @@ Examples:
 ```text
 NotFoundException
 ConflictException
+UnauthorizedException
 ```
 
 The API layer maps these exceptions to HTTP responses through global exception middleware.
 
 ```text
-NotFoundException  → 404 Not Found
-ConflictException  → 409 Conflict
-Unexpected errors  → 500 Internal Server Error
+NotFoundException      → 404 Not Found
+UnauthorizedException  → 401 Unauthorized
+ConflictException      → 409 Conflict
+Unexpected errors      → 500 Internal Server Error
 ```
+
 
 This keeps controllers clean because they do not need to handle every error case manually.
 
@@ -357,7 +427,7 @@ Use this rule when deciding where code belongs:
 
 ```text
 Entity or enum?                         → Domain
-Use case or business rule?              → Application
-Database or external technical detail?  → Infrastructure
-HTTP endpoint or middleware?            → API
+Use case, DTO, validator or interface?  → Application
+Database, Identity or JWT detail?       → Infrastructure
+HTTP endpoint, middleware or Swagger?   → API
 ```
