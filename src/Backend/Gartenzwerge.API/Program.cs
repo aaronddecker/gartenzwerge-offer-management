@@ -10,6 +10,7 @@ using Gartenzwerge.Application.OfferItems.Services;
 using Gartenzwerge.Application.Orders.Interfaces;
 using Gartenzwerge.Application.Orders.Services;
 using Gartenzwerge.Infrastructure;
+using Gartenzwerge.Infrastructure.Identity;
 using Gartenzwerge.API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -107,6 +108,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+await IdentitySeeder.SeedRolesAndDevelopmentUsersAsync(app.Services);
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseSerilogRequestLogging();
