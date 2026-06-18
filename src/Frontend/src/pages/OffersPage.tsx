@@ -1,8 +1,12 @@
+import { PageHeader } from '../shared/components/PageHeader'
+
 export function OffersPage() {
   return (
     <section className="page">
-      <h2>Angebote</h2>
-      <p>Hier entsteht später die Angebotsübersicht.</p>
+      <PageHeader
+        title="Angebote"
+        description="Hier entsteht später die Angebotsübersicht."
+      />
     </section>
   )
 }

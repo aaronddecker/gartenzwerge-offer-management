@@ -1,8 +1,12 @@
+import { PageHeader } from '../shared/components/PageHeader'
+
 export function DashboardPage() {
   return (
     <section className="page">
-      <h2>Dashboard</h2>
-      <p>Übersicht über Kunden, Angebote und Aufträge.</p>
+      <PageHeader
+        title="Dashboard"
+        description="Übersicht über Kunden, Angebote und Aufträge."
+      />
     </section>
   )
 }

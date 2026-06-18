@@ -1,8 +1,12 @@
+import { PageHeader } from '../shared/components/PageHeader'
+
 export function CustomersPage() {
   return (
     <section className="page">
-      <h2>Kunden</h2>
-      <p>Hier entsteht später die Kundenübersicht.</p>
+      <PageHeader
+        title="Kunden"
+        description="Hier entsteht später die Kundenübersicht."
+      />
     </section>
   )
 }

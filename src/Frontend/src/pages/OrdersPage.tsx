@@ -1,8 +1,12 @@
+import { PageHeader } from '../shared/components/PageHeader'
+
 export function OrdersPage() {
   return (
     <section className="page">
-      <h2>Aufträge</h2>
-      <p>Hier entsteht später die Auftragsübersicht.</p>
+      <PageHeader
+        title="Aufträge"
+        description="Hier entsteht später die Auftragsübersicht."
+      />
     </section>
   )
 }

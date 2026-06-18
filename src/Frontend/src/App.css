@@ -94,3 +94,14 @@
     padding-right: 2rem;
   }
 }
+
+.page-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0.5rem 0 0;
+  color: #5f6f52;
+  line-height: 1.5;
+}

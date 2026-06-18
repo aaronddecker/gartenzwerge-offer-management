@@ -1,8 +1,12 @@
+import { PageHeader } from '../shared/components/PageHeader'
+
 export function LoginPage() {
   return (
     <section className="page">
-      <h2>Login</h2>
-      <p>Hier entsteht später der JWT-Login.</p>
+      <PageHeader
+        title="Login"
+        description="Hier entsteht später der JWT-Login."
+      />
     </section>
   )
 }
