@@ -25,3 +25,72 @@
   margin: 0.5rem 0;
   font-size: 1.1rem;
 }
+
+.app-layout {
+  min-height: 100vh;
+  background: #f7f7f2;
+}
+
+.app-header {
+  padding: 1.5rem 1rem 1rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.app-kicker {
+  margin: 0 0 0.25rem;
+  color: #5f6f52;
+  font-weight: 600;
+}
+
+.app-nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e3e3d8;
+  border-bottom: 1px solid #e3e3d8;
+  background: #ffffff;
+}
+
+.app-nav a {
+  white-space: nowrap;
+  padding: 0.6rem 0.85rem;
+  border-radius: 999px;
+  color: #33402b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.app-nav a.active {
+  background: #dfe8d5;
+}
+
+.app-content {
+  padding: 1rem;
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(33, 53, 71, 0.08);
+}
+
+.page h2 {
+  margin-top: 0;
+}
+
+@media (min-width: 768px) {
+  .app-header,
+  .app-nav,
+  .app-content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
