@@ -143,3 +143,55 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+.dashboard-section {
+  margin-top: 2rem;
+}
+
+.dashboard-section h3 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.quick-action-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.quick-action {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #ffffff;
+  color: #213547;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.quick-action:hover {
+  transform: translateY(-2px);
+  border-color: #c7d6bb;
+  box-shadow: 0 10px 24px rgba(33, 53, 71, 0.08);
+}
+
+.quick-action__title {
+  display: block;
+  font-weight: 700;
+}
+
+.quick-action__description {
+  display: block;
+  margin-top: 0.4rem;
+  color: #66705f;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .quick-action-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
