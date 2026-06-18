@@ -105,3 +105,41 @@
   color: #5f6f52;
   line-height: 1.5;
 }
+
+.stat-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #fbfbf7;
+}
+
+.stat-card__title {
+  margin: 0;
+  color: #5f6f52;
+  font-weight: 700;
+}
+
+.stat-card__value {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 2rem;
+  color: #213547;
+}
+
+.stat-card__description {
+  margin: 0.5rem 0 0;
+  color: #66705f;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .stat-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
