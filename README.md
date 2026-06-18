@@ -1,8 +1,8 @@
 ﻿# Gartenzwerge Außenservice – Angebots- und Auftragsmanagement
 
-A modern full-stack business management application for managing customers, offers and service orders for a landscaping and outdoor service business.
+A modern full-stack business management application for managing customers, offered services, offers and service orders for a landscaping and outdoor service business.
 
-The application is designed to support real business workflows such as customer management, offer creation, service pricing and order handling while demonstrating clean architecture and professional software engineering practices.
+The application is designed to support real business workflows such as customer management, offer creation, service pricing, order handling, authentication, authorization and a mobile-first frontend experience.
 
 ---
 
@@ -10,7 +10,21 @@ The application is designed to support real business workflows such as customer 
 
 🚧 Active Development
 
-### Completed
+Current milestone:
+
+```text
+v0.9.0 – Frontend Foundation
+```
+
+The backend already provides the core business API, authentication and role-based authorization.
+
+The frontend foundation has been added with React, TypeScript and Vite. It currently includes routing, a basic app layout, mobile-first navigation, placeholder pages and reusable UI components.
+
+---
+
+## Completed
+
+### Backend Foundation
 
 * Customer CRUD API
 * Offered Service CRUD API
@@ -24,24 +38,11 @@ The application is designed to support real business workflows such as customer 
   * Automatic item total calculation
   * Automatic offer total recalculation
 * Order Management Foundation
+
   * Create orders from accepted offers
   * Prevent duplicate orders
   * View and update orders
   * Soft delete orders
-* Authentication Foundation
-  - Admin and Employee roles
-  - Role seeding for local development
-  - Development users for Admin and Employee testing
-  - Role claims in JWT tokens
-  - Role-based endpoint protection
-  - Admin-only protection for critical delete and service management actions
-  * User registration with ASP.NET Core Identity
-  * User login with password validation
-  * JWT token generation
-  * JWT bearer authentication setup
-  * Protected `/api/auth/me` endpoint
-  * Swagger JWT authorization support
-  * Protected business endpoints with JWT authentication
 * PostgreSQL integration
 * Entity Framework Core persistence
 * Repository Pattern
@@ -53,20 +54,75 @@ The application is designed to support real business workflows such as customer 
 * Swagger/OpenAPI documentation
 * Docker Compose setup for local PostgreSQL
 
+### Authentication and Authorization
 
-### Planned
+* User registration with ASP.NET Core Identity
+* User login with password validation
+* Secure password hashing through ASP.NET Core Identity
+* JWT token generation
+* JWT bearer authentication setup
+* Protected `/api/auth/me` endpoint
+* Swagger JWT authorization support
+* Protected business endpoints with JWT authentication
+* Admin and Employee roles
+* Role seeding for local development
+* Development users for Admin and Employee authorization testing
+* Role claims in JWT tokens
+* Role-based endpoint protection
+* Admin-only protection for critical delete and service management actions
+
+### Frontend Foundation
+
+* React + TypeScript + Vite frontend setup
+* Frontend routing with React Router
+* Basic app layout with shared navigation
+* Mobile-first navigation structure
+* More page for secondary navigation areas
+* Analytics page placeholder
+* Placeholder pages for dashboard, customers, offers, orders, offered services and login
+* Reusable `PageHeader` component
+* Reusable `StatCard` component
+* Reusable `QuickActionLink` component
+* Initial dashboard statistic cards
+* Dashboard quick actions
+* Mobile navigation improved to avoid horizontal scrolling
+
+---
+
+## Planned
+
+### Backend
 
 * Full Order Management
+
   * Dedicated complete/cancel order endpoints
   * Order scheduling
   * Employee/user assignment
 * Advanced Pricing Calculator
-* Frontend with React and TypeScript
+* AI-assisted offer creation
+
+### Frontend
+
+* Login form with JWT authentication
+* Token handling in the frontend
+* Protected frontend routes
+* User information loading through `/api/auth/me`
+* Logout function
+* Role-aware UI behavior for Admin and Employee
+* Dashboard with upcoming orders
+* Simple calendar field for upcoming orders
+* Customer CRUD UI
+* Offered Service CRUD UI
+* Offer Management UI
+* Order Management UI
+* Loading, error and empty states
+* Responsive polishing
+
+### DevOps
+
 * Dockerized full-stack setup
 * GitHub Actions CI pipeline
 * Deployment
-* AI-assisted offer creation
-
 
 ---
 
@@ -79,7 +135,16 @@ The application is designed to support real business workflows such as customer 
 * Update customers
 * Soft delete customers
 
-### Offer Management 
+### Offered Service Management
+
+* Create offered services
+* View offered services
+* Update offered services
+* Soft delete offered services
+* Manage prices and units
+
+### Offer Management
+
 * Create offers for existing customers
 * View offers
 * Update offer metadata and status
@@ -108,55 +173,38 @@ The application is designed to support real business workflows such as customer 
 * Automatically set `completedAt` when an order is completed
 * Clear `completedAt` when an order is reopened
 
-### Validation
+### Authentication
 
-* Request validation using FluentValidation
-* Required field validation
-* Empty GUID validation
-* Email format validation
-* Quantity validation
-* Price validation
-* Future date validation
-* Maximum length validation
+* Register users
+* Log in users
+* Generate JWT tokens
+* Validate JWT bearer tokens
+* Retrieve the currently authenticated user through `/api/auth/me`
 
-### Error Handling
+### Authorization
 
-* Global exception middleware
-* Standardized JSON error responses
-* Trace identifier support for debugging
+* Admin and Employee roles
+* Role claims in JWT tokens
+* Role-based endpoint protection
+* Admin-only access for critical actions
+* `401 Unauthorized` for missing or invalid tokens
+* `403 Forbidden` for insufficient role permissions
 
-### Logging
+### Frontend UI
 
-* Structured logging with Serilog
-* Console logging
-* File-based rolling logs
-
-### Testing
-
-* Unit tests with xUnit
-* FluentAssertions
-* Testable service layer through repository abstractions
+* Mobile-first layout
+* App layout with shared navigation
+* Dashboard foundation
+* Quick action cards
+* Analytics area prepared for future statistics
+* More page for secondary areas
+* Placeholder pages for core business modules
 
 ---
 
-### Authentication Foundation
-
-Implemented:
-
-* User registration with ASP.NET Core Identity
-* User login with password validation
-* Secure password hashing through ASP.NET Core Identity
-* JWT token generation
-* JWT bearer authentication setup
-* Protected `/api/auth/me` endpoint
-* Swagger JWT authorization support
-* Request validation for register and login requests
-* Unit tests for authentication request validators
-* Protected business endpoints with JWT authentication
-
 ## Architecture
 
-The application follows Clean Architecture principles.
+The backend follows Clean Architecture principles.
 
 ```text
 API
@@ -166,7 +214,10 @@ Application
 Domain
 
 Infrastructure
- ↑
+ ↓
+Application
+ ↓
+Domain
 ```
 
 ### Domain Layer
@@ -190,10 +241,12 @@ Contains application-specific business logic and use cases.
 Examples:
 
 * DTOs
+* Validators
 * Service interfaces
 * Application services
 * Repository interfaces
-* Validators
+* Application exceptions
+* Authorization constants
 
 ### Infrastructure Layer
 
@@ -205,6 +258,9 @@ Examples:
 * PostgreSQL persistence
 * Repository implementations
 * Database migrations
+* ASP.NET Core Identity
+* JWT token generation
+* Role seeding
 
 ### API Layer
 
@@ -216,6 +272,21 @@ Examples:
 * Middleware
 * Swagger configuration
 * Dependency injection setup
+* Authentication and authorization configuration
+
+### Frontend
+
+The frontend is a separate React client.
+
+```text
+React Frontend
+ ↓ HTTP
+ASP.NET Core API
+ ↓
+Application / Infrastructure / Database
+```
+
+This keeps the backend client-independent. A future mobile app could use the same API.
 
 ---
 
@@ -227,23 +298,26 @@ Examples:
 * ASP.NET Core 9
 * Entity Framework Core
 * PostgreSQL
+* ASP.NET Core Identity
+* JWT Bearer Authentication
 * FluentValidation
 * Serilog
 * Swagger / OpenAPI
+
+### Frontend
+
+* React
+* TypeScript
+* Vite
+* React Router
+* CSS with mobile-first responsive styling
 
 ### Testing
 
 * xUnit
 * FluentAssertions
-
-### Planned Frontend
-
-* React
-* TypeScript
-* Vite
-* React Query
-* Zustand
-* React Router
+* ESLint
+* Frontend production build check
 
 ### Planned DevOps
 
@@ -256,6 +330,16 @@ Examples:
 ---
 
 ## API Endpoints
+
+### Authentication
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/me
+```
+
+`/api/auth/me` requires a valid JWT bearer token.
 
 ### Customers
 
@@ -276,6 +360,7 @@ POST   /api/offered-services
 PUT    /api/offered-services/{id}
 DELETE /api/offered-services/{id}
 ```
+
 ### Offers
 
 ```http
@@ -285,6 +370,7 @@ POST   /api/offers
 PUT    /api/offers/{id}
 DELETE /api/offers/{id}
 ```
+
 ### Offer Items
 
 ```http
@@ -304,15 +390,30 @@ PUT    /api/orders/{id}
 DELETE /api/orders/{id}
 ```
 
-### Authentication
+---
 
-```http
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/auth/me
+## Frontend Routes
+
+Current frontend routes:
+
+```text
+/dashboard
+/customers
+/offers
+/orders
+/more
+/analytics
+/offered-services
+/login
 ```
 
-`/api/auth/me` requires a valid JWT bearer token.
+Current frontend limitations:
+
+* No backend API integration yet
+* No login form functionality yet
+* No protected frontend routes yet
+* No JWT handling in the frontend yet
+* No real dashboard or analytics data yet
 
 ---
 
@@ -334,21 +435,24 @@ GET  /api/auth/me
 ```
 
 ## Example Offer Request
+
 ```json
-{ 
-	"customerId": "00000000-0000-0000-0000-000000000000",
-	"validUntil": "2026-12-31T00:00:00Z",
-	"notes": "Test offer for garden maintenance."
+{
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "validUntil": "2026-12-31T00:00:00Z",
+  "notes": "Test offer for garden maintenance."
 }
 ```
 
 ## Example Offer Item Request
+
 ```json
 {
   "offeredServiceId": "00000000-0000-0000-0000-000000000000",
   "quantity": 10
 }
 ```
+
 ---
 
 ## Running the Backend Locally
@@ -387,7 +491,50 @@ http://localhost:5041/swagger
 
 ---
 
-## Running Tests
+## Running the Frontend Locally
+
+### Prerequisites
+
+* Node.js
+* npm
+
+### Install dependencies
+
+```bash
+cd src/Frontend
+
+npm install
+```
+
+### Run the frontend
+
+```bash
+npm run dev
+```
+
+The frontend is available at:
+
+```text
+http://localhost:5173
+```
+
+### Build the frontend
+
+```bash
+npm run build
+```
+
+### Run ESLint
+
+```bash
+npm run lint
+```
+
+---
+
+## Running Tests and Checks
+
+### Backend
 
 ```bash
 cd src/Backend
@@ -395,22 +542,40 @@ cd src/Backend
 dotnet test
 ```
 
+### Frontend
+
+```bash
+cd src/Frontend
+
+npm run build
+npm run lint
+```
+
 ---
 
 ## Project Structure
 
 ```text
-gartenzwerge-offer-management/
+gartenzwerge-management/
 ├── docs/
 │   ├── api/
 │   ├── architecture/
+│   ├── business-processes/
 │   └── database/
 ├── src/
-│   └── Backend/
-│       ├── Gartenzwerge.Domain/
-│       ├── Gartenzwerge.Application/
-│       ├── Gartenzwerge.Infrastructure/
-│       └── Gartenzwerge.API/
+│   ├── Backend/
+│   │   ├── Gartenzwerge.Domain/
+│   │   ├── Gartenzwerge.Application/
+│   │   ├── Gartenzwerge.Infrastructure/
+│   │   └── Gartenzwerge.API/
+│   └── Frontend/
+│       ├── src/
+│       │   ├── api/
+│       │   ├── app/
+│       │   ├── pages/
+│       │   └── shared/
+│       ├── package.json
+│       └── vite.config.ts
 ├── tests/
 │   └── Gartenzwerge.UnitTests/
 ├── docker-compose.yml
@@ -418,21 +583,22 @@ gartenzwerge-offer-management/
 └── .gitignore
 ```
 
+---
+
 ## Documentation
 
 Additional project documentation is available in the `docs` folder.
 
-- [API Endpoints](docs/api/endpoints.md)  
+* [API Endpoints](docs/api/endpoints.md)
   Documents the available REST API endpoints, request bodies, response codes and example payloads.
 
-- [Business Process Documentation](docs/business-processes/)  
-  Contains documentation about important business workflows, such as adding offer items, creating orders from accepted offers and other process-specific application flows.
+* [Business Process Documentation](docs/business-processes/)
+  Contains documentation about important business workflows, such as adding offer items and creating orders from accepted offers.
 
+* [Architecture Documentation](docs/architecture/)
+  Contains documentation about Clean Architecture, request flow, authentication and architectural decisions.
 
-- [Architecture Documentation](docs/architecture/)  
-  Contains documentation about Clean Architecture, request flow and architectural decisions.
-
-- [Database Documentation](docs/database/)  
+* [Database Documentation](docs/database/)
   Contains documentation about entities, relationships and database-related concepts.
 
 ---
@@ -443,10 +609,13 @@ This project follows a small-step development workflow.
 
 Before committing changes:
 
-- Make sure the project builds successfully
-- Run the relevant tests
-- Test changed API endpoints through Swagger when applicable
-- Keep commits small and focused
+* Make sure the backend builds successfully when backend code changed
+* Run backend tests when backend code changed
+* Make sure the frontend builds successfully when frontend code changed
+* Run frontend linting when frontend code changed
+* Test changed API endpoints through Swagger when applicable
+* Test changed frontend routes in the browser when applicable
+* Keep commits small and focused
 
 ### Commit Message Convention
 
@@ -460,6 +629,8 @@ docs: update documentation
 test: add or update tests
 chore: update tooling, configuration or maintenance tasks
 ```
+
+---
 
 ## Development Roadmap
 
@@ -479,6 +650,7 @@ chore: update tooling, configuration or maintenance tasks
 * Service CRUD API
 
 ### v0.3.0 – Offer Management
+
 * Create offers
 * Manage offer status
 * Automatic offer number generation
@@ -499,12 +671,13 @@ chore: update tooling, configuration or maintenance tasks
 * Travel cost calculation
 
 ### v0.6.0 – Order Management Foundation
+
 * Convert accepted offers into orders
 * Prevent duplicate orders
 * Add order validation
 * Unit tests
 
-### v0.7.0 – Authentication Foundation
+### v0.7.0 – Authentication and Protected API Foundation
 
 * User registration with ASP.NET Core Identity
 * User login with password validation
@@ -530,37 +703,63 @@ chore: update tooling, configuration or maintenance tasks
 * React + TypeScript frontend setup
 * Vite project structure
 * Routing
-* API client setup
-* Basic layout
+* Basic app layout
+* Mobile-first navigation
+* Placeholder pages for core business areas
+* More and Analytics pages
+* Reusable UI components
+* Initial dashboard foundation
+* Dashboard quick actions
 
-### v0.10.0 – Customer and Service UI
+### v0.10.0 – Authentication UI & Protected Frontend
+
+* Login form
+* JWT token handling
+* Auth state
+* Protected frontend routes
+* Logout
+* Load current user through `/api/auth/me`
+
+### v0.11.0 – Customer and Service UI
 
 * Customer management UI
 * Offered service management UI
 * Form validation
 * API integration
+* Loading, error and empty states
 
-### v0.11.0 – Offer Management UI
+### v0.12.0 – Offer Management UI
 
 * Offer overview
 * Offer detail view
 * Offer item management
 * Offer total display
+* Smart customer lookup during offer creation
 
-### v0.12.0 – Order Management UI
+### v0.13.0 – Order Management UI
 
 * Order overview
 * Order detail view
 * Update order status
 * Display completed orders
+* Dashboard upcoming orders
+* Simple calendar field for upcoming orders
 
-### v0.13.0 – Fullstack Business Workflow MVP
+### v0.14.0 – Analytics & Reporting UI
+
+* Customer statistics
+* Completed order statistics
+* Revenue overview
+* Revenue chart
+* Offer-to-order conversion insights
+
+### v0.15.0 – Fullstack Business Workflow MVP
 
 * End-to-end workflow from customer to offer to order
 * Backend and frontend connected
 * Local full-stack setup documented
 
-### v0.14.0 – CI Pipeline
+### v0.16.0 – CI Pipeline
 
 * GitHub Actions workflow
 * Automated build
@@ -576,6 +775,17 @@ chore: update tooling, configuration or maintenance tasks
 * Complete README setup instructions
 * Stable portfolio-ready MVP
 
+---
+
+## Future Ideas
+
+* Customer portal with customer-specific login
+* Automatic customer lookup during offer creation
+* Create a new customer directly inside the offer creation form if no matching customer exists
+* PDF generation for offers
+* Email sending for offers
+* PWA support
+* Native mobile client using the same backend API
 
 ---
 
