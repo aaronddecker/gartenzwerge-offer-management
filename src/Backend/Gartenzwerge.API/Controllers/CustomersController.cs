@@ -1,5 +1,6 @@
 using Gartenzwerge.Application.Customers.DTOs;
 using Gartenzwerge.Application.Customers.Interfaces;
+using Gartenzwerge.Application.Common.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -13,7 +14,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/customers")]
-[Authorize]
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -89,6 +90,7 @@ public class CustomersController : ControllerBase
     /// <summary>
     /// Soft deletes a customer.
     /// </summary>
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

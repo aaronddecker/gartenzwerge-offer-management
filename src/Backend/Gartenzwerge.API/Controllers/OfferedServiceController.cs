@@ -1,5 +1,6 @@
 using Gartenzwerge.Application.OfferedServices.DTOs;
 using Gartenzwerge.Application.OfferedServices.Interfaces;
+using Gartenzwerge.Application.Common.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -13,7 +14,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/offered-services")]
-[Authorize]
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
 public class OfferedServicesController : ControllerBase
 {
     private readonly IOfferedServiceService _offeredServiceService;
@@ -44,6 +45,7 @@ public class OfferedServicesController : ControllerBase
         return Ok(offeredService);
     }
 
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPost]
     public async Task<ActionResult<OfferedServiceDto>> Create(
         CreateOfferedServiceRequest request)
@@ -56,6 +58,7 @@ public class OfferedServicesController : ControllerBase
             offeredService);
     }
 
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<OfferedServiceDto>> Update(
         Guid id,
@@ -71,6 +74,7 @@ public class OfferedServicesController : ControllerBase
         return Ok(offeredService);
     }
 
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

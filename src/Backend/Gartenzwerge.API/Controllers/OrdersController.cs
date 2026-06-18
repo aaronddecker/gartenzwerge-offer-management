@@ -1,5 +1,6 @@
 using Gartenzwerge.Application.Orders.DTOs;
 using Gartenzwerge.Application.Orders.Interfaces;
+using Gartenzwerge.Application.Common.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -10,7 +11,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api")]
-[Authorize]
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -61,6 +62,7 @@ public class OrdersController : ControllerBase
     }
 
     // DELETE /api/orders/{id}
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpDelete("orders/{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

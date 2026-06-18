@@ -1,5 +1,6 @@
 using Gartenzwerge.Application.OfferItems.Interfaces;
 using Gartenzwerge.Application.OfferItems.DTOs;
+using Gartenzwerge.Application.Common.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -12,7 +13,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/offers/{offerId:guid}/items")]
-[Authorize]
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
 public class OfferItemsController : ControllerBase
 {
     private readonly IOfferItemService _offerItemService;

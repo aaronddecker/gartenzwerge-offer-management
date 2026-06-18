@@ -1,5 +1,6 @@
 using Gartenzwerge.Application.Offers.DTOs;
 using Gartenzwerge.Application.Offers.Interfaces;
+using Gartenzwerge.Application.Common.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -12,7 +13,7 @@ namespace Gartenzwerge.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/offers")]
-[Authorize]
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
 public class OffersController : ControllerBase
 {
     private readonly IOfferService _offerService;
@@ -69,6 +70,7 @@ public class OffersController : ControllerBase
         return Ok(offer);
     }
 
+    [Authorize(Roles = ApplicationRoles.Admin)]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

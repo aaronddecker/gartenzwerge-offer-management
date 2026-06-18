@@ -56,7 +56,7 @@ public class AuthService : IAuthService
 			UserId = user.Id,
 			Email = user.Email ?? string.Empty,
 			DisplayName = user.DisplayName,
-			Token = GenerateJwtToken(user)
+			Token = await GenerateJwtTokenAsync(user)
 		};
 	}
 
@@ -81,41 +81,48 @@ public class AuthService : IAuthService
 			UserId = user.Id,
 			Email = user.Email ?? string.Empty,
 			DisplayName = user.DisplayName,
-			Token = GenerateJwtToken(user)
+			Token = await GenerateJwtTokenAsync(user)
 		};
 	}
 
-	private string GenerateJwtToken(ApplicationUser user)
-	{
-		var issuer = _configuration["Jwt:Issuer"];
-		var audience = _configuration["Jwt:Audience"];
-		var secret = _configuration["Jwt:Secret"];
-		var expiresInMinutes = int.Parse(_configuration["Jwt:ExpiresInMinutes"] ?? "60");
+    private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
+    {
+        var issuer = _configuration["Jwt:Issuer"];
+        var audience = _configuration["Jwt:Audience"];
+        var secret = _configuration["Jwt:Secret"];
+        var expiresInMinutes = int.Parse(_configuration["Jwt:ExpiresInMinutes"] ?? "60");
 
-		if (string.IsNullOrWhiteSpace(secret))
-		{
-			throw new InvalidOperationException("JWT secret is not configured.");
-		}
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            throw new InvalidOperationException("JWT secret is not configured.");
+        }
 
-		var claims = new List<Claim>
-		{
-			new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-			new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-			new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-			new(ClaimTypes.Name, user.DisplayName),
-			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		};
+        var roles = await _userManager.GetRolesAsync(user);
 
-		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-		var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var claims = new List<Claim>
+    {
+        new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new(ClaimTypes.Name, user.DisplayName),
+        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
-		var token = new JwtSecurityToken(
-			issuer: issuer,
-			audience: audience,
-			claims: claims,
-			expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
-			signingCredentials: credentials);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
-		return new JwtSecurityTokenHandler().WriteToken(token);
-	}
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }
