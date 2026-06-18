@@ -11,11 +11,11 @@ export function AppLayout() {
       </header>
 
       <nav className="app-nav" aria-label="Main navigation">
-        <NavLink to="/dashboard">Dashboard</NavLink>
+        <NavLink to="/dashboard">Start</NavLink>
         <NavLink to="/customers">Kunden</NavLink>
-        <NavLink to="/offered-services">Leistungen</NavLink>
         <NavLink to="/offers">Angebote</NavLink>
         <NavLink to="/orders">Aufträge</NavLink>
+        <NavLink to="/more">Mehr</NavLink>
       </nav>
 
       <main className="app-content">

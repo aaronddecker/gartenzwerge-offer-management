@@ -8,6 +8,8 @@ import { LoginPage } from './pages/LoginPage'
 import { OfferedServicesPage } from './pages/OfferedServicesPage'
 import { OffersPage } from './pages/OffersPage'
 import { OrdersPage } from './pages/OrdersPage'
+import { AnalyticsPage } from './pages/AnalyticsPage'
+import { MorePage } from './pages/MorePage'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/offered-services" element={<OfferedServicesPage />} />
           <Route path="/offers" element={<OffersPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/more" element={<MorePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
