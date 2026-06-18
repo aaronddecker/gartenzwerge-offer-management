@@ -218,9 +218,36 @@ If someone modifies a token, the signature becomes invalid and the API rejects t
 
 ---
 
-## Current Limitations
+## Role-based Authorization
 
-The current authentication implementation is a foundation.
+The backend uses ASP.NET Core Identity roles for role-based authorization.
+
+Available roles:
+
+* `Admin`
+* `Employee`
+
+Roles are seeded during application startup for local development.
+
+Development users are assigned to roles so authorization behavior can be tested locally:
+
+* `test@gartenzwerge.de` → `Admin`
+* `employee@gartenzwerge.de` → `Employee`
+
+JWT tokens include role claims so ASP.NET Core can evaluate role-based authorization rules.
+
+Example:
+
+```text
+[Authorize(Roles = ApplicationRoles.Admin)]
+```
+
+Authorization behavior:
+
+* `401 Unauthorized` means the request is not authenticated
+* `403 Forbidden` means the request is authenticated but the user does not have the required role
+
+## Current Limitations
 
 Implemented:
 
@@ -229,15 +256,23 @@ Implemented:
 * Password hashing through ASP.NET Core Identity
 * JWT token generation
 * JWT bearer authentication
+* Role claims in JWT tokens
+* Admin and Employee roles
+* Role seeding for local development
+* Development users for local authorization testing
 * Protected `/api/auth/me` endpoint
+* Protected business endpoints
+* Role-based endpoint protection
 * Swagger JWT authorization
 * Auth request validation
 
 Not implemented yet:
 
-* Role-based authorization
-* Admin or Employee roles
+* Customer user role or customer portal
+* User management endpoints
+* Runtime role assignment through the API
+* Authorization policies
 * Refresh tokens
 * Password reset flow
 * Email confirmation
-* Protecting all existing business endpoints
+

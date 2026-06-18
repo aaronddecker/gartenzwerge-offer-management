@@ -24,13 +24,17 @@ The application is designed to support real business workflows such as customer 
   * Automatic item total calculation
   * Automatic offer total recalculation
 * Order Management Foundation
-
   * Create orders from accepted offers
   * Prevent duplicate orders
   * View and update orders
   * Soft delete orders
 * Authentication Foundation
-
+  - Admin and Employee roles
+  - Role seeding for local development
+  - Development users for Admin and Employee testing
+  - Role claims in JWT tokens
+  - Role-based endpoint protection
+  - Admin-only protection for critical delete and service management actions
   * User registration with ASP.NET Core Identity
   * User login with password validation
   * JWT token generation
@@ -52,9 +56,7 @@ The application is designed to support real business workflows such as customer 
 
 ### Planned
 
-* Authorization & User Roles
 * Full Order Management
-
   * Dedicated complete/cancel order endpoints
   * Order scheduling
   * Employee/user assignment
@@ -517,9 +519,11 @@ chore: update tooling, configuration or maintenance tasks
 
 ### v0.8.0 – Authorization & User Roles
 
-* User roles such as Admin or Employee
+* User roles such as Admin and Employee
+* Role seeding for local development
+* Role claims in JWT tokens
 * Role-based endpoint protection
-* Authorization policies
+* Admin-only protection for critical actions
 
 ### v0.9.0 – Frontend Foundation
 

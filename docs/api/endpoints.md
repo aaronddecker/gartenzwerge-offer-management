@@ -1,6 +1,6 @@
-# API Endpoints
+Ôªø# API Endpoints
 
-This document describes the currently available REST API endpoints of the Gartenzwerge Auﬂenservice offer management backend.
+This document describes the currently available REST API endpoints of the Gartenzwerge Au√üenservice offer management backend.
 
 Base URL for local development:
 
@@ -231,6 +231,35 @@ If a protected endpoint is called without a valid token, the API returns:
 401 Unauthorized
 ```
 
+## Role-based Authorization
+
+The API uses role-based authorization with ASP.NET Core Identity roles.
+
+Available roles:
+
+* `Admin`
+* `Employee`
+
+Authorization behavior:
+
+* Requests without a valid JWT token return `401 Unauthorized`
+* Requests with a valid JWT token but insufficient role permissions return `403 Forbidden`
+
+### Role Permissions
+
+| Endpoint group                        | Employee | Admin |
+| ------------------------------------- | -------: | ----: |
+| Customers read/create/update          |        ‚úÖ |     ‚úÖ |
+| Customers delete                      |        ‚ùå |     ‚úÖ |
+| Offered Services read                 |        ‚úÖ |     ‚úÖ |
+| Offered Services create/update/delete |        ‚ùå |     ‚úÖ |
+| Offers read/create/update             |        ‚úÖ |     ‚úÖ |
+| Offers delete                         |        ‚ùå |     ‚úÖ |
+| Offer Items read/create/update/delete |        ‚úÖ |     ‚úÖ |
+| Orders read/create/update             |        ‚úÖ |     ‚úÖ |
+| Orders delete                         |        ‚ùå |     ‚úÖ |
+
+
 ## Customers
 
 Customer endpoints are used to manage customer master data.
@@ -285,7 +314,7 @@ Creates a new customer.
   "company": "Privatkunde",
   "phoneNumber": "0711 123456",
   "email": "max.mustermann@example.com",
-  "street": "Gartenstraﬂe",
+  "street": "Gartenstra√üe",
   "houseNumber": "12",
   "postalCode": "70173",
   "city": "Stuttgart",
@@ -395,9 +424,9 @@ Creates a new offered service.
 
 ```json
 {
-  "name": "Rasen m‰hen",
+  "name": "Rasen m√§hen",
   "description": "Mowing lawn areas based on square meters.",
-  "unit": "m≤",
+  "unit": "m¬≤",
   "basePrice": 0.18,
   "isActive": true
 }
@@ -598,9 +627,9 @@ Adds a new item to an existing offer.
 #### Example calculation
 
 ```text
-Quantity: 250 m≤
-Unit price: 0.18 Ä
-Total price: 45.00 Ä
+Quantity: 250 m¬≤
+Unit price: 0.18 ‚Ç¨
+Total price: 45.00 ‚Ç¨
 ```
 
 #### Responses
@@ -619,9 +648,9 @@ Total price: 45.00 Ä
   "id": "00000000-0000-0000-0000-000000000000",
   "offerId": "00000000-0000-0000-0000-000000000000",
   "offeredServiceId": "00000000-0000-0000-0000-000000000000",
-  "description": "Rasen m‰hen",
+  "description": "Rasen m√§hen",
   "quantity": 250,
-  "unit": "m≤",
+  "unit": "m¬≤",
   "unitPrice": 0.18,
   "totalPrice": 45.00
 }
@@ -661,9 +690,9 @@ Soft-deleted offer items are not included in the response.
     "id": "00000000-0000-0000-0000-000000000000",
     "offerId": "00000000-0000-0000-0000-000000000000",
     "offeredServiceId": "00000000-0000-0000-0000-000000000000",
-    "description": "Rasen m‰hen",
+    "description": "Rasen m√§hen",
     "quantity": 250,
-    "unit": "m≤",
+    "unit": "m¬≤",
     "unitPrice": 0.18,
     "totalPrice": 45.00
   }
@@ -699,9 +728,9 @@ Updates the quantity of an existing offer item and recalculates its total price.
 #### Example calculation
 
 ```text
-Quantity: 300 m≤
-Unit price: 0.18 Ä
-Total price: 54.00 Ä
+Quantity: 300 m¬≤
+Unit price: 0.18 ‚Ç¨
+Total price: 54.00 ‚Ç¨
 ```
 
 #### Responses
@@ -720,9 +749,9 @@ Total price: 54.00 Ä
   "id": "00000000-0000-0000-0000-000000000000",
   "offerId": "00000000-0000-0000-0000-000000000000",
   "offeredServiceId": "00000000-0000-0000-0000-000000000000",
-  "description": "Rasen m‰hen",
+  "description": "Rasen m√§hen",
   "quantity": 300,
-  "unit": "m≤",
+  "unit": "m¬≤",
   "unitPrice": 0.18,
   "totalPrice": 54.00
 }
@@ -947,6 +976,10 @@ Implemented authentication features:
 * Retrieve the currently authenticated user through `/api/auth/me`
 * Protect business endpoints with JWT authentication
 * Test JWT-protected endpoints through Swagger authorization
+* Seed Admin and Employee roles
+* Assign development users to Admin and Employee roles
+* Include role claims in JWT tokens
+* Protect endpoints with role-based authorization
 
 Implemented offer item features:
 
@@ -966,8 +999,6 @@ Implemented order features:
 
 Not implemented yet:
 
-* Authorization with roles and permissions
-* User roles such as Admin or Employee
 * Refresh tokens
 * Password reset flow
 * Email confirmation

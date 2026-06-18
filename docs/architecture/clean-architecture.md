@@ -105,7 +105,6 @@ Examples:
 * Logging in users
 * Validating authentication requests
 
-
 The Application layer contains:
 
 * DTOs
@@ -114,6 +113,7 @@ The Application layer contains:
 * Service implementations
 * Repository interfaces
 * Application exceptions
+* Authorization constants
 
 Examples:
 
@@ -130,6 +130,7 @@ IOrderRepository
 
 NotFoundException
 ConflictException
+UnauthorizedException
 
 IAuthService
 
@@ -140,7 +141,7 @@ AuthResponse
 RegisterRequestValidator
 LoginRequestValidator
 
-UnauthorizedException
+ApplicationRoles
 ```
 
 Business rules belong here.
@@ -155,6 +156,15 @@ Examples:
 * Duplicate user registration is prevented by checking existing email addresses.
 * Invalid login attempts return the same error message for unknown emails and wrong passwords.
 
+Authorization-related constants also live in the Application layer.
+
+Example:
+
+```text
+ApplicationRoles
+```
+
+The Application layer defines the supported role names, but it does not manage users, Identity tables or JWT generation.
 
 ---
 
@@ -179,11 +189,15 @@ Examples:
 * ASP.NET Core Identity
 * `ApplicationUser`
 * Identity database schema
+* Identity roles
+* Role seeding
+* Development user seeding
 * JWT token generation
+* Role claims in JWT tokens
 * `AuthService`
+* `IdentitySeeder`
 
-
-Authentication-related technical details also live in the Infrastructure layer.
+Authentication-related technical details live in the Infrastructure layer.
 
 Example:
 
@@ -199,6 +213,19 @@ JWT token generation
 
 This keeps the Application layer independent from ASP.NET Core Identity and JWT implementation details.
 
+Authorization-related technical details also live in the Infrastructure layer.
+
+Examples:
+
+```text
+ASP.NET Core Identity roles
+IdentitySeeder
+RoleManager<IdentityRole<Guid>>
+UserManager<ApplicationUser>
+Role claims in JWT tokens
+```
+
+This keeps role storage, development user seeding and JWT role generation outside the Application layer.
 
 ---
 
@@ -221,7 +248,6 @@ Examples:
 * `OrdersController`
 * `AuthController`
 
-
 The API layer is responsible for:
 
 * Receiving HTTP requests
@@ -234,10 +260,23 @@ The API layer is responsible for:
 * Registering dependencies
 * Configuring JWT bearer authentication
 * Configuring Swagger JWT authorization
+* Applying role-based authorization rules
+* Protecting controller actions with `[Authorize(Roles = ...)]`
 
 Controllers should stay thin.
 
 They should not contain business rules.
+
+Role-based endpoint access is enforced in the API layer through ASP.NET Core authorization attributes.
+
+Examples:
+
+```text
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
+[Authorize(Roles = ApplicationRoles.Admin)]
+```
+
+The API layer decides which authenticated roles are allowed to access specific controllers or actions.
 
 ---
 
@@ -317,6 +356,22 @@ AuthController
 Current user information
 ```
 
+Role-based authorization example:
+
+```text
+DELETE /api/customers/{id}
+ ↓
+JWT Bearer Authentication Middleware
+ ↓
+Token is validated
+ ↓
+Role claims are read from the JWT
+ ↓
+[Authorize(Roles = ApplicationRoles.Admin)]
+ ↓
+Request is executed only if the user has the Admin role
+```
+
 ---
 
 ## Repository Pattern
@@ -383,6 +438,12 @@ ConflictException      → 409 Conflict
 Unexpected errors      → 500 Internal Server Error
 ```
 
+Some authentication and authorization responses are produced directly by ASP.NET Core middleware.
+
+```text
+Missing or invalid JWT token       → 401 Unauthorized
+Valid token but insufficient role  → 403 Forbidden
+```
 
 This keeps controllers clean because they do not need to handle every error case manually.
 
@@ -418,6 +479,9 @@ This architecture provides several benefits:
 * The Application layer can be tested without a real database.
 * Business rules are easier to find and maintain.
 * New features can follow the same structure consistently.
+* Authentication and authorization are separated clearly.
+* Role names are centralized instead of duplicated as magic strings.
+* Technical Identity and JWT details stay outside the Application layer.
 
 ---
 
@@ -428,6 +492,9 @@ Use this rule when deciding where code belongs:
 ```text
 Entity or enum?                         → Domain
 Use case, DTO, validator or interface?  → Application
+Role constants?                         → Application
 Database, Identity or JWT detail?       → Infrastructure
+Role seeding or JWT role claims?        → Infrastructure
 HTTP endpoint, middleware or Swagger?   → API
+Controller/action authorization rules?  → API
 ```
