@@ -9,6 +9,7 @@ import { MorePage } from './pages/MorePage'
 import { OfferedServicesPage } from './pages/OfferedServicesPage'
 import { OffersPage } from './pages/OffersPage'
 import { OrdersPage } from './pages/OrdersPage'
+import { PublicOnlyRoute } from './auth/PublicOnlyRoute'
 import './App.css'
 
 export function App() {
@@ -16,7 +17,10 @@ export function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<LoginPage />} />
+
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
