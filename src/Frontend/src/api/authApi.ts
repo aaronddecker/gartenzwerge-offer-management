@@ -12,9 +12,9 @@ type LoginResponse = {
 }
 
 export type CurrentUserResponse = {
-  userId?: string
-  id?: string
+  userId: string
   email: string
+  displayName?: string
   roles?: string[]
 }
 

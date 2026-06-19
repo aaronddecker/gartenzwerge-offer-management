@@ -35,6 +35,14 @@ export function AppLayout() {
     navigate('/login', { replace: true })
   }
 
+  function formatRoles(roles?: string[]) {
+  if (!roles || roles.length === 0) {
+    return 'Keine Rolle geladen'
+  }
+
+  return roles.join(', ')
+}
+
   return (
     <div className="app-layout">
       <header className="app-header">
@@ -43,7 +51,7 @@ export function AppLayout() {
           <h1>Management</h1>
           <p className="app-current-user">
             {currentUser
-              ? `Angemeldet als ${currentUser.email}`
+              ? `${currentUser.email} · ${formatRoles(currentUser.roles)}`
               : 'Benutzer wird geladen...'}
           </p>
         </div>

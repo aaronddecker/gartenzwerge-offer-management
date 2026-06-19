@@ -36,17 +36,22 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public ActionResult<object> Me()
+    public IActionResult GetCurrentUser()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var email = User.FindFirstValue(ClaimTypes.Email);
-        var displayName = User.FindFirstValue(ClaimTypes.Name);
+        var displayName = User.FindFirstValue("displayName");
+
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(claim => claim.Value)
+            .ToList();
 
         return Ok(new
         {
             userId,
             email,
-            displayName
+            displayName,
+            roles
         });
     }
 }
