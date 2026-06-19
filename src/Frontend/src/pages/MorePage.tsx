@@ -1,7 +1,19 @@
-import { Link } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { PageHeader } from '../shared/components/PageHeader'
+import type { CurrentUserResponse } from '../api/authApi'
+
+type AppLayoutOutletContext = {
+  currentUser: CurrentUserResponse | null
+}
+
+function hasRole(user: CurrentUserResponse | null, role: string) {
+  return user?.roles?.includes(role) ?? false
+}
 
 export function MorePage() {
+  const { currentUser } = useOutletContext<AppLayoutOutletContext>()
+  const isAdmin = hasRole(currentUser, 'Admin')
+
   return (
     <section className="page">
       <PageHeader
@@ -13,9 +25,12 @@ export function MorePage() {
         <Link to="/analytics" className="more-link">
           Analytics
         </Link>
-        <Link to="/offered-services" className="more-link">
-          Leistungen verwalten
-        </Link>
+
+        {isAdmin && (
+          <Link to="/offered-services" className="more-link">
+            Leistungen verwalten
+          </Link>
+        )}
       </div>
     </section>
   )
