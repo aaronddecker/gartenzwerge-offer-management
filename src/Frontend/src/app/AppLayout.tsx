@@ -1,12 +1,38 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { getCurrentUser, type CurrentUserResponse } from '../api/authApi'
 import { removeAuthToken } from '../auth/authStorage'
 
 export function AppLayout() {
   const navigate = useNavigate()
+  const [currentUser, setCurrentUser] = useState<CurrentUserResponse | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadCurrentUser() {
+      try {
+        const user = await getCurrentUser()
+
+        if (isMounted) {
+          setCurrentUser(user)
+        }
+      } catch {
+        removeAuthToken()
+        navigate('/login', { replace: true })
+      }
+    }
+
+    loadCurrentUser()
+
+    return () => {
+      isMounted = false
+    }
+  }, [navigate])
 
   function handleLogout() {
     removeAuthToken()
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -15,6 +41,11 @@ export function AppLayout() {
         <div className="app-header__title">
           <p className="app-kicker">Gartenzwerge Außenservice</p>
           <h1>Management</h1>
+          <p className="app-current-user">
+            {currentUser
+              ? `Angemeldet als ${currentUser.email}`
+              : 'Benutzer wird geladen...'}
+          </p>
         </div>
 
         <button type="button" className="logout-button" onClick={handleLogout}>
