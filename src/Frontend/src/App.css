@@ -247,3 +247,82 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #eef4e8, #f7f7f2);
+}
+
+.login-card {
+  width: min(100%, 420px);
+  padding: 1.5rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(33, 53, 71, 0.12);
+}
+
+.login-card h1 {
+  margin: 0.25rem 0 0;
+  color: #213547;
+}
+
+.login-card__description {
+  margin: 0.75rem 0 1.5rem;
+  color: #66705f;
+  line-height: 1.5;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+  color: #33402b;
+  font-weight: 700;
+}
+
+.form-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d8ddcf;
+  border-radius: 0.9rem;
+  background: #fbfbf7;
+  color: #213547;
+  font: inherit;
+}
+
+.form-field input:focus {
+  border-color: #7f936d;
+  outline: 3px solid rgba(127, 147, 109, 0.2);
+}
+
+.primary-button {
+  margin-top: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: #33402b;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #435238;
+}
+
+.form-message {
+  margin: 0;
+  color: #66705f;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
