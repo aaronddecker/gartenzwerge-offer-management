@@ -7,7 +7,7 @@ export function DashboardPage() {
     <section className="page">
       <PageHeader
         title="Dashboard"
-        description="Übersicht über Kunden, Angebote und Aufträge."
+        description="Dein Überblick über Kunden, Angebote und anstehende Aufträge."
       />
 
       <div className="stat-grid">
@@ -19,40 +19,32 @@ export function DashboardPage() {
         <StatCard
           title="Offene Angebote"
           value="0"
-          description="Angebote, die noch nicht abgeschlossen sind"
+          description="Angebote, die noch nicht angenommen oder abgelehnt wurden"
         />
         <StatCard
           title="Anstehende Aufträge"
           value="0"
-          description="Geplante Aufträge mit Termin"
+          description="Geplante Aufträge, die noch erledigt werden müssen"
         />
       </div>
 
       <section className="dashboard-section">
-        <h3>Schnellaktionen</h3>
+        <h3>Schnellaktion</h3>
 
         <div className="quick-action-grid">
           <QuickActionLink
-            to="/customers"
-            title="Kunden verwalten"
-            description="Kunden anzeigen, anlegen oder bearbeiten"
-          />
-          <QuickActionLink
             to="/offers"
-            title="Angebote bearbeiten"
-            description="Angebote prüfen und neue Angebote vorbereiten"
-          />
-          <QuickActionLink
-            to="/orders"
-            title="Aufträge anzeigen"
-            description="Geplante und laufende Aufträge im Blick behalten"
-          />
-          <QuickActionLink
-            to="/offered-services"
-            title="Leistungen verwalten"
-            description="Dienstleistungen, Preise und Einheiten pflegen"
+            title="Angebote öffnen"
+            description="Angebote ansehen und später neue Angebote erstellen"
           />
         </div>
+      </section>
+
+      <section className="dashboard-section">
+        <h3>Anstehende Aufträge</h3>
+        <p className="muted-text">
+          Hier werden später die nächsten geplanten Aufträge angezeigt.
+        </p>
       </section>
     </section>
   )

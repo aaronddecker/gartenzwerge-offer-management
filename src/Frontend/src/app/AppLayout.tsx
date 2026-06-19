@@ -70,7 +70,7 @@ export function AppLayout() {
       </nav>
 
       <main className="app-content">
-        <Outlet />
+        <Outlet context={{ currentUser }} />
       </main>
     </div>
   )
