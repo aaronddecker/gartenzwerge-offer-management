@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { login } from '../api/authApi'
+import { saveAuthToken } from '../auth/authStorage'
 
 type LoginFormState = {
   email: string
@@ -23,13 +24,13 @@ export function LoginPage() {
     setErrorMessage(null)
     setSuccessMessage(null)
 
-    try {
-      const response = await login(formData)
+   try {
+  const response = await login(formData)
 
-      setSuccessMessage(
-        `Login erfolgreich. Token erhalten (${response.token.length} Zeichen).`
-      )
-    } catch (error) {
+  saveAuthToken(response.token)
+
+  setSuccessMessage('Login erfolgreich. Token wurde gespeichert.')
+} catch (error) {
       setErrorMessage(
         error instanceof Error
           ? error.message
