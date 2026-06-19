@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { login } from '../api/authApi'
 import { saveAuthToken } from '../auth/authStorage'
+import { useNavigate } from 'react-router-dom'
 
 type LoginFormState = {
   email: string
@@ -16,6 +17,7 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -24,13 +26,13 @@ export function LoginPage() {
     setErrorMessage(null)
     setSuccessMessage(null)
 
-   try {
-  const response = await login(formData)
+    try {
+    const response = await login(formData)
 
-  saveAuthToken(response.token)
+    saveAuthToken(response.token)
 
-  setSuccessMessage('Login erfolgreich. Token wurde gespeichert.')
-} catch (error) {
+    navigate('/dashboard')
+    } catch (error) {
       setErrorMessage(
         error instanceof Error
           ? error.message
