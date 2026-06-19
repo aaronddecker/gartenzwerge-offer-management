@@ -66,6 +66,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendDev", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -97,7 +108,6 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCustomerRequestValidator>();
 
 // Register application services.
-// Register application services.
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IOfferedServiceService, OfferedServiceService>();
 builder.Services.AddScoped<IOfferService, OfferService>();
@@ -122,6 +132,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseCors("FrontendDev");
 
 app.UseAuthentication();
 

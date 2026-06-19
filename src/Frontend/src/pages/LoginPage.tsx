@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { login } from '../api/authApi'
 
 type LoginFormState = {
   email: string
@@ -11,13 +12,33 @@ export function LoginPage() {
     password: '',
   })
 
-  const [submitMessage, setSubmitMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault()
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
 
-  setSubmitMessage('Login-Formular funktioniert. Der echte API-Login kommt im nächsten Schritt.')
-}
+    setIsSubmitting(true)
+    setErrorMessage(null)
+    setSuccessMessage(null)
+
+    try {
+      const response = await login(formData)
+
+      setSuccessMessage(
+        `Login erfolgreich. Token erhalten (${response.token.length} Zeichen).`
+      )
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ein unbekannter Fehler ist aufgetreten.'
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <main className="login-page">
@@ -63,10 +84,17 @@ function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
             />
           </label>
 
-          <button type="submit" className="primary-button">
-            Einloggen
+          <button type="submit" className="primary-button" disabled={isSubmitting}>
+            {isSubmitting ? 'Einloggen...' : 'Einloggen'}
           </button>
-          {submitMessage && <p className="form-message">{submitMessage}</p>}
+
+          {errorMessage && (
+            <p className="form-message form-message--error">{errorMessage}</p>
+          )}
+
+          {successMessage && (
+            <p className="form-message form-message--success">{successMessage}</p>
+          )}
         </form>
       </section>
     </main>
