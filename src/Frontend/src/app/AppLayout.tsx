@@ -1,13 +1,25 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { removeAuthToken } from '../auth/authStorage'
 
 export function AppLayout() {
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    removeAuthToken()
+    navigate('/login')
+  }
+
   return (
     <div className="app-layout">
       <header className="app-header">
-        <div>
+        <div className="app-header__title">
           <p className="app-kicker">Gartenzwerge Außenservice</p>
           <h1>Management</h1>
         </div>
+
+        <button type="button" className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
       </header>
 
       <nav className="app-nav" aria-label="Main navigation">
