@@ -10,6 +10,7 @@ import { OfferedServicesPage } from './pages/OfferedServicesPage'
 import { OffersPage } from './pages/OffersPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { PublicOnlyRoute } from './auth/PublicOnlyRoute'
+import { RoleProtectedRoute } from './auth/RoleProtectedRoute'
 import './App.css'
 
 export function App() {
@@ -29,8 +30,12 @@ export function App() {
             <Route path="/offers" element={<OffersPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/more" element={<MorePage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/offered-services" element={<OfferedServicesPage />} />
+            
+
+            <Route element={<RoleProtectedRoute requiredRole="Admin" />}>
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/offered-services" element={<OfferedServicesPage />} />
+            </Route>
           </Route>
         </Route>
 
