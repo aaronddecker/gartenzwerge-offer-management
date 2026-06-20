@@ -13,12 +13,12 @@ The application is designed to support real business workflows such as customer 
 Current milestone:
 
 ```text
-v0.9.0 – Frontend Foundation
+v0.10.0 – Authentication UI & Protected Frontend
 ```
 
-The backend already provides the core business API, authentication and role-based authorization.
+The backend already provides the core business API, authentication, JWT-based authorization and role-based endpoint protection.
 
-The frontend foundation has been added with React, TypeScript and Vite. It currently includes routing, a basic app layout, mobile-first navigation, placeholder pages and reusable UI components.
+The frontend foundation has been extended with a working authentication flow. The React client can log in through the backend API, store a JWT token, protect internal routes, load the current authenticated user through `/api/auth/me`, display the user's role and restrict Admin-only frontend areas.
 
 ---
 
@@ -87,6 +87,22 @@ The frontend foundation has been added with React, TypeScript and Vite. It curre
 * Dashboard quick actions
 * Mobile navigation improved to avoid horizontal scrolling
 
+### Authentication UI & Protected Frontend
+
+* Login form connected to the backend authentication API
+* Loading, success and error states for the login flow
+* Local CORS support for the React development frontend
+* JWT token storage in the frontend
+* Redirect to dashboard after successful login
+* Logout action with token removal
+* Protected frontend routes for authenticated users
+* Public-only login route for already authenticated users
+* Current user loading through `/api/auth/me`
+* Current user email and role display in the app header
+* Role-aware UI behavior for Admin and Employee users
+* Admin-only frontend routes for Analytics and Offered Services
+* `.vite/` ignored to prevent committing generated Vite cache files
+
 ---
 
 ## Planned
@@ -103,19 +119,15 @@ The frontend foundation has been added with React, TypeScript and Vite. It curre
 
 ### Frontend
 
-* Login form with JWT authentication
-* Token handling in the frontend
-* Protected frontend routes
-* User information loading through `/api/auth/me`
-* Logout function
-* Role-aware UI behavior for Admin and Employee
+* Global AuthContext for cleaner shared authentication state
+* Admin/Employee UI polishing
 * Dashboard with upcoming orders
 * Simple calendar field for upcoming orders
 * Customer CRUD UI
 * Offered Service CRUD UI
 * Offer Management UI
 * Order Management UI
-* Loading, error and empty states
+* Loading, error and empty states for business data
 * Responsive polishing
 
 ### DevOps
@@ -190,14 +202,27 @@ The frontend foundation has been added with React, TypeScript and Vite. It curre
 * `401 Unauthorized` for missing or invalid tokens
 * `403 Forbidden` for insufficient role permissions
 
+### Frontend Authentication and Route Protection
+
+* Login form connected to the backend API
+* JWT token storage in `localStorage`
+* Redirect to dashboard after successful login
+* Logout with token removal
+* Protected routes for authenticated users
+* Public-only login route for authenticated users
+* Current user loading through `/api/auth/me`
+* Current user email and role display in the header
+* Role-aware UI behavior for Admin and Employee users
+* Admin-only frontend route protection for Analytics and Offered Services
+
 ### Frontend UI
 
 * Mobile-first layout
 * App layout with shared navigation
 * Dashboard foundation
-* Quick action cards
-* Analytics area prepared for future statistics
-* More page for secondary areas
+* Quick action cards focused on the offer workflow
+* More page for secondary and Admin-only areas
+* Analytics area prepared for future Admin reporting
 * Placeholder pages for core business modules
 
 ---
@@ -339,7 +364,18 @@ POST /api/auth/login
 GET  /api/auth/me
 ```
 
-`/api/auth/me` requires a valid JWT bearer token.
+`/api/auth/me` requires a valid JWT bearer token and returns the current authenticated user including role information.
+
+Example response:
+
+```json
+{
+  "userId": "019eca0b-1a65-70bc-9821-1f6a0c344c11",
+  "email": "test@gartenzwerge.de",
+  "displayName": "Test User",
+  "roles": ["Admin"]
+}
+```
 
 ### Customers
 
@@ -407,13 +443,21 @@ Current frontend routes:
 /login
 ```
 
+Current frontend route behavior:
+
+* `/login` is public and redirects authenticated users to `/dashboard`
+* Internal app routes are protected for authenticated users
+* `/analytics` is restricted to Admin users
+* `/offered-services` is restricted to Admin users
+* Unauthorized users are redirected to `/dashboard` for Admin-only frontend routes
+
 Current frontend limitations:
 
-* No backend API integration yet
-* No login form functionality yet
-* No protected frontend routes yet
-* No JWT handling in the frontend yet
+* No global AuthContext yet
+* No refresh token flow yet
 * No real dashboard or analytics data yet
+* No backend API integration for business data yet
+* No Customer, Offer, Order or Offered Service CRUD UI yet
 
 ---
 
@@ -561,7 +605,8 @@ gartenzwerge-management/
 │   ├── api/
 │   ├── architecture/
 │   ├── business-processes/
-│   └── database/
+│   ├── database/
+│   └── frontend/
 ├── src/
 │   ├── Backend/
 │   │   ├── Gartenzwerge.Domain/
@@ -572,6 +617,7 @@ gartenzwerge-management/
 │       ├── src/
 │       │   ├── api/
 │       │   ├── app/
+│       │   ├── auth/
 │       │   ├── pages/
 │       │   └── shared/
 │       ├── package.json
@@ -600,6 +646,9 @@ Additional project documentation is available in the `docs` folder.
 
 * [Database Documentation](docs/database/)
   Contains documentation about entities, relationships and database-related concepts.
+
+* [Frontend Architecture](docs/frontend/frontend-architecture.md)
+  Documents the React frontend structure, routing, mobile-first navigation, authentication flow and current frontend limitations.
 
 ---
 
@@ -713,12 +762,16 @@ chore: update tooling, configuration or maintenance tasks
 
 ### v0.10.0 – Authentication UI & Protected Frontend
 
-* Login form
-* JWT token handling
-* Auth state
+* Login form connected to the backend authentication API
+* JWT token handling in the frontend
+* Redirect after successful login
+* Logout action
 * Protected frontend routes
-* Logout
+* Public-only login route
 * Load current user through `/api/auth/me`
+* Display current user email and role in the header
+* Basic role-aware frontend UI
+* Admin-only frontend routes for Analytics and Offered Services
 
 ### v0.11.0 – Customer and Service UI
 
