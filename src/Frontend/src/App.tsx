@@ -30,9 +30,10 @@ export function App() {
             <Route path="/offers" element={<OffersPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/more" element={<MorePage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
+            
 
             <Route element={<RoleProtectedRoute requiredRole="Admin" />}>
+              <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/offered-services" element={<OfferedServicesPage />} />
             </Route>
           </Route>

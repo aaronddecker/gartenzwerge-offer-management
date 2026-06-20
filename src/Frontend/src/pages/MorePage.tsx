@@ -22,14 +22,16 @@ export function MorePage() {
       />
 
       <div className="more-link-list">
-        <Link to="/analytics" className="more-link">
-          Analytics
-        </Link>
-
         {isAdmin && (
-          <Link to="/offered-services" className="more-link">
-            Leistungen verwalten
-          </Link>
+          <>
+            <Link to="/analytics" className="more-link">
+              Analytics
+            </Link>
+
+            <Link to="/offered-services" className="more-link">
+              Leistungen verwalten
+            </Link>
+          </>
         )}
       </div>
     </section>
