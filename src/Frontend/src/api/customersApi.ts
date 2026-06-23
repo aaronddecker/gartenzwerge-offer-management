@@ -86,3 +86,23 @@ export async function deleteCustomer(customerId: string): Promise<void> {
     throw new Error('Kunde konnte nicht gelöscht werden.')
   }
 }
+
+export async function updateCustomer(
+  customerId: string,
+  request: CreateCustomerRequest
+): Promise<CustomerResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/customers/${customerId}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthorizationHeader(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
+
+  if (!response.ok) {
+    throw new Error('Kunde konnte nicht aktualisiert werden.')
+  }
+
+  return response.json()
+}

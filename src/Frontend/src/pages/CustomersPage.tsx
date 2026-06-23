@@ -5,6 +5,7 @@ import {
   createCustomer,
   deleteCustomer,
   getCustomers,
+  updateCustomer,
   type CreateCustomerRequest,
   type CustomerResponse,
 } from '../api/customersApi'
@@ -74,7 +75,9 @@ export function CustomersPage() {
   const [customers, setCustomers] = useState<CustomerResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null)
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(
+    null
+  )
 
   const [formData, setFormData] = useState<CustomerFormState>(
     initialCustomerFormData
@@ -86,6 +89,9 @@ export function CustomersPage() {
   const [createSuccessMessage, setCreateSuccessMessage] = useState<
     string | null
   >(null)
+
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null)
+  const isEditing = editingCustomerId !== null
 
   useEffect(() => {
     let isMounted = true
@@ -137,7 +143,34 @@ export function CustomersPage() {
     })
   }
 
-  async function handleCreateCustomer(event: FormEvent<HTMLFormElement>) {
+  function handleStartEditCustomer(customer: CustomerResponse) {
+    setEditingCustomerId(customer.id)
+
+    setFormData({
+      firstName: customer.firstName ?? '',
+      lastName: customer.lastName ?? '',
+      company: customer.company ?? '',
+      phoneNumber: customer.phoneNumber ?? '',
+      email: customer.email ?? '',
+      street: customer.street ?? '',
+      houseNumber: customer.houseNumber ?? '',
+      postalCode: customer.postalCode ?? '',
+      city: customer.city ?? '',
+      notes: customer.notes ?? '',
+    })
+
+    setCreateErrorMessage(null)
+    setCreateSuccessMessage(null)
+  }
+
+  function handleCancelEdit() {
+    setEditingCustomerId(null)
+    setFormData(initialCustomerFormData)
+    setCreateErrorMessage(null)
+    setCreateSuccessMessage(null)
+  }
+
+  async function handleSaveCustomer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     setIsCreating(true)
@@ -145,9 +178,20 @@ export function CustomersPage() {
     setCreateSuccessMessage(null)
 
     try {
-      await createCustomer(toCreateCustomerRequest(formData))
+      if (editingCustomerId) {
+        await updateCustomer(
+          editingCustomerId,
+          toCreateCustomerRequest(formData)
+        )
+
+        setCreateSuccessMessage('Kunde wurde erfolgreich aktualisiert.')
+        setEditingCustomerId(null)
+      } else {
+        await createCustomer(toCreateCustomerRequest(formData))
+        setCreateSuccessMessage('Kunde wurde erfolgreich angelegt.')
+      }
+
       setFormData(initialCustomerFormData)
-      setCreateSuccessMessage('Kunde wurde erfolgreich angelegt.')
       await refreshCustomers()
     } catch (error) {
       setCreateErrorMessage(
@@ -191,9 +235,9 @@ export function CustomersPage() {
       />
 
       <section className="customer-form-card">
-        <h3>Neuen Kunden anlegen</h3>
+        <h3>{isEditing ? 'Kunden bearbeiten' : 'Neuen Kunden anlegen'}</h3>
 
-        <form className="customer-form" onSubmit={handleCreateCustomer}>
+        <form className="customer-form" onSubmit={handleSaveCustomer}>
           <div className="customer-form-grid">
             <label className="form-field">
               <span>Vorname</span>
@@ -299,9 +343,29 @@ export function CustomersPage() {
             </label>
           </div>
 
-          <button type="submit" className="primary-button" disabled={isCreating}>
-            {isCreating ? 'Kunde wird gespeichert...' : 'Kunde anlegen'}
-          </button>
+          <div className="customer-form-actions">
+            {isEditing && (
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={handleCancelEdit}
+              >
+                Abbrechen
+              </button>
+            )}
+
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={isCreating}
+            >
+              {isCreating
+                ? 'Kunde wird gespeichert...'
+                : isEditing
+                  ? 'Speichern'
+                  : 'Kunde anlegen'}
+            </button>
+          </div>
 
           {createErrorMessage && (
             <p className="form-message form-message--error">
@@ -371,15 +435,25 @@ export function CustomersPage() {
                 )}
               </dl>
 
-              {isAdmin && (
+              <div className="customer-card__actions">
                 <button
                   type="button"
-                  className="secondary-danger-button"
-                  onClick={() => handleDeleteCustomer(customer.id)}
+                  className="secondary-button"
+                  onClick={() => handleStartEditCustomer(customer)}
                 >
-                  Löschen
+                  Bearbeiten
                 </button>
-              )}
+
+                {isAdmin && (
+                  <button
+                    type="button"
+                    className="secondary-danger-button"
+                    onClick={() => handleDeleteCustomer(customer.id)}
+                  >
+                    Löschen
+                  </button>
+                )}
+              </div>
             </article>
           ))}
         </div>
