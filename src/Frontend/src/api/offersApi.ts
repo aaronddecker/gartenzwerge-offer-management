@@ -16,6 +16,12 @@ export type OfferResponse = {
   notes?: string | null
 }
 
+export type CreateOfferRequest = {
+  customerId: string
+  validUntil: string
+  notes?: string | null
+}
+
 function getAuthorizationHeader() {
   const token = getAuthToken()
 
@@ -37,6 +43,25 @@ export async function getOffers(): Promise<OfferResponse[]> {
 
   if (!response.ok) {
     throw new Error('Angebote konnten nicht geladen werden.')
+  }
+
+  return response.json()
+}
+
+export async function createOffer(
+  request: CreateOfferRequest
+): Promise<OfferResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/offers`, {
+    method: 'POST',
+    headers: {
+      ...getAuthorizationHeader(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
+
+  if (!response.ok) {
+    throw new Error('Angebot konnte nicht angelegt werden.')
   }
 
   return response.json()
