@@ -486,3 +486,19 @@
     grid-column: 1 / -1;
   }
 }
+
+.secondary-danger-button {
+  justify-self: start;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #e6c8c1;
+  border-radius: 999px;
+  background: #fff7f5;
+  color: #9b2f22;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-danger-button:hover {
+  background: #fdebe7;
+}

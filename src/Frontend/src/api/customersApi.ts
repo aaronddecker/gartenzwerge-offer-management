@@ -73,3 +73,16 @@ export async function createCustomer(
 
   return response.json()
 }
+
+export async function deleteCustomer(customerId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/customers/${customerId}`, {
+    method: 'DELETE',
+    headers: {
+      ...getAuthorizationHeader(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Kunde konnte nicht gelöscht werden.')
+  }
+}

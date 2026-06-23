@@ -1,6 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useOutletContext } from 'react-router-dom'
+import type { CurrentUserResponse } from '../api/authApi'
 import {
   createCustomer,
+  deleteCustomer,
   getCustomers,
   type CreateCustomerRequest,
   type CustomerResponse,
@@ -20,6 +23,10 @@ type CustomerFormState = {
   notes: string
 }
 
+type AppLayoutOutletContext = {
+  currentUser: CurrentUserResponse | null
+}
+
 const initialCustomerFormData: CustomerFormState = {
   firstName: '',
   lastName: '',
@@ -31,6 +38,10 @@ const initialCustomerFormData: CustomerFormState = {
   postalCode: '',
   city: '',
   notes: '',
+}
+
+function hasRole(user: CurrentUserResponse | null, role: string) {
+  return user?.roles?.includes(role) ?? false
 }
 
 function emptyToNull(value: string) {
@@ -57,9 +68,13 @@ function toCreateCustomerRequest(
 }
 
 export function CustomersPage() {
+  const { currentUser } = useOutletContext<AppLayoutOutletContext>()
+  const isAdmin = hasRole(currentUser, 'Admin')
+
   const [customers, setCustomers] = useState<CustomerResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<CustomerFormState>(
     initialCustomerFormData
@@ -142,6 +157,29 @@ export function CustomersPage() {
       )
     } finally {
       setIsCreating(false)
+    }
+  }
+
+  async function handleDeleteCustomer(customerId: string) {
+    const confirmed = window.confirm(
+      'Möchtest du diesen Kunden wirklich löschen?'
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setDeleteErrorMessage(null)
+
+    try {
+      await deleteCustomer(customerId)
+      await refreshCustomers()
+    } catch (error) {
+      setDeleteErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ein unbekannter Fehler ist aufgetreten.'
+      )
     }
   }
 
@@ -279,6 +317,10 @@ export function CustomersPage() {
         </form>
       </section>
 
+      {deleteErrorMessage && (
+        <p className="form-message form-message--error">{deleteErrorMessage}</p>
+      )}
+
       {isLoading && <p className="muted-text">Kunden werden geladen...</p>}
 
       {!isLoading && errorMessage && (
@@ -328,6 +370,16 @@ export function CustomersPage() {
                   </>
                 )}
               </dl>
+
+              {isAdmin && (
+                <button
+                  type="button"
+                  className="secondary-danger-button"
+                  onClick={() => handleDeleteCustomer(customer.id)}
+                >
+                  Löschen
+                </button>
+              )}
             </article>
           ))}
         </div>
