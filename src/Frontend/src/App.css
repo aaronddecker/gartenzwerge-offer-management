@@ -433,3 +433,56 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.customer-form-card {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #fbfbf7;
+}
+
+.customer-form-card h3 {
+  margin: 0;
+  color: #213547;
+}
+
+.customer-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.customer-form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field textarea {
+  width: 100%;
+  min-height: 6rem;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d8ddcf;
+  border-radius: 0.9rem;
+  background: #ffffff;
+  color: #213547;
+  font: inherit;
+  resize: vertical;
+}
+
+.form-field textarea:focus {
+  border-color: #7f936d;
+  outline: 3px solid rgba(127, 147, 109, 0.2);
+}
+
+@media (min-width: 768px) {
+  .customer-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer-form__full {
+    grid-column: 1 / -1;
+  }
+}
