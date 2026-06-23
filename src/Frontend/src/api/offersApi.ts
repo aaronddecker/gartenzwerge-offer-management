@@ -66,3 +66,17 @@ export async function createOffer(
 
   return response.json()
 }
+
+export async function getOfferById(offerId: string): Promise<OfferResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/offers/${offerId}`, {
+    headers: {
+      ...getAuthorizationHeader(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Angebot konnte nicht geladen werden.')
+  }
+
+  return response.json()
+}

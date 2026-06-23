@@ -118,6 +118,12 @@ export function OffersPage() {
               </dl>
 
               {offer.notes && <p className="muted-text">{offer.notes}</p>}
+
+              <div className="customer-card__actions">
+                <Link to={`/offers/${offer.id}`} className="secondary-link-button">
+                  Details
+                </Link>
+              </div>
             </article>
           ))}
         </div>

@@ -770,3 +770,54 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.offer-summary-card {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #fbfbf7;
+}
+
+.offer-summary-card h3 {
+  margin: 0;
+  color: #213547;
+}
+
+.offer-items-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.offer-items-section h3 {
+  margin: 0;
+  color: #213547;
+}
+
+.offer-item-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.offer-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #fbfbf7;
+}
+
+.offer-item-card h4 {
+  margin: 0;
+  color: #213547;
+}
+
+.offer-item-card strong {
+  color: #213547;
+  white-space: nowrap;
+}
