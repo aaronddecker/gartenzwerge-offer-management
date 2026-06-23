@@ -391,3 +391,45 @@
 .logout-button:hover {
   background: #eef4e8;
 }
+
+.customer-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.customer-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e3e3d8;
+  border-radius: 1rem;
+  background: #fbfbf7;
+}
+
+.customer-card h3 {
+  margin: 0;
+  color: #213547;
+}
+
+.customer-card__details {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.customer-card__details dt {
+  color: #66705f;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.customer-card__details dd {
+  margin: 0 0 0.5rem;
+  color: #213547;
+}
+
+@media (min-width: 768px) {
+  .customer-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
