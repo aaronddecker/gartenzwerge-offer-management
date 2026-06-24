@@ -9,6 +9,8 @@ import { MorePage } from './pages/MorePage'
 import { OfferedServicesPage } from './pages/OfferedServicesPage'
 import { OffersPage } from './pages/OffersPage'
 import { OrdersPage } from './pages/OrdersPage'
+import { OfferCreatePage } from './pages/OfferCreatePage'
+import { OfferDetailsPage } from './pages/OfferDetailsPage'
 import { PublicOnlyRoute } from './auth/PublicOnlyRoute'
 import { RoleProtectedRoute } from './auth/RoleProtectedRoute'
 import './App.css'
@@ -28,6 +30,8 @@ export function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/offers" element={<OffersPage />} />
+            <Route path="/offers/new" element={<OfferCreatePage />} />
+            <Route path="/offers/:offerId" element={<OfferDetailsPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/more" element={<MorePage />} />
             

@@ -1,0 +1,32 @@
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--color-green-soft), var(--color-page));
+}
+
+.login-card {
+  width: min(100%, 420px);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-login);
+}
+
+.login-card h1 {
+  margin: 0.25rem 0 0;
+  color: var(--color-text);
+}
+
+.login-card__description {
+  margin: 0.75rem 0 1.5rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}

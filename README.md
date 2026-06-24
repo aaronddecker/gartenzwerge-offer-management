@@ -5,20 +5,28 @@ A modern full-stack business management application for managing customers, offe
 The application is designed to support real business workflows such as customer management, offer creation, service pricing, order handling, authentication, authorization and a mobile-first frontend experience.
 
 ---
-
 ## Current Status
 
 🚧 Active Development
 
-Current milestone:
+### Current milestone:
 
 ```text
-v0.10.0 – Authentication UI & Protected Frontend
-```
+v0.12.0 – Offer Creation Workflow UI
+````
 
-The backend already provides the core business API, authentication, JWT-based authorization and role-based endpoint protection.
+The backend already provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the foundational offer-to-order business workflow.
 
-The frontend foundation has been extended with a working authentication flow. The React client can log in through the backend API, store a JWT token, protect internal routes, load the current authenticated user through `/api/auth/me`, display the user's role and restrict Admin-only frontend areas.
+The frontend now includes a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation and a connected offer creation workflow.
+
+The current frontend milestone focuses on creating offers through a realistic business workflow:
+
+* search and select existing customers during offer creation
+* create new customers directly inside the offer creation form if no matching customer exists
+* create offer headers
+* open offer details
+* add offer items by selecting offered services and entering quantities
+* display updated offer totals after adding items
 
 ---
 
@@ -102,6 +110,52 @@ The frontend foundation has been extended with a working authentication flow. Th
 * Role-aware UI behavior for Admin and Employee users
 * Admin-only frontend routes for Analytics and Offered Services
 * `.vite/` ignored to prevent committing generated Vite cache files
+
+### Customer Management UI
+
+* Customers page connected to the backend Customers API
+* Customer list with loading, error, empty and data states
+* Mobile-friendly customer cards
+* Customer creation form
+* Customer editing with reusable form state
+* Customer update through `PUT /api/customers/{id}`
+* Admin-only customer delete action through `DELETE /api/customers/{id}`
+* Confirmation dialog before deleting customers
+* Automatic customer list refresh after create, update and delete actions
+
+### Offered Service Creation UI
+
+* Offered Services page connected to the backend Offered Services API
+* Offered service list with loading, error, empty and data states
+* Mobile-friendly offered service cards
+* Admin-only offered service creation form
+* Create offered services with name, description, unit, base price and active status
+* Automatic service list refresh after creating a service
+
+### Offer Creation Workflow UI
+
+* Offers page connected to the backend Offers API
+* Offer overview with offer cards
+* Offer creation page under `/offers/new`
+* Offer creation for existing customers
+* Customer lookup during offer creation
+* Matching customer suggestions while typing
+* Automatic display of new customer fields if no matching customer exists
+* Create a new customer during the offer creation workflow
+* Create the offer after resolving the correct customer id
+* Offer details page under `/offers/:offerId`
+* Load offer details and offer items
+* Load active offered services for item creation
+* Add offer items through `POST /api/offers/{offerId}/items`
+* Refresh offer details and total amount after adding offer items
+
+### Frontend Style Structure
+
+* Global frontend styles split into structured CSS files
+* Design tokens for colors, radii and shadows
+* Separate CSS files for layout, forms, buttons and page-specific styles
+* Removed outdated global style blocks from earlier frontend iterations
+
 
 ---
 
@@ -430,34 +484,42 @@ DELETE /api/orders/{id}
 
 ## Frontend Routes
 
-Current frontend routes:
+### Current frontend routes:
 
 ```text
+/login
 /dashboard
 /customers
 /offers
+/offers/new
+/offers/:offerId
 /orders
 /more
 /analytics
 /offered-services
-/login
 ```
 
-Current frontend route behavior:
+### Current frontend route behavior:
 
-* `/login` is public and redirects authenticated users to `/dashboard`
-* Internal app routes are protected for authenticated users
-* `/analytics` is restricted to Admin users
-* `/offered-services` is restricted to Admin users
-* Unauthorized users are redirected to `/dashboard` for Admin-only frontend routes
+- `/login` is public and redirects authenticated users to `/dashboard`
+- Internal app routes are protected for authenticated users
+- `/analytics` is restricted to Admin users
+- `/offered-services` is restricted to Admin users
+- Unauthorized users are redirected to `/dashboard` for Admin-only frontend routes
+- `/offers` displays the offer overview
+- `/offers/new` supports creating offers for existing or newly created customers
+- `/offers/:offerId` displays offer details and allows adding offer items
 
 Current frontend limitations:
 
-* No global AuthContext yet
-* No refresh token flow yet
-* No real dashboard or analytics data yet
-* No backend API integration for business data yet
-* No Customer, Offer, Order or Offered Service CRUD UI yet
+- No global AuthContext yet
+- No refresh token flow yet
+- No real dashboard or analytics data yet
+- Orders are not yet connected to the frontend workflow
+- Offer status transitions are not yet managed in the frontend
+- Creating an order from an accepted offer is planned for a later milestone
+- Offered services currently support read and create in the frontend
+- Customer lookup during offer creation is currently performed client-side after loading all customers
 
 ---
 
@@ -773,7 +835,7 @@ chore: update tooling, configuration or maintenance tasks
 * Basic role-aware frontend UI
 * Admin-only frontend routes for Analytics and Offered Services
 
-### v0.11.0 – Customer and Service UI
+### v0.11.0 – Customer Management and Service Creation UI
 
 * Customer management UI
 * Offered service management UI
@@ -781,7 +843,7 @@ chore: update tooling, configuration or maintenance tasks
 * API integration
 * Loading, error and empty states
 
-### v0.12.0 – Offer Management UI
+### v0.12.0 – Offer Creation Workflow UI
 
 * Offer overview
 * Offer detail view
