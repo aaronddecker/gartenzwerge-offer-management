@@ -1,0 +1,87 @@
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.form-field input,
+.form-field select {
+  background: var(--color-surface-muted);
+}
+
+.form-field textarea {
+  min-height: 6rem;
+  background: var(--color-surface);
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--color-focus);
+  outline: 3px solid rgba(127, 147, 109, 0.2);
+}
+
+.form-field input[type='date'] {
+  appearance: none;
+  min-height: 3.15rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.form-field input[type='date']::-webkit-calendar-picker-indicator {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-green-soft);
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.form-field input[type='date']::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--color-green-active);
+  opacity: 1;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.checkbox-field input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.form-message {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.form-message--error {
+  color: var(--color-danger-text);
+}
+
+.form-message--success {
+  color: var(--color-success);
+}

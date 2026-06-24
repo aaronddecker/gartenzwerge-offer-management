@@ -1,0 +1,109 @@
+.primary-button {
+  margin-top: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: var(--color-primary-hover);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.secondary-button {
+  justify-self: start;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: var(--color-green-soft);
+}
+
+.secondary-danger-button {
+  justify-self: start;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-danger-button:hover {
+  background: var(--color-danger-surface-hover);
+}
+
+.primary-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary-link-button:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondary-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.secondary-link-button:hover {
+  background: var(--color-green-soft);
+}
+
+.logout-button {
+  flex-shrink: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: var(--color-green-soft);
+}
+
+@media (min-width: 768px) {
+  .logout-button {
+    padding: 0.65rem 0.9rem;
+    font-size: 1rem;
+  }
+}
