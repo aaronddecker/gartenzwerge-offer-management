@@ -6,7 +6,9 @@ This document explains the current frontend foundation and authentication flow o
 
 The frontend is built as a React client for the existing ASP.NET Core backend API.
 
-It provides the foundation for a mobile-first business application with routing, a shared app layout, reusable UI components, authentication, protected routes and role-aware frontend behavior.
+It provides a mobile-first business application with routing, a shared app layout, reusable UI components, authentication, protected routes, role-aware frontend behavior and connected business workflows.
+
+The frontend currently supports customer management, offered service creation and the offer creation workflow.
 
 The backend remains the actual security boundary. Frontend route protection improves user experience and prevents users from navigating into areas that are not relevant for their role.
 
@@ -27,7 +29,10 @@ src/
 ├── app/
 ├── auth/
 ├── pages/
-└── shared/
+├── shared/
+└── styles/
+	├── components/
+	└── pages/
 ```
 
 ## Responsibilities
@@ -46,11 +51,24 @@ Contains frontend API functions for communication with the ASP.NET Core backend.
 
 Current examples:
 
-* `authApi`
-  * `login`
-  * `getCurrentUser`
-
-This area can later be expanded with endpoint-specific API functions for customers, offered services, offers and orders.
+- `authApi`
+	- `login`
+	- `getCurrentUser`
+- `customersApi`
+	- `getCustomers`
+	- `createCustomer`
+	- `updateCustomer`
+	- `deleteCustomer`
+- `offeredServicesApi`
+	- `getOfferedServices`
+	- `createOfferedService`
+- `offersApi`
+	- `getOffers`
+	- `getOfferById`
+	- `createOffer`
+- `offerItemsApi`
+	- `getOfferItems`
+	- `createOfferItem`
 
 ### auth
 
@@ -78,14 +96,18 @@ Contains route-level page components.
 
 Examples:
 
-* `DashboardPage`
-* `CustomersPage`
-* `OffersPage`
-* `OrdersPage`
-* `AnalyticsPage`
-* `MorePage`
-* `OfferedServicesPage`
-* `LoginPage`
+- `DashboardPage`
+- `CustomersPage`
+- `OffersPage`
+- `OfferCreatePage`
+- `OfferDetailsPage`
+- `OrdersPage`
+- `AnalyticsPage`
+- `MorePage`
+- `OfferedServicesPage`
+- `LoginPage`
+
+Contains route-level page components.
 
 ### shared
 
@@ -97,6 +119,20 @@ Examples:
 * `StatCard`
 * `QuickActionLink`
 
+### styles
+
+Contains structured global CSS files.
+
+Examples:
+
+- `tokens.css`
+- `base.css`
+- `layout.css`
+- `components/buttons.css`
+- `components/forms.css`
+- `pages/customers.css`
+- `pages/offers.css`
+
 ## Routing
 
 Current frontend routes:
@@ -106,6 +142,8 @@ Current frontend routes:
 /dashboard
 /customers
 /offers
+/offers/new
+/offers/:offerId
 /orders
 /more
 /analytics
@@ -128,6 +166,8 @@ Protected routes include:
 /dashboard
 /customers
 /offers
+/offers/new
+/offers/:offerId
 /orders
 /more
 ```
@@ -152,6 +192,66 @@ Current Admin-only routes:
 If an Employee opens one of these routes directly, the user is redirected to `/dashboard`.
 
 This improves the frontend user flow. The backend still remains responsible for enforcing real authorization.
+
+## Offer Creation Workflow
+
+The offer workflow is split across multiple pages.
+
+### OffersPage
+
+Route:
+
+```text
+/offers
+````
+
+Responsibilities:
+
+* Load offers from the backend API
+* Display offer cards
+* Show offer number, customer name, status, valid-until date and total amount
+* Navigate to the offer creation page
+* Navigate to offer details
+
+### OfferCreatePage
+
+Route:
+
+```text
+/offers/new
+```
+
+Responsibilities:
+
+* Load existing customers
+* Search customers while typing
+* Show matching customer suggestions
+* Allow selecting an existing customer
+* Automatically show new customer fields if no matching customer exists
+* Create a customer first if needed
+* Create the offer afterwards using the resolved customer id
+* Redirect back to `/offers` after successful creation
+
+The user never needs to know or enter a technical `customerId`. The UI shows customer names and customer details, while the frontend internally uses the selected or newly created customer id for the backend request.
+
+### OfferDetailsPage
+
+Route:
+
+```text
+/offers/:offerId
+```
+
+Responsibilities:
+
+* Load offer details
+* Load offer items
+* Load active offered services
+* Display offer summary
+* Display existing offer items
+* Add new offer items by selecting an offered service and entering a quantity
+* Refresh offer details and total amount after adding offer items
+
 
 ## Authentication Flow
 
@@ -303,7 +403,6 @@ Implemented:
 * Safe-area-aware bottom navigation on mobile
 * More page
 * Analytics page placeholder
-* Placeholder pages for core business areas
 * Reusable page header component
 * Reusable statistic card component
 * Reusable quick action link component
@@ -321,20 +420,30 @@ Implemented:
 * Current user email and role display in the header
 * Role-aware UI behavior
 * Admin-only frontend routes for Analytics and Offered Services
+* Customer management UI with read, create, update and Admin-only delete
+* Offered Services UI with read and create
+* Offer overview
+* Offer creation page
+* Customer lookup during offer creation
+* New customer creation during offer creation
+* Offer details page
+* Offer item creation
+* Structured frontend CSS files for tokens, layout, components and page-specific styles
 
 ## Current Limitations
 
 * No global AuthContext yet
 * No refresh token handling yet
 * No automatic token expiration handling in the frontend yet
-* No full API client abstraction for all business endpoints yet
+* No full API client abstraction yet
 * No real dashboard data yet
 * No real analytics data yet
-* Customer, service, offer and order pages are still placeholders
-* No customer CRUD UI yet
-* No offered service CRUD UI yet
-* No offer management UI yet
-* No order management UI yet
+* Orders are not yet connected to the frontend workflow
+* Offer status transitions are not yet managed in the frontend
+* Creating an order from an accepted offer is planned for a later milestone
+* Offered services currently support read and create in the frontend
+* Customer lookup during offer creation is currently performed client-side after loading all customers
+* The Customers page still contains a visible customer creation form, although the main business workflow now also supports creating customers during offer creation
 
 ## Future Improvements
 
@@ -345,14 +454,15 @@ Planned frontend improvements:
 * Better unauthorized-state UX
 * Optional dedicated access denied page
 * Token expiration handling
-* Customer CRUD UI
-* Offered Service CRUD UI
-* Offer Management UI
-* Smart customer lookup during offer creation
+* Backend-supported customer search endpoint if customer volume grows
+* Improve Customers page into a clearer master data management area
+* Offered Service edit and delete UI
+* Offer status management
+* Create orders from accepted offers
 * Order Management UI
 * Dashboard with upcoming orders
 * Calendar field for upcoming orders
 * Analytics with real business data
-* Loading, error and empty states for business pages
 * API client abstraction for business endpoints
 * PWA support
+
