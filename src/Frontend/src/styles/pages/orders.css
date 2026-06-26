@@ -5,10 +5,10 @@
 
 .order-card {
   display: grid;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 1.25rem;
+  padding: 1.1rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
 }
@@ -25,7 +25,8 @@
 }
 
 .order-status-badge {
-  padding: 0.35rem 0.65rem;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
   border-radius: 999px;
   background: var(--color-surface-muted);
   color: var(--color-text);
@@ -48,4 +49,111 @@
 .order-card__details dd {
   margin: 0;
   font-weight: 600;
+}
+
+.order-detail-card {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.order-detail-card h3 {
+  margin: 0;
+}
+
+.order-card__top {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.order-card__top h3 {
+  margin: 0.1rem 0;
+  font-size: 1.35rem;
+}
+
+.order-card__eyebrow {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.order-card__customer {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.order-card__metrics {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.order-card__metrics div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.order-card__metrics span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.order-card__metrics strong {
+  font-size: 1rem;
+}
+
+.order-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.order-card__action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: auto;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.order-card__action-button:hover,
+.order-card__action-button:focus {
+  text-decoration: none;
+}
+
+@media (min-width: 720px) {
+  .order-card__top {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+
+  .order-card__metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .order-card__actions {
+    grid-template-columns: 1fr;
+  }
 }

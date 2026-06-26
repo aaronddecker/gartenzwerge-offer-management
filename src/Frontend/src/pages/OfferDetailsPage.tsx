@@ -307,8 +307,8 @@ export function OfferDetailsPage() {
                   als Grundlage erhalten und kann nicht mehr verändert werden.
                 </p>
 
-                <Link to="/orders" className="secondary-link-button">
-                  Auftrag in der Übersicht öffnen
+                <Link to={`/orders/${existingOrder.id}`} className="secondary-link-button">
+                  Auftrag öffnen
                 </Link>
               </>
             ) : null}

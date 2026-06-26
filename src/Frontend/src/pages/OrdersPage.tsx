@@ -15,9 +15,17 @@ function formatCurrency(value: number) {
   }).format(value)
 }
 
-function formatDate(value: string | null) {
+function formatPlannedDate(value: string | null) {
   if (!value) {
     return 'Noch nicht geplant'
+  }
+
+  return new Intl.DateTimeFormat('de-DE').format(new Date(value))
+}
+
+function formatCompletedDate(value: string | null) {
+  if (!value) {
+    return 'Noch nicht abgeschlossen'
   }
 
   return new Intl.DateTimeFormat('de-DE').format(new Date(value))
@@ -36,6 +44,10 @@ function getOrderStatusLabel(status: OrderStatus) {
     default:
       return 'Unbekannt'
   }
+}
+
+function getShortId(id: string) {
+  return id.slice(0, 8).toUpperCase()
 }
 
 function getOfferById(offers: OfferResponse[], offerId: string) {
@@ -89,7 +101,7 @@ export function OrdersPage() {
     <section className="page">
       <PageHeader
         title="Aufträge"
-        description="Sieh angenommene Angebote, die als Aufträge weiterbearbeitet werden."
+        description="Verwalte angenommene Angebote, die als Aufträge weiterbearbeitet werden."
       />
 
       {isLoading && <p className="muted-text">Aufträge werden geladen...</p>}
@@ -119,16 +131,19 @@ export function OrdersPage() {
 
             return (
               <article key={order.id} className="order-card">
-                <div className="order-card__header">
+                <div className="order-card__top">
                   <div>
-                    <h3>
-                      {relatedOffer?.offerNumber ??
-                        `Auftrag ${order.id.slice(0, 8)}`}
-                    </h3>
+                    <span className="order-card__eyebrow">Auftrag</span>
+                    <h3>#{getShortId(order.id)}</h3>
 
-                    <p className="muted-text">
+                    <p className="order-card__customer">
                       {relatedOffer?.customerName ??
                         `Kunde ${order.customerId.slice(0, 8)}`}
+                    </p>
+
+                    <p className="muted-text">
+                      Aus Angebot{' '}
+                      {relatedOffer?.offerNumber ?? order.offerId.slice(0, 8)}
                     </p>
                   </div>
 
@@ -137,29 +152,39 @@ export function OrdersPage() {
                   </span>
                 </div>
 
-                <dl className="order-card__details">
-                  <dt>Geplant für</dt>
-                  <dd>{formatDate(order.plannedDate)}</dd>
+                <div className="order-card__metrics">
+                  <div>
+                    <span>Gesamt netto</span>
+                    <strong>
+                      {relatedOffer
+                        ? formatCurrency(relatedOffer.totalNet)
+                        : 'Nicht verfügbar'}
+                    </strong>
+                  </div>
 
-                  <dt>Abgeschlossen am</dt>
-                  <dd>{formatDate(order.completedAt)}</dd>
+                  <div>
+                    <span>Geplant für</span>
+                    <strong>{formatPlannedDate(order.plannedDate)}</strong>
+                  </div>
 
-                  <dt>Gesamt netto</dt>
-                  <dd>
-                    {relatedOffer
-                      ? formatCurrency(relatedOffer.totalNet)
-                      : 'Nicht verfügbar'}
-                  </dd>
-                </dl>
+                  <div>
+                    <span>Abgeschlossen</span>
+                    <strong>{formatCompletedDate(order.completedAt)}</strong>
+                  </div>
+                </div>
 
                 {order.notes && <p className="muted-text">{order.notes}</p>}
 
-                <div className="page-actions page-actions--left">
+                <div className="order-card__actions">
+                  <Link to={`/orders/${order.id}`} className="primary-button order-card__action-button">
+                    Öffnen
+                  </Link>
+
                   <Link
                     to={`/offers/${order.offerId}`}
-                    className="secondary-link-button"
+                    className="secondary-link-button order-card__action-button"
                   >
-                    Zugehöriges Angebot öffnen
+                    Zum Angebot
                   </Link>
                 </div>
               </article>
