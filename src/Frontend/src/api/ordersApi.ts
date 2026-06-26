@@ -14,7 +14,49 @@ function getAuthorizationHeader() {
   }
 }
 
-export async function createOrderFromOffer(offerId: string): Promise<void> {
+export type OrderStatus = 1 | 2 | 3 | 4
+
+export type OrderResponse = {
+  id: string
+  offerId: string
+  customerId: string
+  status: OrderStatus
+  plannedDate: string | null
+  completedAt: string | null
+  notes: string | null
+}
+
+export async function getOrders(): Promise<OrderResponse[]> {
+  const response = await fetch(`${API_BASE_URL}/api/orders`, {
+    headers: {
+      ...getAuthorizationHeader(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Aufträge konnten nicht geladen werden.')
+  }
+
+  return response.json()
+}
+
+export async function getOrderById(orderId: string): Promise<OrderResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+    headers: {
+      ...getAuthorizationHeader(),
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Auftrag konnte nicht geladen werden.')
+  }
+
+  return response.json()
+}
+
+export async function createOrderFromOffer(
+  offerId: string
+): Promise<OrderResponse> {
   const response = await fetch(`${API_BASE_URL}/api/offers/${offerId}/order`, {
     method: 'POST',
     headers: {
@@ -32,4 +74,6 @@ export async function createOrderFromOffer(offerId: string): Promise<void> {
         `Auftrag konnte nicht erstellt werden. Statuscode: ${response.status}`
     )
   }
+
+  return response.json()
 }
