@@ -1,9 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import {
-  getOfferedServices,
-  type OfferedServiceResponse,
-} from '../api/offeredServicesApi'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { createOrderFromOffer } from '../api/ordersApi'
 import {
   createOfferItem,
   getOfferItems,
@@ -11,9 +8,14 @@ import {
 } from '../api/offerItemsApi'
 import {
   getOfferById,
+  updateOffer,
   type OfferResponse,
   type OfferStatus,
 } from '../api/offersApi'
+import {
+  getOfferedServices,
+  type OfferedServiceResponse,
+} from '../api/offeredServicesApi'
 import { PageHeader } from '../shared/components/PageHeader'
 
 type OfferItemFormState = {
@@ -53,6 +55,7 @@ function getOfferStatusLabel(status: OfferStatus) {
 }
 
 export function OfferDetailsPage() {
+  const navigate = useNavigate()
   const { offerId } = useParams<{ offerId: string }>()
 
   const [offer, setOffer] = useState<OfferResponse | null>(null)
@@ -73,12 +76,16 @@ export function OfferDetailsPage() {
   const [createSuccessMessage, setCreateSuccessMessage] = useState<
     string | null
   >(null)
+  const [isConvertingToOrder, setIsConvertingToOrder] = useState(false)
+  const [conversionErrorMessage, setConversionErrorMessage] = useState<
+    string | null
+  >(null)
 
   useEffect(() => {
     let isMounted = true
 
     if (!offerId) {
-    return
+      return
     }
 
     Promise.all([
@@ -173,6 +180,44 @@ export function OfferDetailsPage() {
     }
   }
 
+  async function handleAcceptOfferAndCreateOrder() {
+    if (!offerId || !offer) {
+      return
+    }
+
+    const confirmed = window.confirm(
+      'Möchtest du dieses Angebot annehmen und daraus einen Auftrag erstellen?'
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setIsConvertingToOrder(true)
+    setConversionErrorMessage(null)
+
+    try {
+      if (offer.status !== 3) {
+        await updateOffer(offerId, {
+          validUntil: new Date(offer.validUntil).toISOString(),
+          status: 3,
+          notes: offer.notes ?? null,
+        })
+      }
+
+      await createOrderFromOffer(offerId)
+      navigate('/orders')
+    } catch (error) {
+      setConversionErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ein unbekannter Fehler ist aufgetreten.'
+      )
+    } finally {
+      setIsConvertingToOrder(false)
+    }
+  }
+
   const activeOfferedServices = offeredServices.filter(
     (offeredService) => offeredService.isActive
   )
@@ -231,6 +276,60 @@ export function OfferDetailsPage() {
             </dl>
 
             {offer.notes && <p className="muted-text">{offer.notes}</p>}
+          </section>
+
+          <section className="offer-conversion-card">
+            {offer.status === 1 || offer.status === 2 ? (
+              <>
+                <p className="muted-text">
+                  Wenn der Kunde dieses Angebot angenommen hat, kannst du daraus direkt
+                  einen Auftrag erstellen.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  disabled={isConvertingToOrder}
+                  onClick={handleAcceptOfferAndCreateOrder}
+                >
+                  {isConvertingToOrder
+                    ? 'Auftrag wird erstellt...'
+                    : 'Angebot annehmen & Auftrag erstellen'}
+                </button>
+              </>
+            ) : null}
+
+            {offer.status === 3 ? (
+              <>
+                <p className="muted-text">
+                  Dieses Angebot ist angenommen. Du kannst daraus einen Auftrag erstellen.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  disabled={isConvertingToOrder}
+                  onClick={handleAcceptOfferAndCreateOrder}
+                >
+                  {isConvertingToOrder
+                    ? 'Auftrag wird erstellt...'
+                    : 'Auftrag erstellen'}
+                </button>
+              </>
+            ) : null}
+
+            {offer.status === 4 ? (
+              <p className="muted-text">
+                Dieses Angebot wurde abgelehnt und kann nicht direkt in einen Auftrag
+                umgewandelt werden.
+              </p>
+            ) : null}
+
+            {conversionErrorMessage && (
+              <p className="form-message form-message--error">
+                {conversionErrorMessage}
+              </p>
+            )}
           </section>
 
           <section className="offer-form-card">
