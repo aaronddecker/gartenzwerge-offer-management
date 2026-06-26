@@ -1,6 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { createOrderFromOffer } from '../api/ordersApi'
+import {
+  createOrderFromOffer,
+  getOrders,
+  type OrderResponse,
+} from '../api/ordersApi'
 import {
   createOfferItem,
   getOfferItems,
@@ -80,6 +84,7 @@ export function OfferDetailsPage() {
   const [conversionErrorMessage, setConversionErrorMessage] = useState<
     string | null
   >(null)
+  const [orders, setOrders] = useState<OrderResponse[]>([])
 
   useEffect(() => {
     let isMounted = true
@@ -92,8 +97,10 @@ export function OfferDetailsPage() {
       getOfferById(offerId),
       getOfferItems(offerId),
       getOfferedServices(),
+      getOrders(),
     ])
-      .then(([loadedOffer, loadedOfferItems, loadedOfferedServices]) => {
+      .then(
+      ([loadedOffer, loadedOfferItems, loadedOfferedServices, loadedOrders]) => {
         if (!isMounted) {
           return
         }
@@ -101,6 +108,7 @@ export function OfferDetailsPage() {
         setOffer(loadedOffer)
         setOfferItems(loadedOfferItems)
         setOfferedServices(loadedOfferedServices)
+        setOrders(loadedOrders)
         setErrorMessage(null)
       })
       .catch((error) => {
@@ -184,6 +192,12 @@ export function OfferDetailsPage() {
     if (!offerId || !offer) {
       return
     }
+    if (existingOrder) {
+      setConversionErrorMessage(
+        'Für dieses Angebot wurde bereits ein Auftrag erstellt.'
+      )
+      return
+    }
 
     const confirmed = window.confirm(
       'Möchtest du dieses Angebot annehmen und daraus einen Auftrag erstellen?'
@@ -221,6 +235,13 @@ export function OfferDetailsPage() {
   const activeOfferedServices = offeredServices.filter(
     (offeredService) => offeredService.isActive
   )
+
+  const existingOrder = offerId
+  ? orders.find((order) => order.offerId === offerId)
+  : undefined
+
+  const isOfferReadOnly =
+    offer?.status === 3 || offer?.status === 4 || existingOrder !== undefined
 
   if (!offerId) {
     return (
@@ -279,7 +300,20 @@ export function OfferDetailsPage() {
           </section>
 
           <section className="offer-conversion-card">
-            {offer.status === 1 || offer.status === 2 ? (
+            {existingOrder ? (
+              <>
+                <p className="muted-text">
+                  Für dieses Angebot wurde bereits ein Auftrag erstellt. Das Angebot bleibt
+                  als Grundlage erhalten und kann nicht mehr verändert werden.
+                </p>
+
+                <Link to="/orders" className="secondary-link-button">
+                  Auftrag in der Übersicht öffnen
+                </Link>
+              </>
+            ) : null}
+
+            {!existingOrder && (offer.status === 1 || offer.status === 2) ? (
               <>
                 <p className="muted-text">
                   Wenn der Kunde dieses Angebot angenommen hat, kannst du daraus direkt
@@ -299,7 +333,7 @@ export function OfferDetailsPage() {
               </>
             ) : null}
 
-            {offer.status === 3 ? (
+            {!existingOrder && offer.status === 3 ? (
               <>
                 <p className="muted-text">
                   Dieses Angebot ist angenommen. Du kannst daraus einen Auftrag erstellen.
@@ -318,7 +352,7 @@ export function OfferDetailsPage() {
               </>
             ) : null}
 
-            {offer.status === 4 ? (
+            {!existingOrder && offer.status === 4 ? (
               <p className="muted-text">
                 Dieses Angebot wurde abgelehnt und kann nicht direkt in einen Auftrag
                 umgewandelt werden.
@@ -335,7 +369,11 @@ export function OfferDetailsPage() {
           <section className="offer-form-card">
             <h3>Position hinzufügen</h3>
 
-            {activeOfferedServices.length === 0 ? (
+            {isOfferReadOnly ? (
+              <p className="muted-text">
+                Dieses Angebot ist abgeschlossen und kann nicht mehr verändert werden.
+              </p>
+            ) : activeOfferedServices.length === 0 ? (
               <p className="muted-text">
                 Es sind keine aktiven Leistungen vorhanden.
               </p>
@@ -354,10 +392,7 @@ export function OfferDetailsPage() {
                       <option value="">Leistung auswählen</option>
 
                       {activeOfferedServices.map((offeredService) => (
-                        <option
-                          key={offeredService.id}
-                          value={offeredService.id}
-                        >
+                        <option key={offeredService.id} value={offeredService.id}>
                           {offeredService.name} ·{' '}
                           {formatCurrency(offeredService.basePrice)} /{' '}
                           {offeredService.unit}
@@ -370,7 +405,7 @@ export function OfferDetailsPage() {
                     <span>Menge</span>
                     <input
                       type="number"
-                      min="0"
+                      min="0.01"
                       step="0.01"
                       value={formData.quantity}
                       onChange={(event) =>
