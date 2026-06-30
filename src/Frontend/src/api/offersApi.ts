@@ -22,6 +22,12 @@ export type CreateOfferRequest = {
   notes?: string | null
 }
 
+export type UpdateOfferRequest = {
+  validUntil: string
+  status: OfferStatus
+  notes?: string | null
+}
+
 function getAuthorizationHeader() {
   const token = getAuthToken()
 
@@ -76,6 +82,26 @@ export async function getOfferById(offerId: string): Promise<OfferResponse> {
 
   if (!response.ok) {
     throw new Error('Angebot konnte nicht geladen werden.')
+  }
+
+  return response.json()
+}
+
+export async function updateOffer(
+  offerId: string,
+  request: UpdateOfferRequest
+): Promise<OfferResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/offers/${offerId}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthorizationHeader(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
+
+  if (!response.ok) {
+    throw new Error('Angebot konnte nicht aktualisiert werden.')
   }
 
   return response.json()

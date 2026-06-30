@@ -1,25 +1,49 @@
 ﻿# Frontend Architecture
 
-This document explains the current frontend foundation and authentication flow of the Gartenzwerge management application.
+This document explains the current frontend architecture of the Gartenzwerge management application.
+
+The frontend is a React client for the ASP.NET Core backend API. It provides a mobile-first business interface with authentication, protected routes, role-aware navigation and connected workflows for customers, offers and orders.
+
+---
 
 ## Goal
 
-The frontend is built as a React client for the existing ASP.NET Core backend API.
+The frontend is designed to support a realistic service business workflow:
 
-It provides a mobile-first business application with routing, a shared app layout, reusable UI components, authentication, protected routes, role-aware frontend behavior and connected business workflows.
+```text
+Customer
+→ Offer
+→ Offer Items
+→ Accepted Offer
+→ Order
+```
 
-The frontend currently supports customer management, offered service creation and the offer creation workflow.
+The current frontend separates offer work from operational order work:
 
-The backend remains the actual security boundary. Frontend route protection improves user experience and prevents users from navigating into areas that are not relevant for their role.
+```text
+/offers
+→ active offer work and offer history
+
+/orders
+→ real service orders
+```
+
+Frontend route protection improves the user experience, but the backend remains the real security boundary. Authorization and business rules must always be enforced by the API.
+
+---
 
 ## Technologies
 
-* React
-* TypeScript
-* Vite
-* React Router
-* CSS with mobile-first responsive styling
-* Browser `localStorage` for the current development JWT storage
+| Technology   | Usage                                |
+| ------------ | ------------------------------------ |
+| React        | UI library                           |
+| TypeScript   | Type-safe frontend development       |
+| Vite         | Development server and build tooling |
+| React Router | Frontend routing                     |
+| CSS          | Mobile-first responsive styling      |
+| localStorage | Current development JWT storage      |
+
+---
 
 ## Project Structure
 
@@ -31,263 +55,129 @@ src/
 ├── pages/
 ├── shared/
 └── styles/
-	├── components/
-	└── pages/
+    ├── components/
+    └── pages/
 ```
 
-## Responsibilities
+---
 
-### app
+## Folder Responsibilities
 
-Contains app-wide structure such as layout and routing-related components.
+| Folder   | Responsibility                                   |
+| -------- | ------------------------------------------------ |
+| `api`    | Frontend API functions for backend communication |
+| `app`    | App-wide layout and structure                    |
+| `auth`   | Token storage and route guards                   |
+| `pages`  | Route-level page components                      |
+| `shared` | Reusable UI components                           |
+| `styles` | Structured global CSS files                      |
 
-Examples:
+---
 
-* `AppLayout`
+## API Modules
 
-### api
+The frontend keeps backend communication in dedicated API modules.
 
-Contains frontend API functions for communication with the ASP.NET Core backend.
+| Module               | Responsibility                                        |
+| -------------------- | ----------------------------------------------------- |
+| `authApi`            | Login and current user loading                        |
+| `customersApi`       | Customer read, create, update and delete              |
+| `offeredServicesApi` | Offered service read and create                       |
+| `offersApi`          | Offer overview, detail, create and update             |
+| `offerItemsApi`      | Offer item read and create                            |
+| `ordersApi`          | Order overview, detail and order creation from offers |
 
-Current examples:
+This keeps API logic separate from page components.
 
-- `authApi`
-	- `login`
-	- `getCurrentUser`
-- `customersApi`
-	- `getCustomers`
-	- `createCustomer`
-	- `updateCustomer`
-	- `deleteCustomer`
-- `offeredServicesApi`
-	- `getOfferedServices`
-	- `createOfferedService`
-- `offersApi`
-	- `getOffers`
-	- `getOfferById`
-	- `createOffer`
-- `offerItemsApi`
-	- `getOfferItems`
-	- `createOfferItem`
+---
 
-### auth
+## Authentication Helpers
 
-Contains authentication-related frontend helpers and route guard components.
+The `auth` folder contains frontend authentication helpers and route guard components.
 
-Examples:
+| File / Component     | Responsibility                                  |
+| -------------------- | ----------------------------------------------- |
+| `authStorage`        | Store, read and remove the JWT token            |
+| `ProtectedRoute`     | Protect authenticated app routes                |
+| `PublicOnlyRoute`    | Redirect authenticated users away from `/login` |
+| `RoleProtectedRoute` | Protect Admin-only frontend routes              |
 
-* `authStorage`
-* `ProtectedRoute`
-* `PublicOnlyRoute`
-* `RoleProtectedRoute`
-
-Responsibilities:
-
-* Store the JWT token
-* Read the JWT token
-* Remove the JWT token on logout
-* Protect authenticated frontend routes
-* Redirect authenticated users away from public-only routes such as `/login`
-* Protect Admin-only frontend routes
-
-### pages
-
-Contains route-level page components.
-
-Examples:
-
-- `DashboardPage`
-- `CustomersPage`
-- `OffersPage`
-- `OfferCreatePage`
-- `OfferDetailsPage`
-- `OrdersPage`
-- `AnalyticsPage`
-- `MorePage`
-- `OfferedServicesPage`
-- `LoginPage`
-
-Contains route-level page components.
-
-### shared
-
-Contains reusable UI components that can be used across multiple pages.
-
-Examples:
-
-* `PageHeader`
-* `StatCard`
-* `QuickActionLink`
-
-### styles
-
-Contains structured global CSS files.
-
-Examples:
-
-- `tokens.css`
-- `base.css`
-- `layout.css`
-- `components/buttons.css`
-- `components/forms.css`
-- `pages/customers.css`
-- `pages/offers.css`
+---
 
 ## Routing
 
 Current frontend routes:
 
-```text
-/login
-/dashboard
-/customers
-/offers
-/offers/new
-/offers/:offerId
-/orders
-/more
-/analytics
-/offered-services
-```
+| Route               | Purpose                              | Protection    |
+| ------------------- | ------------------------------------ | ------------- |
+| `/login`            | Login page                           | Public-only   |
+| `/dashboard`        | Operational entry page               | Authenticated |
+| `/customers`        | Customer management                  | Authenticated |
+| `/offers`           | Offer overview with filters          | Authenticated |
+| `/offers/new`       | Create a new offer                   | Authenticated |
+| `/offers/:offerId`  | Offer details and conversion actions | Authenticated |
+| `/orders`           | Orders overview                      | Authenticated |
+| `/orders/:orderId`  | Read-only order details              | Authenticated |
+| `/more`             | Secondary navigation                 | Authenticated |
+| `/analytics`        | Future reporting area                | Admin-only    |
+| `/offered-services` | Offered service management           | Admin-only    |
+
+---
 
 ## Route Protection
 
-The frontend currently uses three route guard components.
+```mermaid
+flowchart TD
+    A[User opens route] --> B{Public route?}
+    B -->|Yes| C[PublicOnlyRoute]
+    B -->|No| D[ProtectedRoute]
 
-### ProtectedRoute
+    C --> E{Token exists?}
+    E -->|Yes| F[Redirect to dashboard]
+    E -->|No| G[Show login]
 
-`ProtectedRoute` protects internal app routes for authenticated users.
+    D --> H{Token exists?}
+    H -->|No| I[Redirect to login]
+    H -->|Yes| J{Admin-only route?}
 
-If no token is available, the user is redirected to `/login`.
-
-Protected routes include:
-
-```text
-/dashboard
-/customers
-/offers
-/offers/new
-/offers/:offerId
-/orders
-/more
+    J -->|No| K[Show page]
+    J -->|Yes| L[RoleProtectedRoute]
+    L --> M{User is Admin?}
+    M -->|Yes| K
+    M -->|No| N[Redirect to dashboard]
 ```
 
-### PublicOnlyRoute
+The frontend route guards improve navigation and user experience. The backend still enforces real authentication and authorization.
 
-`PublicOnlyRoute` prevents already authenticated users from opening the login page.
-
-If a token is already available, `/login` redirects to `/dashboard`.
-
-### RoleProtectedRoute
-
-`RoleProtectedRoute` protects Admin-only frontend routes.
-
-Current Admin-only routes:
-
-```text
-/analytics
-/offered-services
-```
-
-If an Employee opens one of these routes directly, the user is redirected to `/dashboard`.
-
-This improves the frontend user flow. The backend still remains responsible for enforcing real authorization.
-
-## Offer Creation Workflow
-
-The offer workflow is split across multiple pages.
-
-### OffersPage
-
-Route:
-
-```text
-/offers
-````
-
-Responsibilities:
-
-* Load offers from the backend API
-* Display offer cards
-* Show offer number, customer name, status, valid-until date and total amount
-* Navigate to the offer creation page
-* Navigate to offer details
-
-### OfferCreatePage
-
-Route:
-
-```text
-/offers/new
-```
-
-Responsibilities:
-
-* Load existing customers
-* Search customers while typing
-* Show matching customer suggestions
-* Allow selecting an existing customer
-* Automatically show new customer fields if no matching customer exists
-* Create a customer first if needed
-* Create the offer afterwards using the resolved customer id
-* Redirect back to `/offers` after successful creation
-
-The user never needs to know or enter a technical `customerId`. The UI shows customer names and customer details, while the frontend internally uses the selected or newly created customer id for the backend request.
-
-### OfferDetailsPage
-
-Route:
-
-```text
-/offers/:offerId
-```
-
-Responsibilities:
-
-* Load offer details
-* Load offer items
-* Load active offered services
-* Display offer summary
-* Display existing offer items
-* Add new offer items by selecting an offered service and entering a quantity
-* Refresh offer details and total amount after adding offer items
-
+---
 
 ## Authentication Flow
 
-The current frontend authentication flow works as follows:
+```mermaid
+sequenceDiagram
+    participant User
+    participant LoginPage
+    participant API
+    participant Storage
+    participant AppLayout
 
-```text
-LoginPage
-→ POST /api/auth/login
-→ JWT token received
-→ token stored in localStorage
-→ redirect to /dashboard
-→ AppLayout calls GET /api/auth/me
-→ backend validates the token
-→ frontend receives current user data
-→ email and role are displayed in the app header
+    User->>LoginPage: Enter email and password
+    LoginPage->>API: POST /api/auth/login
+    API-->>LoginPage: JWT token
+    LoginPage->>Storage: Save token
+    LoginPage->>AppLayout: Redirect to /dashboard
+    AppLayout->>API: GET /api/auth/me
+    API-->>AppLayout: Current user
+    AppLayout-->>User: Show email and role
 ```
 
-## Logout Flow
-
-The logout flow works as follows:
-
-```text
-Logout button
-→ remove token from localStorage
-→ redirect to /login
-```
-
-## Current User Loading
-
-The frontend loads the current authenticated user through:
+The current user is loaded through:
 
 ```http
 GET /api/auth/me
 ```
 
-Expected response example:
+Example response:
 
 ```json
 {
@@ -298,48 +188,177 @@ Expected response example:
 }
 ```
 
-The user information is shown in the app header.
+---
 
-Example:
+## Logout Flow
 
 ```text
-test@gartenzwerge.de · Admin
+Logout button
+→ remove token from localStorage
+→ redirect to /login
 ```
+
+---
 
 ## Role-Based Frontend Behavior
 
-The frontend currently distinguishes between Admin and Employee users.
+| Role     | Allowed frontend areas                                                  |
+| -------- | ----------------------------------------------------------------------- |
+| Admin    | Dashboard, Customers, Offers, Orders, More, Analytics, Offered Services |
+| Employee | Dashboard, Customers, Offers, Orders, More                              |
 
-### Admin
+Admin-only frontend areas:
 
-Admins can:
-
-* See Analytics in the More page
-* Access `/analytics`
-* See Offered Services in the More page
-* Access `/offered-services`
-
-### Employee
-
-Employees can:
-
-* Access regular authenticated app areas
-* Use Dashboard, Customers, Offers and Orders pages
-
-Employees cannot:
-
-* See Analytics in the More page
-* Access `/analytics`
-* See Offered Services in the More page
-* Access `/offered-services`
+```text
+/analytics
+/offered-services
+```
 
 If an Employee opens an Admin-only route directly, the frontend redirects to `/dashboard`.
 
+---
+
+## Main Business Workflow
+
+```mermaid
+flowchart TD
+    A[Create or select customer] --> B[Create offer]
+    B --> C[Add offer items]
+    C --> D[Review offer total]
+    D --> E{Customer accepts?}
+    E -->|No| F[Offer stays open or moves to archive]
+    E -->|Yes| G[Accept offer]
+    G --> H[Create order]
+    H --> I[Show order in /orders]
+    I --> J[Open read-only order details]
+    H --> K[Offer becomes historical record]
+```
+
+---
+
+## Offer Workflow
+
+The offer workflow is split across multiple pages.
+
+### `/offers`
+
+Responsibilities:
+
+* load offers from the backend
+* load orders to detect converted offers
+* show open offers by default
+* provide filters for open, archived and all offers
+* show converted offers in the archive
+* link converted offers to the related order
+* navigate to offer creation
+* navigate to offer details
+
+Offer filters:
+
+| Filter  | Shows                                                    |
+| ------- | -------------------------------------------------------- |
+| Open    | Draft, sent and accepted offers without an order         |
+| Archive | Rejected offers and offers already converted into orders |
+| All     | All offers                                               |
+
+### `/offers/new`
+
+Responsibilities:
+
+* load existing customers
+* search customers while typing
+* show matching customer suggestions
+* allow selecting an existing customer
+* automatically show new customer fields if no matching customer exists
+* create a customer first if needed
+* create the offer afterwards using the resolved customer id
+* redirect back to `/offers` after successful creation
+
+The user never needs to know or enter a technical `customerId`. The UI shows customer names and customer details, while the frontend internally uses the selected or newly created customer id for the backend request.
+
+### `/offers/:offerId`
+
+Responsibilities:
+
+* load offer details
+* load offer items
+* load active offered services
+* load orders to detect whether the offer was already converted
+* display offer summary
+* display existing offer items
+* add new offer items while the offer is still editable
+* accept the offer and create an order
+* prevent duplicate order creation
+* show a direct link to the created order
+* make accepted, rejected and converted offers read-only for item changes
+
+---
+
+## Order Workflow
+
+The order workflow starts after an offer has been accepted.
+
+### `/orders`
+
+Responsibilities:
+
+* load real orders from the backend
+* load offers to enrich the order overview
+* show customer name, offer number and total amount from the related offer
+* show order status, planned date and completed date
+* navigate to read-only order details
+* navigate back to the related offer
+
+Because the current `OrderDto` is lightweight, the frontend combines order data with related offer data for a more useful overview.
+
+| Displayed information | Source        |
+| --------------------- | ------------- |
+| Order status          | Order         |
+| Planned date          | Order         |
+| Completed date        | Order         |
+| Customer name         | Related offer |
+| Offer number          | Related offer |
+| Total amount          | Related offer |
+
+### `/orders/:orderId`
+
+Responsibilities:
+
+* load a single order
+* load the related offer
+* load the related offer items
+* display order data
+* display the offer foundation
+* display positions from the original offer
+* link back to `/orders`
+* link to the related offer
+* stay read-only for now
+
+The order details page is intentionally read-only in the current milestone. Editing order planning, notes and status is planned for a later milestone.
+
+---
+
+## Read-Only Rules
+
+The frontend prevents offer item changes when an offer should no longer be edited.
+
+| Condition            | Frontend behavior                              |
+| -------------------- | ---------------------------------------------- |
+| Offer is Draft       | Offer items can be added                       |
+| Offer is Sent        | Offer items can be added                       |
+| Offer is Accepted    | Offer becomes read-only                        |
+| Offer is Rejected    | Offer becomes read-only                        |
+| Related order exists | Offer becomes read-only and links to the order |
+
+This protects the offer as a historical business document after order conversion.
+
+---
+
 ## UI/UX Decisions
 
-The frontend follows a mobile-first approach.
+### Mobile-first navigation
 
-On mobile, the primary navigation focuses on the most important work areas:
+The primary mobile navigation focuses on the most important work areas:
 
 ```text
 Dashboard
@@ -351,118 +370,169 @@ More
 
 Secondary and Admin-specific areas such as Analytics and Offered Services are accessible through the More page for Admin users.
 
-This keeps the main navigation simple and avoids horizontal scrolling on mobile devices.
-
-## Mobile Navigation
-
-The mobile navigation is designed as a bottom navigation.
-
-Reasons:
-
-* Important areas are directly reachable
-* No hidden horizontal scrolling
-* Better app-like user experience on mobile
-* Clear structure for future mobile or PWA usage
-
-The navigation uses safe-area spacing so that browser or device controls do not cover the menu on mobile devices.
-
-## Dashboard vs Analytics
+### Dashboard vs Analytics
 
 The dashboard is intended as an operational entry point.
 
-It should focus on:
+It should later focus on:
 
-* The most important next action
-* Upcoming work
-* Important daily overview
-* Fast access to core workflows
-
-The dashboard quick action currently focuses on the offer workflow.
+* upcoming work
+* important daily overview
+* quick access to core workflows
+* next recommended action
 
 Analytics is intended for reporting and business insights.
 
 It can later include:
 
-* Customer statistics
-* Completed order statistics
-* Revenue overview
-* Revenue charts
-* Offer-to-order conversion insights
-* Top services
+* customer statistics
+* completed order statistics
+* revenue overview
+* revenue charts
+* offer-to-order conversion insights
+* top services
 
 Analytics is currently treated as an Admin-only area.
 
+### Offers vs Orders
+
+The frontend intentionally separates offers and orders.
+
+```text
+/offers
+→ offer work and offer history
+
+/orders
+→ operational work orders
+```
+
+Converted offers are not deleted. They remain available as historical records and link to the related order.
+
+---
+
+## Style Architecture
+
+The frontend uses structured CSS files instead of one large stylesheet.
+
+```text
+src/Frontend/src/
+├── App.css
+└── styles/
+    ├── tokens.css
+    ├── base.css
+    ├── layout.css
+    ├── components/
+    │   ├── buttons.css
+    │   └── forms.css
+    └── pages/
+        ├── auth.css
+        ├── dashboard.css
+        ├── more.css
+        ├── customers.css
+        ├── offered-services.css
+        ├── offers.css
+        └── orders.css
+```
+
+| File                     | Responsibility                                  |
+| ------------------------ | ----------------------------------------------- |
+| `tokens.css`             | Design tokens such as colors, radii and shadows |
+| `base.css`               | Base element styles                             |
+| `layout.css`             | App layout and navigation                       |
+| `components/buttons.css` | Shared button and link-button styles            |
+| `components/forms.css`   | Shared form styles                              |
+| `pages/*.css`            | Page-specific styles                            |
+
+`App.css` imports the structured CSS files.
+
+---
+
 ## Current Frontend Status
 
-Implemented:
+| Area                                  | Status      |
+| ------------------------------------- | ----------- |
+| React + TypeScript + Vite setup       | Implemented |
+| React Router foundation               | Implemented |
+| Mobile-first navigation               | Implemented |
+| Authentication UI                     | Implemented |
+| Protected routes                      | Implemented |
+| Role-aware navigation                 | Implemented |
+| Customer management UI                | Implemented |
+| Offered service creation UI           | Implemented |
+| Offer creation workflow               | Implemented |
+| Offer item creation                   | Implemented |
+| Offer acceptance and order conversion | Implemented |
+| Duplicate order creation prevention   | Implemented |
+| Orders overview                       | Implemented |
+| Read-only order details               | Implemented |
+| Offer overview filters                | Implemented |
+| Dashboard                             | Placeholder |
+| Analytics                             | Placeholder |
 
-* React + TypeScript + Vite setup
-* React Router foundation
-* Basic app layout
-* Mobile-first navigation
-* Safe-area-aware bottom navigation on mobile
-* More page
-* Analytics page placeholder
-* Reusable page header component
-* Reusable statistic card component
-* Reusable quick action link component
-* Initial dashboard foundation
-* Simplified dashboard quick action focused on offers
-* Login form UI
-* Login API integration through `POST /api/auth/login`
-* Login loading, success and error states
-* JWT token storage
-* Redirect after successful login
-* Logout action
-* Protected frontend routes
-* Public-only login route
-* Current user loading through `/api/auth/me`
-* Current user email and role display in the header
-* Role-aware UI behavior
-* Admin-only frontend routes for Analytics and Offered Services
-* Customer management UI with read, create, update and Admin-only delete
-* Offered Services UI with read and create
-* Offer overview
-* Offer creation page
-* Customer lookup during offer creation
-* New customer creation during offer creation
-* Offer details page
-* Offer item creation
-* Structured frontend CSS files for tokens, layout, components and page-specific styles
+---
 
 ## Current Limitations
 
-* No global AuthContext yet
-* No refresh token handling yet
-* No automatic token expiration handling in the frontend yet
-* No full API client abstraction yet
-* No real dashboard data yet
-* No real analytics data yet
-* Orders are not yet connected to the frontend workflow
-* Offer status transitions are not yet managed in the frontend
-* Creating an order from an accepted offer is planned for a later milestone
-* Offered services currently support read and create in the frontend
-* Customer lookup during offer creation is currently performed client-side after loading all customers
-* The Customers page still contains a visible customer creation form, although the main business workflow now also supports creating customers during offer creation
+| Limitation                                                         | Notes                                                                  |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| No global AuthContext yet                                          | Auth state is currently handled through token storage and route guards |
+| No refresh token handling yet                                      | Token expiration is not handled automatically in the frontend          |
+| No full API client abstraction yet                                 | API calls are grouped by feature modules                               |
+| No real dashboard data yet                                         | Dashboard is still mostly placeholder-based                            |
+| No real analytics data yet                                         | Analytics is prepared but not connected to business data               |
+| Orders are currently read-only in the frontend                     | Editing is planned for a later milestone                               |
+| Order planned date is not editable yet                             | Planned for order planning milestone                                   |
+| Order status updates are not editable yet                          | Planned for order lifecycle milestone                                  |
+| Offered services currently support read and create in the frontend | Edit and delete UI can be added later                                  |
+| Customer lookup is client-side                                     | Acceptable for current project size                                    |
+| Customers page can be refined                                      | It may later become a clearer master data area                         |
+| OrderDto is lightweight                                            | Some displayed order data is combined from related offer data          |
+
+---
+
+## Screenshot Plan
+
+Screenshots should be added after the `v0.13.0` release, when the UI is stable.
+
+Planned screenshots:
+
+| Screenshot                             | Suggested file                                             |
+| -------------------------------------- | ---------------------------------------------------------- |
+| Offer overview with filters            | `docs/assets/screenshots/offers-overview-filters.png`      |
+| Offer creation with customer lookup    | `docs/assets/screenshots/offer-create-customer-lookup.png` |
+| Offer details with existing order link | `docs/assets/screenshots/offer-details-converted.png`      |
+| Orders overview                        | `docs/assets/screenshots/orders-overview.png`              |
+| Read-only order details                | `docs/assets/screenshots/order-details.png`                |
+
+---
 
 ## Future Improvements
 
 Planned frontend improvements:
 
-* Global auth state handling
-* Cleaner shared authorization helpers
-* Better unauthorized-state UX
-* Optional dedicated access denied page
-* Token expiration handling
-* Backend-supported customer search endpoint if customer volume grows
-* Improve Customers page into a clearer master data management area
+* global auth state handling
+* token expiration handling
+* cleaner shared authorization helpers
+* optional dedicated access denied page
+* backend-supported customer search endpoint if customer volume grows
+* improve Customers page into a clearer master data management area
 * Offered Service edit and delete UI
-* Offer status management
-* Create orders from accepted offers
-* Order Management UI
-* Dashboard with upcoming orders
-* Calendar field for upcoming orders
-* Analytics with real business data
+* order planning UI
+* order status management UI
+* order notes editing
+* dashboard with upcoming orders
+* calendar field for upcoming orders
+* analytics with real business data
 * API client abstraction for business endpoints
 * PWA support
 
+---
+
+## Related Documentation
+
+* [Current Project Status](../project/current-status.md)
+* [Project Roadmap](../project/roadmap.md)
+* [Offer-to-Order Workflow](../business-processes/offer-to-order-workflow.md)
+* [Create Order From Offer Flow](../business-processes/create-order-from-offer-flow.md)
+* [Add Offer Item Flow](../business-processes/add-offer-item-flow.md)
+* [API Endpoints](../api/endpoints.md)

@@ -1,6 +1,6 @@
 ﻿# API Endpoints
 
-This document describes the currently available REST API endpoints of the Gartenzwerge Außenservice offer management backend.
+This document describes the currently available REST API endpoints of the Gartenzwerge Außenservice backend.
 
 Base URL for local development:
 
@@ -16,37 +16,104 @@ http://localhost:5041/swagger
 
 ---
 
-## Validation
+## API Overview
 
-Incoming API requests are validated automatically using FluentValidation.
+The API supports the core business workflow of the application:
 
-If a request contains invalid input, the API returns:
+```text
+Customer
+→ Offer
+→ Offer Items
+→ Accepted Offer
+→ Order
+```
+
+The backend is the source of truth for authentication, authorization, validation and business rules.
+
+---
+
+## Authentication
+
+The API uses ASP.NET Core Identity for user management and JWT bearer tokens for authentication.
+
+Authenticated requests must include the JWT token in the `Authorization` header.
 
 ```http
-400 Bad Request
+Authorization: Bearer <token>
 ```
+
+Swagger also supports JWT authentication through the `Authorize` button.
+
+---
+
+## Authorization
+
+Most business endpoints require authentication.
+
+The API currently uses two application roles:
+
+| Role     | Purpose                                                                         |
+| -------- | ------------------------------------------------------------------------------- |
+| Admin    | Full management access including critical delete and service management actions |
+| Employee | Regular business workflow access for customers, offers, offer items and orders  |
+
+Authorization behavior:
+
+| Case                              | Response           |
+| --------------------------------- | ------------------ |
+| Missing or invalid token          | `401 Unauthorized` |
+| Valid token but insufficient role | `403 Forbidden`    |
+
+---
+
+## Role Permissions
+
+| Endpoint group                        | Employee | Admin |
+| ------------------------------------- | -------- | ----- |
+| Customers read/create/update          | Yes      | Yes   |
+| Customers delete                      | No       | Yes   |
+| Offered Services read                 | Yes      | Yes   |
+| Offered Services create/update/delete | No       | Yes   |
+| Offers read/create/update             | Yes      | Yes   |
+| Offers delete                         | No       | Yes   |
+| Offer Items read/create/update/delete | Yes      | Yes   |
+| Orders read/create/update             | Yes      | Yes   |
+| Orders delete                         | No       | Yes   |
+
+---
+
+## Common Status Codes
+
+| Status code                  | Meaning                                              |
+| ---------------------------- | ---------------------------------------------------- |
+| `200 OK`                     | Request succeeded                                    |
+| `201 Created`                | Resource was created                                 |
+| `204 No Content`             | Resource was deleted or no response body is returned |
+| `400 Bad Request`            | Validation or business rule error                    |
+| `401 Unauthorized`           | Missing or invalid JWT token                         |
+| `403 Forbidden`              | Authenticated user has insufficient permissions      |
+| `404 Not Found`              | Resource does not exist                              |
+| `409 Conflict`               | Request conflicts with existing state                |
+| `415 Unsupported Media Type` | Request body or content type is missing or invalid   |
+| `500 Internal Server Error`  | Unexpected server error                              |
+
+---
+
+## Validation
+
+Incoming API requests are validated using FluentValidation and application-level business rules.
 
 Typical validation rules include:
 
-* Required fields must not be empty
+* required fields must not be empty
 * IDs must not be `00000000-0000-0000-0000-000000000000`
-* Quantities must be greater than `0`
-* Prices must not be negative
-* Validity dates such as `validUntil` must be in the future
-* Email fields must contain a valid email address if provided
-* Text fields must not exceed their configured maximum length
+* quantities must be greater than `0`
+* prices must not be negative
+* validity dates such as `validUntil` must be in the future
+* email fields must contain a valid email address if provided
+* text fields must not exceed their configured maximum length
 
-Example invalid request:
-
-```json
-{
-  "firstName": "",
-  "lastName": "Mustermann",
-  "email": "not-an-email"
-}
-```
-
-Example response:
+Example validation response:
 
 ```json
 {
@@ -63,31 +130,60 @@ Example response:
 
 ---
 
-## Authentication
+# Endpoint Summary
 
-Authentication endpoints are used to register users, authenticate existing users and retrieve information about the currently authenticated user.
+## Authentication Endpoints
 
-The API uses ASP.NET Core Identity for user management and JWT bearer tokens for authentication.
-
-Authenticated requests must include the JWT token in the `Authorization` header.
-
-```http
-Authorization: Bearer <token>
-```
-
-Swagger also supports JWT authentication through the `Authorize` button.
+| Method | Endpoint             | Auth          | Description                    |
+| ------ | -------------------- | ------------- | ------------------------------ |
+| `POST` | `/api/auth/register` | Public        | Register a new user            |
+| `POST` | `/api/auth/login`    | Public        | Login and receive JWT token    |
+| `GET`  | `/api/auth/me`       | Authenticated | Get current authenticated user |
 
 ---
 
-### Register user
+## Business Endpoints
+
+| Method   | Endpoint                               | Roles           | Description                      |
+| -------- | -------------------------------------- | --------------- | -------------------------------- |
+| `GET`    | `/api/customers`                       | Admin, Employee | Get all customers                |
+| `GET`    | `/api/customers/{id}`                  | Admin, Employee | Get customer by id               |
+| `POST`   | `/api/customers`                       | Admin, Employee | Create customer                  |
+| `PUT`    | `/api/customers/{id}`                  | Admin, Employee | Update customer                  |
+| `DELETE` | `/api/customers/{id}`                  | Admin           | Soft delete customer             |
+| `GET`    | `/api/offered-services`                | Admin, Employee | Get all offered services         |
+| `GET`    | `/api/offered-services/{id}`           | Admin, Employee | Get offered service by id        |
+| `POST`   | `/api/offered-services`                | Admin           | Create offered service           |
+| `PUT`    | `/api/offered-services/{id}`           | Admin           | Update offered service           |
+| `DELETE` | `/api/offered-services/{id}`           | Admin           | Soft delete offered service      |
+| `GET`    | `/api/offers`                          | Admin, Employee | Get all offers                   |
+| `GET`    | `/api/offers/{id}`                     | Admin, Employee | Get offer by id                  |
+| `POST`   | `/api/offers`                          | Admin, Employee | Create offer                     |
+| `PUT`    | `/api/offers/{id}`                     | Admin, Employee | Update offer                     |
+| `DELETE` | `/api/offers/{id}`                     | Admin           | Soft delete offer                |
+| `POST`   | `/api/offers/{offerId}/items`          | Admin, Employee | Add offer item                   |
+| `GET`    | `/api/offers/{offerId}/items`          | Admin, Employee | Get offer items                  |
+| `PUT`    | `/api/offers/{offerId}/items/{itemId}` | Admin, Employee | Update offer item                |
+| `DELETE` | `/api/offers/{offerId}/items/{itemId}` | Admin, Employee | Soft delete offer item           |
+| `GET`    | `/api/orders`                          | Admin, Employee | Get all orders                   |
+| `GET`    | `/api/orders/{id}`                     | Admin, Employee | Get order by id                  |
+| `POST`   | `/api/offers/{offerId}/order`          | Admin, Employee | Create order from accepted offer |
+| `PUT`    | `/api/orders/{id}`                     | Admin, Employee | Update order                     |
+| `DELETE` | `/api/orders/{id}`                     | Admin           | Soft delete order                |
+
+---
+
+# Authentication
+
+## Register User
 
 ```http
 POST /api/auth/register
 ```
 
-Creates a new application user and returns a JWT token.
+Creates a new application user and returns an authentication response.
 
-#### Request body
+### Request body
 
 ```json
 {
@@ -97,32 +193,18 @@ Creates a new application user and returns a JWT token.
 }
 ```
 
-#### Server-side behavior
+### Responses
 
-* Validates the request body
-* Checks whether a user with the same email already exists
-* Creates a new Identity user
-* Hashes the password using ASP.NET Core Identity
-* Returns an authentication response with a JWT token
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-409 Conflict
-500 Internal Server Error
-```
-
-#### Conflict cases
-
-```text
-A user with this email already exists.
-```
+| Status                      | Meaning                             |
+| --------------------------- | ----------------------------------- |
+| `200 OK`                    | User was registered                 |
+| `400 Bad Request`           | Request validation failed           |
+| `409 Conflict`              | User with this email already exists |
+| `500 Internal Server Error` | Unexpected server error             |
 
 ---
 
-### Login user
+## Login User
 
 ```http
 POST /api/auth/login
@@ -130,7 +212,7 @@ POST /api/auth/login
 
 Authenticates an existing user and returns a JWT token.
 
-#### Request body
+### Request body
 
 ```json
 {
@@ -139,33 +221,20 @@ Authenticates an existing user and returns a JWT token.
 }
 ```
 
-#### Server-side behavior
+### Responses
 
-* Validates the request body
-* Looks up the user by email
-* Checks the password using ASP.NET Core Identity
-* Returns an authentication response with a JWT token
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-401 Unauthorized
-500 Internal Server Error
-```
-
-#### Unauthorized cases
-
-```text
-Invalid email or password.
-```
+| Status                      | Meaning                   |
+| --------------------------- | ------------------------- |
+| `200 OK`                    | Login successful          |
+| `400 Bad Request`           | Request validation failed |
+| `401 Unauthorized`          | Invalid email or password |
+| `500 Internal Server Error` | Unexpected server error   |
 
 The same error message is returned for unknown emails and wrong passwords to avoid leaking whether an email address exists.
 
 ---
 
-### Get current authenticated user
+## Get Current User
 
 ```http
 GET /api/auth/me
@@ -173,139 +242,42 @@ GET /api/auth/me
 
 Returns information about the currently authenticated user.
 
-This endpoint requires a valid JWT bearer token.
-
-#### Authorization header
-
-```http
-Authorization: Bearer <token>
-```
-
-#### Responses
-
-```http
-200 OK
-401 Unauthorized
-500 Internal Server Error
-```
-
-#### Example response
+### Example response
 
 ```json
 {
   "userId": "00000000-0000-0000-0000-000000000000",
   "email": "test@gartenzwerge.de",
-  "displayName": "Test User"
+  "displayName": "Test User",
+  "roles": ["Admin"]
 }
 ```
----
 
-## Protected Business Endpoints
+### Responses
 
-Most business endpoints require authentication.
-
-Authenticated requests must include a valid JWT bearer token.
-
-```http
-Authorization: Bearer <token>
-```
-
-Protected endpoint groups:
-
-* Customers
-* Offered Services
-* Offers
-* Offer Items
-* Orders
-
-Public endpoint groups:
-
-* Register user
-* Login user
-
-The `/api/auth/me` endpoint is also protected and can be used to verify that a JWT token is valid.
-
-If a protected endpoint is called without a valid token, the API returns:
-
-```http
-401 Unauthorized
-```
-
-## Role-based Authorization
-
-The API uses role-based authorization with ASP.NET Core Identity roles.
-
-Available roles:
-
-* `Admin`
-* `Employee`
-
-Authorization behavior:
-
-* Requests without a valid JWT token return `401 Unauthorized`
-* Requests with a valid JWT token but insufficient role permissions return `403 Forbidden`
-
-### Role Permissions
-
-| Endpoint group                        | Employee | Admin |
-| ------------------------------------- | -------: | ----: |
-| Customers read/create/update          |        ✅ |     ✅ |
-| Customers delete                      |        ❌ |     ✅ |
-| Offered Services read                 |        ✅ |     ✅ |
-| Offered Services create/update/delete |        ❌ |     ✅ |
-| Offers read/create/update             |        ✅ |     ✅ |
-| Offers delete                         |        ❌ |     ✅ |
-| Offer Items read/create/update/delete |        ✅ |     ✅ |
-| Orders read/create/update             |        ✅ |     ✅ |
-| Orders delete                         |        ❌ |     ✅ |
-
-
-## Customers
-
-Customer endpoints are used to manage customer master data.
-
-### Get all customers
-
-```http
-GET /api/customers
-```
-
-Returns all non-deleted customers.
-
-#### Response
-
-```http
-200 OK
-```
+| Status                      | Meaning                  |
+| --------------------------- | ------------------------ |
+| `200 OK`                    | Current user returned    |
+| `401 Unauthorized`          | Missing or invalid token |
+| `500 Internal Server Error` | Unexpected server error  |
 
 ---
 
-### Get customer by id
+# Customers
 
-```http
-GET /api/customers/{id}
-```
+Customer endpoints manage customer master data.
 
-Returns a single customer by id.
+## Customer Endpoints
 
-#### Responses
+| Method   | Endpoint              | Description                   |
+| -------- | --------------------- | ----------------------------- |
+| `GET`    | `/api/customers`      | Get all non-deleted customers |
+| `GET`    | `/api/customers/{id}` | Get customer by id            |
+| `POST`   | `/api/customers`      | Create customer               |
+| `PUT`    | `/api/customers/{id}` | Update customer               |
+| `DELETE` | `/api/customers/{id}` | Soft delete customer          |
 
-```http
-200 OK
-404 Not Found
-```
-
----
-
-### Create customer
-
-```http
-POST /api/customers
-```
-
-Creates a new customer.
-
-#### Request body
+## Create or Update Customer Request
 
 ```json
 {
@@ -322,105 +294,40 @@ Creates a new customer.
 }
 ```
 
-#### Responses
+## Response Codes
 
-```http
-201 Created
-400 Bad Request
-```
-
----
-
-### Update customer
-
-```http
-PUT /api/customers/{id}
-```
-
-Updates an existing customer.
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-404 Not Found
-```
+| Method                       | Success          | Common errors                     |
+| ---------------------------- | ---------------- | --------------------------------- |
+| `GET /api/customers`         | `200 OK`         | `401`, `403`, `500`               |
+| `GET /api/customers/{id}`    | `200 OK`         | `401`, `403`, `404`, `500`        |
+| `POST /api/customers`        | `201 Created`    | `400`, `401`, `403`, `500`        |
+| `PUT /api/customers/{id}`    | `200 OK`         | `400`, `401`, `403`, `404`, `500` |
+| `DELETE /api/customers/{id}` | `204 No Content` | `401`, `403`, `404`, `500`        |
 
 ---
 
-### Delete customer
+# Offered Services
 
-```http
-DELETE /api/customers/{id}
-```
-
-Soft deletes an existing customer.
-
-#### Responses
-
-```http
-204 No Content
-404 Not Found
-```
-
----
-
-## Offered Services
-
-Offered service endpoints are used to manage services that can later be used inside offers.
+Offered service endpoints manage reusable services that can be used inside offers.
 
 Examples:
 
-* Lawn mowing
-* Hedge cutting
-* Green waste disposal
-* Pressure washing
+* lawn mowing
+* hedge cutting
+* green waste disposal
+* pressure washing
 
----
+## Offered Service Endpoints
 
-### Get all offered services
+| Method   | Endpoint                     | Description                 |
+| -------- | ---------------------------- | --------------------------- |
+| `GET`    | `/api/offered-services`      | Get all offered services    |
+| `GET`    | `/api/offered-services/{id}` | Get offered service by id   |
+| `POST`   | `/api/offered-services`      | Create offered service      |
+| `PUT`    | `/api/offered-services/{id}` | Update offered service      |
+| `DELETE` | `/api/offered-services/{id}` | Soft delete offered service |
 
-```http
-GET /api/offered-services
-```
-
-Returns all active/non-deleted offered services.
-
-#### Response
-
-```http
-200 OK
-```
-
----
-
-### Get offered service by id
-
-```http
-GET /api/offered-services/{id}
-```
-
-Returns a single offered service by id.
-
-#### Responses
-
-```http
-200 OK
-404 Not Found
-```
-
----
-
-### Create offered service
-
-```http
-POST /api/offered-services
-```
-
-Creates a new offered service.
-
-#### Request body
+## Create or Update Offered Service Request
 
 ```json
 {
@@ -432,102 +339,44 @@ Creates a new offered service.
 }
 ```
 
-#### Responses
+## Response Codes
 
-```http
-201 Created
-400 Bad Request
-```
-
----
-
-### Update offered service
-
-```http
-PUT /api/offered-services/{id}
-```
-
-Updates an existing offered service.
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-404 Not Found
-```
+| Method                              | Success          | Common errors                     |
+| ----------------------------------- | ---------------- | --------------------------------- |
+| `GET /api/offered-services`         | `200 OK`         | `401`, `403`, `500`               |
+| `GET /api/offered-services/{id}`    | `200 OK`         | `401`, `403`, `404`, `500`        |
+| `POST /api/offered-services`        | `201 Created`    | `400`, `401`, `403`, `500`        |
+| `PUT /api/offered-services/{id}`    | `200 OK`         | `400`, `401`, `403`, `404`, `500` |
+| `DELETE /api/offered-services/{id}` | `204 No Content` | `401`, `403`, `404`, `500`        |
 
 ---
 
-### Delete offered service
+# Offers
 
-```http
-DELETE /api/offered-services/{id}
-```
-
-Soft deletes an existing offered service.
-
-#### Responses
-
-```http
-204 No Content
-404 Not Found
-```
-
----
-
-## Offers
-
-Offer endpoints are used to create and manage customer offers.
+Offer endpoints manage customer offers.
 
 An offer belongs to one customer and can contain multiple offer items.
 
----
+## Offer Status Values
 
-### Get all offers
+| Value | Status     | Meaning                            |
+| ----- | ---------- | ---------------------------------- |
+| `1`   | `Draft`    | Offer is being prepared            |
+| `2`   | `Sent`     | Offer was sent to the customer     |
+| `3`   | `Accepted` | Offer was accepted by the customer |
+| `4`   | `Rejected` | Offer was rejected                 |
 
-```http
-GET /api/offers
-```
+## Offer Endpoints
 
-Returns all non-deleted offers.
+| Method   | Endpoint           | Description                |
+| -------- | ------------------ | -------------------------- |
+| `GET`    | `/api/offers`      | Get all non-deleted offers |
+| `GET`    | `/api/offers/{id}` | Get offer by id            |
+| `POST`   | `/api/offers`      | Create offer               |
+| `PUT`    | `/api/offers/{id}` | Update offer               |
+| `DELETE` | `/api/offers/{id}` | Soft delete offer          |
 
-#### Response
-
-```http
-200 OK
-```
-
----
-
-### Get offer by id
-
-```http
-GET /api/offers/{id}
-```
-
-Returns a single offer by id.
-
-#### Responses
-
-```http
-200 OK
-404 Not Found
-```
-
----
-
-### Create offer
-
-```http
-POST /api/offers
-```
-
-Creates a new offer for an existing customer.
-
-The offer number, status and total value are generated by the backend.
-
-#### Request body
+## Create Offer Request
 
 ```json
 {
@@ -537,76 +386,69 @@ The offer number, status and total value are generated by the backend.
 }
 ```
 
-#### Server-side behavior
+## Update Offer Request
 
-* Verifies that the customer exists
-* Generates an offer number
-* Sets the initial status to `Draft`
-* Sets the initial total value to `0`
-
-#### Responses
-
-```http
-201 Created
-400 Bad Request
-404 Not Found
+```json
+{
+  "validUntil": "2026-12-31T00:00:00Z",
+  "status": 3,
+  "notes": "Customer accepted the offer."
+}
 ```
+
+## Offer Response Example
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "offerNumber": "O-20260626-123456",
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "customerName": "Max Mustermann",
+  "createdAt": "2026-06-26T10:00:00Z",
+  "validUntil": "2026-12-31T00:00:00Z",
+  "status": 3,
+  "totalNet": 305.00,
+  "notes": "Customer accepted the offer."
+}
+```
+
+## Server-Side Behavior
+
+When an offer is created:
+
+* the backend verifies that the customer exists
+* an offer number is generated
+* the initial status is set to `Draft`
+* the initial total value is set to `0`
+
+## Response Codes
+
+| Method                    | Success          | Common errors                     |
+| ------------------------- | ---------------- | --------------------------------- |
+| `GET /api/offers`         | `200 OK`         | `401`, `403`, `500`               |
+| `GET /api/offers/{id}`    | `200 OK`         | `401`, `403`, `404`, `500`        |
+| `POST /api/offers`        | `201 Created`    | `400`, `401`, `403`, `404`, `500` |
+| `PUT /api/offers/{id}`    | `200 OK`         | `400`, `401`, `403`, `404`, `500` |
+| `DELETE /api/offers/{id}` | `204 No Content` | `401`, `403`, `404`, `500`        |
 
 ---
 
-### Update offer
+# Offer Items
 
-```http
-PUT /api/offers/{id}
-```
-
-Updates an existing offer.
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-404 Not Found
-```
-
----
-
-### Delete offer
-
-```http
-DELETE /api/offers/{id}
-```
-
-Soft deletes an existing offer.
-
-#### Responses
-
-```http
-204 No Content
-404 Not Found
-```
-
----
-
-## Offer Items
-
-Offer item endpoints are used to manage service positions within existing offers.
+Offer item endpoints manage service positions inside offers.
 
 An offer item belongs to exactly one offer and references one offered service.
-The offered service provides the base price and unit, while the offer item stores the selected quantity, unit price and calculated total price.
 
----
+## Offer Item Endpoints
 
-### Add offer item to offer
+| Method   | Endpoint                               | Description            |
+| -------- | -------------------------------------- | ---------------------- |
+| `POST`   | `/api/offers/{offerId}/items`          | Add item to offer      |
+| `GET`    | `/api/offers/{offerId}/items`          | Get offer items        |
+| `PUT`    | `/api/offers/{offerId}/items/{itemId}` | Update item quantity   |
+| `DELETE` | `/api/offers/{offerId}/items/{itemId}` | Soft delete offer item |
 
-```http
-POST /api/offers/{offerId}/items
-```
-
-Adds a new item to an existing offer.
-
-#### Request body
+## Create Offer Item Request
 
 ```json
 {
@@ -615,33 +457,15 @@ Adds a new item to an existing offer.
 }
 ```
 
-#### Server-side behavior
+## Update Offer Item Request
 
-* Loads the offer including existing offer items
-* Loads the selected offered service
-* Uses the offered service base price as the item unit price
-* Calculates the item total price using `quantity * unitPrice`
-* Adds the item to the offer
-* Recalculates the offer total value from all active offer items
-
-#### Example calculation
-
-```text
-Quantity: 250 m²
-Unit price: 0.18 €
-Total price: 45.00 €
+```json
+{
+  "quantity": 300
+}
 ```
 
-#### Responses
-
-```http
-201 Created
-400 Bad Request
-404 Not Found
-500 Internal Server Error
-```
-
-#### Example response
+## Offer Item Response Example
 
 ```json
 {
@@ -656,353 +480,160 @@ Total price: 45.00 €
 }
 ```
 
----
+## Calculation Behavior
 
-### Get offer items by offer
-
-```http
-GET /api/offers/{offerId}/items
-```
-
-Returns all active offer items for an existing offer.
-
-Soft-deleted offer items are not included in the response.
-
-#### Server-side behavior
-
-* Loads the offer including its offer items
-* Filters out soft-deleted offer items
-* Returns the active offer items as DTOs
-
-#### Responses
-
-```http
-200 OK
-404 Not Found
-500 Internal Server Error
-```
-
-#### Example response
-
-```json
-[
-  {
-    "id": "00000000-0000-0000-0000-000000000000",
-    "offerId": "00000000-0000-0000-0000-000000000000",
-    "offeredServiceId": "00000000-0000-0000-0000-000000000000",
-    "description": "Rasen mähen",
-    "quantity": 250,
-    "unit": "m²",
-    "unitPrice": 0.18,
-    "totalPrice": 45.00
-  }
-]
-```
-
----
-
-### Update offer item
-
-```http
-PUT /api/offers/{offerId}/items/{itemId}
-```
-
-Updates the quantity of an existing offer item and recalculates its total price.
-
-#### Request body
-
-```json
-{
-  "quantity": 300
-}
-```
-
-#### Server-side behavior
-
-* Loads the offer including existing offer items
-* Finds the active offer item by ID
-* Updates the item quantity
-* Recalculates the item total price using `quantity * unitPrice`
-* Recalculates the offer total value from all active offer items
-
-#### Example calculation
+When an offer item is created or updated:
 
 ```text
-Quantity: 300 m²
-Unit price: 0.18 €
-Total price: 54.00 €
+Item total = Quantity × Unit price
+Offer total = Sum of active offer item totals
 ```
 
-#### Responses
+The backend uses the offered service base price as the item unit price and recalculates the offer total after item changes.
 
-```http
-200 OK
-400 Bad Request
-404 Not Found
-500 Internal Server Error
-```
+## Response Codes
 
-#### Example response
-
-```json
-{
-  "id": "00000000-0000-0000-0000-000000000000",
-  "offerId": "00000000-0000-0000-0000-000000000000",
-  "offeredServiceId": "00000000-0000-0000-0000-000000000000",
-  "description": "Rasen mähen",
-  "quantity": 300,
-  "unit": "m²",
-  "unitPrice": 0.18,
-  "totalPrice": 54.00
-}
-```
+| Method                                        | Success          | Common errors                     |
+| --------------------------------------------- | ---------------- | --------------------------------- |
+| `POST /api/offers/{offerId}/items`            | `201 Created`    | `400`, `401`, `403`, `404`, `500` |
+| `GET /api/offers/{offerId}/items`             | `200 OK`         | `401`, `403`, `404`, `500`        |
+| `PUT /api/offers/{offerId}/items/{itemId}`    | `200 OK`         | `400`, `401`, `403`, `404`, `500` |
+| `DELETE /api/offers/{offerId}/items/{itemId}` | `204 No Content` | `401`, `403`, `404`, `500`        |
 
 ---
 
-### Delete offer item
+# Orders
 
-```http
-DELETE /api/offers/{offerId}/items/{itemId}
-```
+Order endpoints manage service orders.
 
-Soft-deletes an existing offer item and recalculates the offer total value.
+An order is created from an accepted offer. Each offer can only be converted into one order.
 
-The item is not physically removed from the database. Instead, it is marked as deleted and excluded from future offer item queries and total calculations.
+## Order Status Values
 
-#### Server-side behavior
+| Value | Status       | Meaning                                 |
+| ----- | ------------ | --------------------------------------- |
+| `1`   | `Planned`    | Order exists but is not yet in progress |
+| `2`   | `InProgress` | Order is currently being worked on      |
+| `3`   | `Completed`  | Order has been completed                |
+| `4`   | `Cancelled`  | Order was cancelled                     |
 
-* Loads the offer including existing offer items
-* Finds the active offer item by ID
-* Marks the item as soft-deleted
-* Sets the deletion timestamp
-* Recalculates the offer total value from all remaining active offer items
+## Order Endpoints
 
-#### Responses
+| Method   | Endpoint                      | Description                      |
+| -------- | ----------------------------- | -------------------------------- |
+| `GET`    | `/api/orders`                 | Get all non-deleted orders       |
+| `GET`    | `/api/orders/{id}`            | Get order by id                  |
+| `POST`   | `/api/offers/{offerId}/order` | Create order from accepted offer |
+| `PUT`    | `/api/orders/{id}`            | Update order                     |
+| `DELETE` | `/api/orders/{id}`            | Soft delete order                |
 
-```http
-204 No Content
-404 Not Found
-500 Internal Server Error
-```
-
-
----
-
-## Orders
-
-Order endpoints are used to create and manage customer orders.
-
-An order is created from an accepted offer.
-Each offer can only be converted into one order.
-
----
-
-### Get all orders
-
-```http
-GET /api/orders
-```
-
-Returns all non-deleted orders.
-
-#### Responses
-
-```http
-200 OK
-500 Internal Server Error
-```
-
----
-
-### Get order by id
-
-```http
-GET /api/orders/{id}
-```
-
-Returns a single order by id.
-
-#### Responses
-
-```http
-200 OK
-404 Not Found
-500 Internal Server Error
-```
-
----
-
-### Create order from offer
+## Create Order From Offer Request
 
 ```http
 POST /api/offers/{offerId}/order
 ```
 
-Creates a new order from an existing accepted offer.
-
-#### Request body
+Current frontend request body:
 
 ```json
-{
-  "plannedDate": "2026-08-01T09:00:00Z",
-  "notes": "First order created from accepted offer."
-}
+{}
 ```
 
-`plannedDate` is optional, but if provided, it must be in the future.
+The endpoint expects a JSON request body. The current frontend sends an empty object because order creation is based on the accepted offer.
 
-#### Server-side behavior
+If the backend request model later exposes optional order fields, the request may also include values such as `plannedDate` or `notes`.
 
-* Loads the offer by ID
-* Verifies that the offer exists
-* Verifies that the offer status is `Accepted`
-* Checks that no order already exists for the offer
-* Creates a new order with status `Planned`
-* Copies the `OfferId` and `CustomerId` from the offer
-* Stores the optional planned date and notes
+## Create Order From Offer Behavior
 
-#### Responses
+The backend:
 
-```http
-201 Created
-400 Bad Request
-404 Not Found
-409 Conflict
-500 Internal Server Error
-```
+* loads the offer by id
+* verifies that the offer exists
+* verifies that the offer status is `Accepted`
+* checks that no order already exists for the offer
+* creates a new order with status `Planned`
+* copies the `OfferId` and `CustomerId` from the offer
+* returns the created order
 
-#### Conflict cases
-
-```text
-Only accepted offers can be converted into orders.
-```
-
-```text
-An order already exists for this offer.
-```
-
----
-
-### Update order
-
-```http
-PUT /api/orders/{id}
-```
-
-Updates an existing order.
-
-
-#### Request body
-
-```json
-{
-  "status": 2,
-  "plannedDate": "2026-08-05T09:00:00Z",
-  "notes": "Order is now in progress."
-}
-```
-
-#### Server-side behavior
-
-* Loads the order by ID
-* Updates the order status
-* Updates the planned date
-* Updates the notes
-* Sets `completedAt` automatically when the status is `Completed`
-* Clears `completedAt` when the status is changed away from `Completed`
-
-#### Responses
-
-```http
-200 OK
-400 Bad Request
-404 Not Found
-500 Internal Server Error
-```
-
-#### Example response
+## Order Response Example
 
 ```json
 {
   "id": "00000000-0000-0000-0000-000000000000",
   "offerId": "00000000-0000-0000-0000-000000000000",
   "customerId": "00000000-0000-0000-0000-000000000000",
+  "status": 1,
+  "plannedDate": null,
+  "completedAt": null,
+  "notes": null
+}
+```
+
+## Update Order Request
+
+```json
+{
   "status": 2,
   "plannedDate": "2026-08-05T09:00:00Z",
-  "completedAt": null,
   "notes": "Order is now in progress."
 }
 ```
 
+## Update Order Behavior
+
+When an order is updated, the backend:
+
+* updates the order status
+* updates the planned date
+* updates the notes
+* sets `completedAt` automatically when the status is `Completed`
+* clears `completedAt` when the status is changed away from `Completed`
+
+## Response Codes
+
+| Method                             | Success          | Common errors                                   |
+| ---------------------------------- | ---------------- | ----------------------------------------------- |
+| `GET /api/orders`                  | `200 OK`         | `401`, `403`, `500`                             |
+| `GET /api/orders/{id}`             | `200 OK`         | `401`, `403`, `404`, `500`                      |
+| `POST /api/offers/{offerId}/order` | `201 Created`    | `400`, `401`, `403`, `404`, `409`, `415`, `500` |
+| `PUT /api/orders/{id}`             | `200 OK`         | `400`, `401`, `403`, `404`, `500`               |
+| `DELETE /api/orders/{id}`          | `204 No Content` | `401`, `403`, `404`, `500`                      |
+
+## Order Creation Error Cases
+
+| Case                              | Expected behavior                                  |
+| --------------------------------- | -------------------------------------------------- |
+| Offer does not exist              | Request fails                                      |
+| Offer is not accepted             | Request fails                                      |
+| Order already exists for offer    | Request fails with conflict or business error      |
+| Missing JSON body or content type | Request may fail with `415 Unsupported Media Type` |
+| Missing authentication            | Request fails with `401 Unauthorized`              |
+| Missing role permission           | Request fails with `403 Forbidden`                 |
+
 ---
 
-### Delete order
+# Current Limitations
 
-```http
-DELETE /api/orders/{id}
-```
+The current API supports authentication, authorization, customer management, offered service management, offer management, offer item management and core order management.
 
-Soft-deletes an existing order.
+Known limitations:
 
-The order is not physically removed from the database. Instead, it is marked as deleted and excluded from future order queries.
+* no refresh tokens
+* no password reset flow
+* no email confirmation
+* no advanced pricing rules
+* no tiered pricing
+* no PDF generation for offers
+* no dedicated complete or cancel order endpoints yet
+* no employee assignment for orders yet
 
-#### Server-side behavior
-
-* Loads the order by ID
-* Verifies that the order exists
-* Marks the order as soft-deleted
-* Sets the deletion timestamp
-* Persists the updated order state
-
-#### Responses
-
-```http
-204 No Content
-404 Not Found
-500 Internal Server Error
-```
 ---
 
-## Current Limitations
+# Related Documentation
 
-The current API supports authentication foundation, customer management, offered service management, offer management, offer item management and core order management.
-
-Implemented authentication features:
-
-* Register users
-* Login users
-* Generate JWT tokens
-* Validate JWT bearer tokens
-* Retrieve the currently authenticated user through `/api/auth/me`
-* Protect business endpoints with JWT authentication
-* Test JWT-protected endpoints through Swagger authorization
-* Seed Admin and Employee roles
-* Assign development users to Admin and Employee roles
-* Include role claims in JWT tokens
-* Protect endpoints with role-based authorization
-
-Implemented offer item features:
-
-* Add offer items to offers
-* Get offer items by offer
-* Update offer item quantities
-* Soft-delete offer items
-* Recalculate offer totals after item changes
-
-Implemented order features:
-
-* Create orders from accepted offers
-* Get all orders
-* Get order by id
-* Update order status, planned date and notes
-* Soft-delete orders
-
-Not implemented yet:
-
-* Refresh tokens
-* Password reset flow
-* Email confirmation
-* Advanced pricing rules
-* Tiered pricing
-* PDF generation for offers
-
+* [Authentication Architecture](../architecture/authentication.md)
+* [Request Flow](../architecture/request-flow.md)
+* [Offer-to-Order Workflow](../business-processes/offer-to-order-workflow.md)
+* [Create Order From Offer Flow](../business-processes/create-order-from-offer-flow.md)
+* [Add Offer Item Flow](../business-processes/add-offer-item-flow.md)
+* [Frontend Architecture](../frontend/frontend-architecture.md)

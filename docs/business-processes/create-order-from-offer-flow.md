@@ -1,394 +1,200 @@
 ﻿# Create Order From Offer Flow
 
-This document describes the business and technical flow for creating a new order from an accepted offer.
+This document describes how an accepted offer is converted into an order.
 
-The feature is exposed through the following API endpoint:
-
-```http
-POST /api/offers/{offerId}/order
-```
+The order creation flow is a key business process because it turns a sales document into an operational service order.
 
 ---
 
 ## Purpose
 
-An order represents actual work that should be planned, executed and completed.
+An offer represents a proposal to a customer.
 
-An offer is only a proposal for a customer.
+An order represents accepted work that should be planned, executed and completed.
 
-When the customer accepts the offer, the system can convert this offer into an order.
+```text
+Offer
+→ Accepted Offer
+→ Order
+```
 
-Examples:
-
-* Lawn mowing order
-* Hedge cutting order
-* Green waste disposal order
-* Pressure washing order
-
-An order is always based on one accepted offer.
-Each offer can only be converted into one order.
+The application keeps the original offer as a historical record and creates a separate order for operational handling.
 
 ---
 
 ## Business Rule
 
-The client is only allowed to send optional order planning information.
+An order can only be created from an accepted offer.
 
-The backend is responsible for:
-
-* Loading the selected offer
-* Verifying that the offer exists
-* Verifying that the offer status is `Accepted`
-* Checking that no order already exists for this offer
-* Creating the order with status `Planned`
-* Copying `OfferId` and `CustomerId` from the offer
-* Persisting the new order
-
-This prevents clients from creating orders from invalid offer states or manipulating the relationship between offers, customers and orders.
+This prevents draft, sent or rejected offers from accidentally becoming real work orders.
 
 ---
 
-## Request
-
-```http
-POST /api/offers/{offerId}/order
-```
-
-### Route parameter
-
-```text
-offerId
-```
-
-The id of the accepted offer that should be converted into an order.
-
-### Request body
-
-```json
-{
-  "plannedDate": "2026-08-01T09:00:00Z",
-  "notes": "First order created from accepted offer."
-}
-```
-
-`plannedDate` is optional, but if provided, it must be in the future.
-
-`notes` is optional and can be used to store additional information about the order.
-
----
-
-## Flow Diagram
+## Flow Overview
 
 ```mermaid
 flowchart TD
-    A[Client sends POST request] --> B[OrdersController]
-    B --> C[CreateOrderFromOfferRequestValidator]
-    C --> D[OrderService.CreateFromOfferAsync]
-
-    D --> E[Load Offer by id]
-    E --> F{Offer found?}
-
-    F -->|No| G[Return 404 Not Found]
-    F -->|Yes| H{Offer status is Accepted?}
-
-    H -->|No| I[Return 409 Conflict]
-    H -->|Yes| J[Check existing Order for Offer]
-
-    J --> K{Order already exists?}
-    K -->|Yes| I
-    K -->|No| L[Create new Order entity]
-
-    L --> M[Set OfferId from Offer]
-    M --> N[Set CustomerId from Offer]
-    N --> O[Set Status = Planned]
-    O --> P[Set optional PlannedDate and Notes]
-    P --> Q[Save Order using OrderRepository]
-    Q --> R[Return 201 Created with OrderDto]
+    A[Open offer details] --> B{Order already exists?}
+    B -->|Yes| C[Show link to existing order]
+    B -->|No| D{Offer accepted?}
+    D -->|No| E[Accept offer]
+    D -->|Yes| F[Create order]
+    E --> F
+    F --> G[Backend validates offer]
+    G --> H{Valid?}
+    H -->|No| I[Return error]
+    H -->|Yes| J[Create planned order]
+    J --> K[Redirect to orders]
 ```
 
 ---
 
-## Technical Flow
-
-### 1. Controller receives the request
-
-The `OrdersController` receives:
-
-* `offerId` from the URL
-* `CreateOrderFromOfferRequest` from the request body
-
-The controller does not contain business logic.
-It forwards the request to the application service.
-
-```text
-OrdersController
-↓
-IOrderService
-```
-
----
-
-### 2. Request body is validated
-
-The `CreateOrderFromOfferRequestValidator` validates the request body.
-
-Validation rules:
-
-* `plannedDate` must be in the future if provided
-* `notes` must not exceed the configured maximum length
-
-If validation fails, the API returns:
-
-```http
-400 Bad Request
-```
-
-This happens before the application service logic is executed.
-
----
-
-### 3. Service loads the offer
-
-The `OrderService` loads the offer by id.
-
-```text
-IOfferRepository.GetByIdAsync(offerId)
-```
-
-If the offer does not exist, the service throws a `NotFoundException`.
-
-The global exception middleware maps this exception to:
-
-```http
-404 Not Found
-```
-
----
-
-### 4. Service checks the offer status
-
-The offer must have the status `Accepted`.
-
-```text
-Offer.Status == Accepted
-```
-
-If the offer is still `Draft`, `Sent` or `Rejected`, the service throws a `ConflictException`.
-
-The global exception middleware maps this exception to:
-
-```http
-409 Conflict
-```
-
-Reason:
-
-```text
-Only accepted offers can be converted into orders.
-```
-
-This protects the business workflow because only accepted offers should become real orders.
-
----
-
-### 5. Service checks for an existing order
-
-The service checks whether an order already exists for the selected offer.
-
-```text
-IOrderRepository.GetByOfferIdAsync(offerId)
-```
-
-If an order already exists, the service throws a `ConflictException`.
-
-The global exception middleware maps this exception to:
-
-```http
-409 Conflict
-```
-
-Reason:
-
-```text
-An order already exists for this offer.
-```
-
-This prevents duplicate orders for the same offer.
-
----
-
-### 6. Service creates the Order entity
-
-The service creates a new `Order` entity using:
-
-* Offer id
-* Customer id
-* Initial order status
-* Optional planned date
-* Optional notes
-
-The new order starts with:
-
-```text
-Status = Planned
-```
-
-This entity represents the internal business state that will be persisted.
-
----
-
-### 7. Service saves the order
-
-The new order is saved through the repository.
-
-```text
-OrderService
-↓
-IOrderRepository
-↓
-OrderRepository
-↓
-AppDbContext
-↓
-PostgreSQL
-```
-
-The application layer does not know Entity Framework Core directly.
-Database-specific logic remains inside the infrastructure layer.
-
----
-
-## Response
-
-If the order was created successfully, the API returns:
-
-```http
-201 Created
-```
-
-### Example response
-
-```json
-{
-  "id": "00000000-0000-0000-0000-000000000000",
-  "offerId": "00000000-0000-0000-0000-000000000000",
-  "customerId": "00000000-0000-0000-0000-000000000000",
-  "status": 1,
-  "plannedDate": "2026-08-01T09:00:00Z",
-  "completedAt": null,
-  "notes": "First order created from accepted offer."
-}
-```
-
----
-
-## Error Cases
-
-### Offer not found
-
-If the offer id does not exist:
-
-```http
-404 Not Found
-```
-
-### Offer is not accepted
-
-If the offer status is not `Accepted`:
-
-```http
-409 Conflict
-```
-
-### Order already exists
-
-If an order already exists for the offer:
-
-```http
-409 Conflict
-```
-
-### Invalid request body
-
-If validation fails:
-
-```http
-400 Bad Request
-```
-
----
-
-## Design Decisions
-
-### Why is `offerId` part of the URL?
-
-The offer id identifies the source resource.
+## API Endpoint
 
 ```http
 POST /api/offers/{offerId}/order
 ```
 
-This means:
+The endpoint expects a JSON request body.
 
-```text
-Create an order from this specific offer.
+Current request body:
+
+```json
+{}
 ```
 
+The request body is intentionally empty at the moment because the order is created from the accepted offer and does not yet require additional input from the frontend.
+
 ---
 
-### Why does the client not send `OfferId` or `CustomerId` in the body?
+## Backend Responsibilities
 
-The order must be based on the selected offer.
+The backend is responsible for enforcing the business rules.
 
-If the client could send `OfferId` or `CustomerId` directly in the body, the relationship between offer, customer and order could be manipulated.
+| Responsibility           | Description                            |
+| ------------------------ | -------------------------------------- |
+| Validate offer existence | The offer must exist                   |
+| Validate offer status    | The offer must be accepted             |
+| Prevent duplicate orders | Only one order may exist for one offer |
+| Create order             | A new order is created from the offer  |
+| Set initial status       | The order starts as `Planned`          |
+| Keep offer history       | The original offer remains available   |
 
-Therefore:
+---
+
+## Frontend Responsibilities
+
+The frontend improves the user experience but does not replace backend validation.
+
+| Responsibility                | Description                                            |
+| ----------------------------- | ------------------------------------------------------ |
+| Provide a clear action        | The user clicks `Angebot annehmen & Auftrag erstellen` |
+| Update offer status if needed | Draft or sent offers are set to accepted first         |
+| Send order creation request   | Calls `POST /api/offers/{offerId}/order`               |
+| Prevent duplicate UI action   | Existing orders are detected and the button is hidden  |
+| Redirect after success        | The user is redirected to `/orders`                    |
+| Link to existing order        | Converted offers link directly to the related order    |
+
+---
+
+## Current Frontend Behavior
+
+The current frontend behavior is implemented on:
 
 ```text
-Client sends optional planning data.
-Backend determines OfferId and CustomerId from the accepted offer.
+/offers/:offerId
 ```
 
----
+Possible states:
 
-### Why does the offer need to be accepted?
-
-An order represents real planned work.
-
-Only an accepted offer should become an order.
-
-This prevents draft, sent or rejected offers from accidentally becoming active work orders.
-
----
-
-### Why is duplicate order creation prevented?
-
-Each offer should only result in one order.
-
-Without this rule, the same accepted offer could create multiple duplicate orders.
-
-Therefore, the system checks for an existing order before creating a new one.
+| Offer state            | Frontend behavior                               |
+| ---------------------- | ----------------------------------------------- |
+| Draft or Sent          | Show `Angebot annehmen & Auftrag erstellen`     |
+| Accepted without order | Show `Auftrag erstellen`                        |
+| Accepted with order    | Hide creation button and show link to the order |
+| Rejected               | Show message that the offer cannot be converted |
+| Converted              | Make offer item changes read-only               |
 
 ---
 
-## Related Order Management Features
+## Order Status
 
-The current implementation supports basic order management.
+Newly created orders start with:
 
-Implemented:
+```text
+Planned
+```
 
-* Creating orders from accepted offers
-* Listing all orders
-* Getting orders by id
-* Updating order status, planned date and notes
-* Automatically setting `completedAt` when an order is completed
-* Clearing `completedAt` when an order is reopened
-* Soft deleting orders
+Current order status values:
 
-Not implemented yet:
+| Value | Status     | Meaning                                     |
+| ----- | ---------- | ------------------------------------------- |
+| 1     | Planned    | The order exists but is not yet in progress |
+| 2     | InProgress | The order is currently being worked on      |
+| 3     | Completed  | The order has been completed                |
+| 4     | Cancelled  | The order was cancelled                     |
 
-* Dedicated complete order endpoint
-* Dedicated cancel order endpoint
-* Order scheduling calendar
-* Order assignment to users or workers
-* Order PDF or report generation
+---
+
+## Error Handling
+
+Typical error cases:
+
+| Case                    | Expected behavior                                             |
+| ----------------------- | ------------------------------------------------------------- |
+| Offer does not exist    | Backend returns an error                                      |
+| Offer is not accepted   | Backend rejects order creation                                |
+| Order already exists    | Backend prevents duplicate order creation                     |
+| Missing authentication  | Request fails with unauthorized response                      |
+| Missing role permission | Request fails with forbidden response                         |
+| Invalid request format  | Request fails with unsupported media type or validation error |
+
+The frontend displays a user-readable error message when the order creation request fails.
+
+---
+
+## Why the Order Is a Separate Entity
+
+The application does not simply rename an accepted offer into an order.
+
+Instead, it creates a separate order because both concepts have different responsibilities.
+
+| Concept | Responsibility                                               |
+| ------- | ------------------------------------------------------------ |
+| Offer   | Sales document, pricing foundation and customer proposal     |
+| Order   | Operational work item for planning, execution and completion |
+
+This separation makes the system easier to extend later with scheduling, employee assignment, order status updates and reporting.
+
+---
+
+## Current Limitations
+
+| Limitation                                                | Notes                                             |
+| --------------------------------------------------------- | ------------------------------------------------- |
+| Order creation request body is currently empty            | Future versions may include planned date or notes |
+| Order details are read-only in the frontend               | Editing is planned for a later milestone          |
+| Order planning is not implemented in the frontend yet     | Planned for `v0.14.0`                             |
+| Order status updates are not editable in the frontend yet | Planned for `v0.14.0`                             |
+
+---
+
+## Future Improvements
+
+Possible future improvements:
+
+* ask for a planned date during order creation
+* assign an employee to an order
+* allow order status transitions in the frontend
+* add dedicated complete and cancel actions
+* display upcoming orders on the dashboard
+* send order confirmation emails
+
+---
+
+## Related Documentation
+
+* [Offer-to-Order Workflow](offer-to-order-workflow.md)
+* [Add Offer Item Flow](add-offer-item-flow.md)
+* [API Endpoints](../api/endpoints.md)
+* [Frontend Architecture](../frontend/frontend-architecture.md)

@@ -2,15 +2,24 @@
 
 This document describes the database tables created and used by ASP.NET Core Identity.
 
+The Identity schema belongs to the technical authentication and authorization infrastructure. It is separate from the core business domain model.
+
 ---
 
 ## Purpose
 
-The Identity schema stores application users and authentication-related data.
+The Identity schema stores application users, roles and authentication-related data.
 
-It is part of the authentication infrastructure and is managed by ASP.NET Core Identity.
+It supports:
 
-The Identity tables are separate from the core business entities such as:
+* user registration
+* user login
+* password hashing
+* role-based authorization
+* JWT role claims
+* local development users for testing Admin and Employee behavior
+
+The Identity tables are separate from business entities such as:
 
 * Customer
 * OfferedService
@@ -52,79 +61,108 @@ The technical Identity base class already provides fields such as:
 * `LockoutEnabled`
 * `AccessFailedCount`
 
----
-
-## Main Identity Tables
-
-ASP.NET Core Identity creates several tables.
-
-### AspNetUsers
-
-Stores application users.
-
-Important fields include:
-
-* `Id`
-* `UserName`
-* `Email`
-* `PasswordHash`
-* `SecurityStamp`
-* `DisplayName`
-
 Passwords are not stored as plain text.
 
 ASP.NET Core Identity stores password hashes.
 
 ---
 
-### AspNetRoles
+## Main Identity Tables
 
-Stores available roles.
+ASP.NET Core Identity creates several tables.
 
-Examples for future use:
-
-* Admin
-* Employee
-
-The current authentication foundation prepares roles technically, but role-based authorization is not implemented yet.
+| Table              | Purpose                                  |
+| ------------------ | ---------------------------------------- |
+| `AspNetUsers`      | Stores application users                 |
+| `AspNetRoles`      | Stores available roles                   |
+| `AspNetUserRoles`  | Stores user-to-role assignments          |
+| `AspNetUserClaims` | Stores claims assigned directly to users |
+| `AspNetRoleClaims` | Stores claims assigned to roles          |
+| `AspNetUserLogins` | Stores external login provider data      |
+| `AspNetUserTokens` | Stores tokens managed by Identity        |
 
 ---
 
-### AspNetUserRoles
+## AspNetUsers
 
-Stores the relationship between users and roles.
+`AspNetUsers` stores application users.
+
+Important fields include:
+
+| Field                | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| `Id`                 | Unique user identifier                      |
+| `UserName`           | Identity username, currently based on email |
+| `NormalizedUserName` | Normalized username for lookup              |
+| `Email`              | User email                                  |
+| `NormalizedEmail`    | Normalized email for lookup                 |
+| `EmailConfirmed`     | Email confirmation flag                     |
+| `PasswordHash`       | Hashed password                             |
+| `SecurityStamp`      | Used to invalidate credentials              |
+| `ConcurrencyStamp`   | Used for concurrency checks                 |
+| `DisplayName`        | Project-specific display name               |
+
+---
+
+## AspNetRoles
+
+`AspNetRoles` stores available roles.
+
+Current application roles:
+
+| Role       | Purpose                                           |
+| ---------- | ------------------------------------------------- |
+| `Admin`    | Full management access including critical actions |
+| `Employee` | Regular business workflow access                  |
+
+Roles are seeded during local development startup.
+
+---
+
+## AspNetUserRoles
+
+`AspNetUserRoles` stores the relationship between users and roles.
 
 ```text
 ApplicationUser n ─── n IdentityRole
 ```
 
-This table will become relevant when role-based authorization is implemented.
+This table is currently used to assign development users to Admin and Employee roles.
+
+Current local development users:
+
+| User                       | Role     |
+| -------------------------- | -------- |
+| `test@gartenzwerge.de`     | Admin    |
+| `employee@gartenzwerge.de` | Employee |
+
+Both users are intended for local authorization testing.
 
 ---
 
-### AspNetUserClaims
+## AspNetUserClaims
 
-Stores additional claims assigned directly to users.
+`AspNetUserClaims` stores additional claims assigned directly to users.
 
-Claims can describe additional user information or permissions.
+The current implementation does not manage custom user claims through application features.
 
-The current implementation does not manage custom user claims yet.
-
----
-
-### AspNetRoleClaims
-
-Stores claims assigned to roles.
-
-This can be useful later for more advanced permission systems.
-
-The current implementation does not manage role claims yet.
+JWT tokens are generated with relevant user and role information during login.
 
 ---
 
-### AspNetUserLogins
+## AspNetRoleClaims
 
-Stores external login provider information.
+`AspNetRoleClaims` stores claims assigned to roles.
+
+The current project does not use role claims for advanced permission systems yet.
+
+Role-based authorization is currently handled through Identity roles such as `Admin` and `Employee`.
+
+---
+
+## AspNetUserLogins
+
+`AspNetUserLogins` stores external login provider information.
 
 Examples:
 
@@ -136,17 +174,17 @@ The current implementation does not use external login providers yet.
 
 ---
 
-### AspNetUserTokens
+## AspNetUserTokens
 
-Stores tokens managed by ASP.NET Core Identity.
+`AspNetUserTokens` stores tokens managed by ASP.NET Core Identity.
 
 This can be useful for features such as:
 
-* Email confirmation
-* Password reset
-* Two-factor authentication
+* email confirmation
+* password reset
+* two-factor authentication
 
-The current implementation does not use Identity token providers yet.
+The current implementation does not use Identity token providers for these workflows yet.
 
 ---
 
@@ -157,9 +195,13 @@ erDiagram
     AspNetUsers {
         Guid Id
         string UserName
+        string NormalizedUserName
         string Email
+        string NormalizedEmail
+        bool EmailConfirmed
         string PasswordHash
         string SecurityStamp
+        string ConcurrencyStamp
         string DisplayName
     }
 
@@ -167,6 +209,7 @@ erDiagram
         Guid Id
         string Name
         string NormalizedName
+        string ConcurrencyStamp
     }
 
     AspNetUserRoles {
@@ -191,6 +234,7 @@ erDiagram
     AspNetUserLogins {
         string LoginProvider
         string ProviderKey
+        string ProviderDisplayName
         Guid UserId
     }
 
@@ -211,6 +255,8 @@ erDiagram
     AspNetUsers ||--o{ AspNetUserTokens : has
 ```
 
+---
+
 ## Relationship to Business Entities
 
 At the current stage, `ApplicationUser` is not directly connected to business entities.
@@ -220,44 +266,128 @@ There is currently no relationship such as:
 ```text
 ApplicationUser 1 ─── n Order
 ApplicationUser 1 ─── n Customer
+ApplicationUser 1 ─── n Offer
 ```
 
 This is intentional.
 
-The current authentication milestone focuses on proving that users can register, log in and access protected endpoints.
+Authentication and authorization are currently used to control access to the application, not to assign business records to individual users.
 
 Future milestones may connect users to business workflows, for example:
 
-* Assigned employee for an order
-* CreatedBy user on offers
-* UpdatedBy user on orders
-* Admin-only management endpoints
+* assigned employee for an order
+* created-by user on offers
+* updated-by user on orders
+* audit trail for business changes
+* user management for Admin users
 
 ---
 
-## Current Implementation
+## Identity vs Business Domain
 
-Implemented:
+The Identity schema and the business domain model have different responsibilities.
 
-* ASP.NET Core Identity database schema
-* Custom `ApplicationUser`
-* GUID-based Identity keys
-* Password hashing through ASP.NET Core Identity
-* User registration
-* User login
-* JWT token generation
-* JWT bearer authentication
+| Area            | Responsibility                                          |
+| --------------- | ------------------------------------------------------- |
+| Identity schema | Users, passwords, roles, claims and authentication data |
+| Business domain | Customers, services, offers, offer items and orders     |
 
-Not implemented yet:
+This separation keeps authentication infrastructure independent from the business workflow.
 
-* Role-based authorization
-* User-role assignment
-* Admin or Employee role workflows
-* Refresh tokens
-* Password reset
-* Email confirmation
-* External login providers
-* Direct relationship between users and business entities
+---
+
+## Role-Based Authorization
+
+The application uses ASP.NET Core Identity roles for backend authorization.
+
+Current roles:
+
+```text
+Admin
+Employee
+```
+
+Example backend authorization attribute:
+
+```csharp
+[Authorize(Roles = ApplicationRoles.Admin)]
+```
+
+Another common authorization rule:
+
+```csharp
+[Authorize(Roles = ApplicationRoles.AdminOrEmployee)]
+```
+
+The role names are centralized in the Application layer through `ApplicationRoles`.
+
+The actual role storage and user-role assignments are handled by ASP.NET Core Identity tables.
+
+---
+
+## JWT Role Claims
+
+When a user logs in, the backend generates a JWT token.
+
+The token includes role claims so ASP.NET Core can evaluate role-based authorization rules on protected endpoints.
+
+Simplified flow:
+
+```text
+Login
+→ Identity validates email and password
+→ User roles are loaded
+→ JWT token is generated with role claims
+→ Frontend uses token for authenticated API requests
+→ Backend checks role claims on protected endpoints
+```
+
+---
+
+## Local Development Seeding
+
+For local development, the application seeds roles and development users.
+
+Seeded roles:
+
+* `Admin`
+* `Employee`
+
+Seeded users:
+
+| Email                      | Role     | Purpose                |
+| -------------------------- | -------- | ---------------------- |
+| `test@gartenzwerge.de`     | Admin    | Test full access       |
+| `employee@gartenzwerge.de` | Employee | Test restricted access |
+
+This makes it possible to test `401 Unauthorized` and `403 Forbidden` behavior locally.
+
+---
+
+## Current Implementation Status
+
+| Feature                                                 | Status          |
+| ------------------------------------------------------- | --------------- |
+| ASP.NET Core Identity database schema                   | Implemented     |
+| Custom `ApplicationUser`                                | Implemented     |
+| GUID-based Identity keys                                | Implemented     |
+| Password hashing through ASP.NET Core Identity          | Implemented     |
+| User registration                                       | Implemented     |
+| User login                                              | Implemented     |
+| JWT token generation                                    | Implemented     |
+| JWT bearer authentication                               | Implemented     |
+| Admin and Employee roles                                | Implemented     |
+| Role seeding                                            | Implemented     |
+| Development user seeding                                | Implemented     |
+| User-role assignment for development users              | Implemented     |
+| Role claims in JWT tokens                               | Implemented     |
+| Role-based backend authorization                        | Implemented     |
+| Direct relationship between users and business entities | Not implemented |
+| Refresh tokens                                          | Not implemented |
+| Password reset flow                                     | Not implemented |
+| Email confirmation flow                                 | Not implemented |
+| External login providers                                | Not implemented |
+| User management endpoints                               | Not implemented |
 
 ---
 
@@ -265,13 +395,13 @@ Not implemented yet:
 
 The project uses ASP.NET Core Identity instead of a completely custom user table.
 
-Reason:
+Reasons:
 
-* Password hashing is handled by a proven framework
-* User management is easier to extend later
-* Roles and claims are technically prepared
-* Security-related defaults are provided by ASP.NET Core Identity
-* The project stays closer to real-world ASP.NET Core applications
+* password hashing is handled by a proven framework
+* user and role management can be extended later
+* roles and claims are supported out of the box
+* security-related defaults are provided by ASP.NET Core Identity
+* the project stays close to real-world ASP.NET Core applications
 
 ---
 
@@ -283,4 +413,13 @@ It should not be confused with the business domain model.
 
 Business entities describe landscaping workflows.
 
-Identity entities describe users, authentication and future authorization.
+Identity entities describe users, authentication and authorization.
+
+---
+
+## Related Documentation
+
+* [Authentication Architecture](../architecture/authentication.md)
+* [Clean Architecture](../architecture/clean-architecture.md)
+* [API Endpoints](../api/endpoints.md)
+* [Entity Relationships](entity-relationships.md)

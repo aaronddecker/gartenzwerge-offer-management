@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  getOfferedServices,
-  type OfferedServiceResponse,
-} from '../api/offeredServicesApi'
+  createOrderFromOffer,
+  getOrders,
+  type OrderResponse,
+} from '../api/ordersApi'
 import {
   createOfferItem,
   getOfferItems,
@@ -11,9 +12,14 @@ import {
 } from '../api/offerItemsApi'
 import {
   getOfferById,
+  updateOffer,
   type OfferResponse,
   type OfferStatus,
 } from '../api/offersApi'
+import {
+  getOfferedServices,
+  type OfferedServiceResponse,
+} from '../api/offeredServicesApi'
 import { PageHeader } from '../shared/components/PageHeader'
 
 type OfferItemFormState = {
@@ -53,6 +59,7 @@ function getOfferStatusLabel(status: OfferStatus) {
 }
 
 export function OfferDetailsPage() {
+  const navigate = useNavigate()
   const { offerId } = useParams<{ offerId: string }>()
 
   const [offer, setOffer] = useState<OfferResponse | null>(null)
@@ -73,20 +80,27 @@ export function OfferDetailsPage() {
   const [createSuccessMessage, setCreateSuccessMessage] = useState<
     string | null
   >(null)
+  const [isConvertingToOrder, setIsConvertingToOrder] = useState(false)
+  const [conversionErrorMessage, setConversionErrorMessage] = useState<
+    string | null
+  >(null)
+  const [orders, setOrders] = useState<OrderResponse[]>([])
 
   useEffect(() => {
     let isMounted = true
 
     if (!offerId) {
-    return
+      return
     }
 
     Promise.all([
       getOfferById(offerId),
       getOfferItems(offerId),
       getOfferedServices(),
+      getOrders(),
     ])
-      .then(([loadedOffer, loadedOfferItems, loadedOfferedServices]) => {
+      .then(
+      ([loadedOffer, loadedOfferItems, loadedOfferedServices, loadedOrders]) => {
         if (!isMounted) {
           return
         }
@@ -94,6 +108,7 @@ export function OfferDetailsPage() {
         setOffer(loadedOffer)
         setOfferItems(loadedOfferItems)
         setOfferedServices(loadedOfferedServices)
+        setOrders(loadedOrders)
         setErrorMessage(null)
       })
       .catch((error) => {
@@ -173,9 +188,60 @@ export function OfferDetailsPage() {
     }
   }
 
+  async function handleAcceptOfferAndCreateOrder() {
+    if (!offerId || !offer) {
+      return
+    }
+    if (existingOrder) {
+      setConversionErrorMessage(
+        'Für dieses Angebot wurde bereits ein Auftrag erstellt.'
+      )
+      return
+    }
+
+    const confirmed = window.confirm(
+      'Möchtest du dieses Angebot annehmen und daraus einen Auftrag erstellen?'
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setIsConvertingToOrder(true)
+    setConversionErrorMessage(null)
+
+    try {
+      if (offer.status !== 3) {
+        await updateOffer(offerId, {
+          validUntil: new Date(offer.validUntil).toISOString(),
+          status: 3,
+          notes: offer.notes ?? null,
+        })
+      }
+
+      await createOrderFromOffer(offerId)
+      navigate('/orders')
+    } catch (error) {
+      setConversionErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ein unbekannter Fehler ist aufgetreten.'
+      )
+    } finally {
+      setIsConvertingToOrder(false)
+    }
+  }
+
   const activeOfferedServices = offeredServices.filter(
     (offeredService) => offeredService.isActive
   )
+
+  const existingOrder = offerId
+  ? orders.find((order) => order.offerId === offerId)
+  : undefined
+
+  const isOfferReadOnly =
+    offer?.status === 3 || offer?.status === 4 || existingOrder !== undefined
 
   if (!offerId) {
     return (
@@ -233,10 +299,81 @@ export function OfferDetailsPage() {
             {offer.notes && <p className="muted-text">{offer.notes}</p>}
           </section>
 
+          <section className="offer-conversion-card">
+            {existingOrder ? (
+              <>
+                <p className="muted-text">
+                  Für dieses Angebot wurde bereits ein Auftrag erstellt. Das Angebot bleibt
+                  als Grundlage erhalten und kann nicht mehr verändert werden.
+                </p>
+
+                <Link to={`/orders/${existingOrder.id}`} className="secondary-link-button">
+                  Auftrag öffnen
+                </Link>
+              </>
+            ) : null}
+
+            {!existingOrder && (offer.status === 1 || offer.status === 2) ? (
+              <>
+                <p className="muted-text">
+                  Wenn der Kunde dieses Angebot angenommen hat, kannst du daraus direkt
+                  einen Auftrag erstellen.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  disabled={isConvertingToOrder}
+                  onClick={handleAcceptOfferAndCreateOrder}
+                >
+                  {isConvertingToOrder
+                    ? 'Auftrag wird erstellt...'
+                    : 'Angebot annehmen & Auftrag erstellen'}
+                </button>
+              </>
+            ) : null}
+
+            {!existingOrder && offer.status === 3 ? (
+              <>
+                <p className="muted-text">
+                  Dieses Angebot ist angenommen. Du kannst daraus einen Auftrag erstellen.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  disabled={isConvertingToOrder}
+                  onClick={handleAcceptOfferAndCreateOrder}
+                >
+                  {isConvertingToOrder
+                    ? 'Auftrag wird erstellt...'
+                    : 'Auftrag erstellen'}
+                </button>
+              </>
+            ) : null}
+
+            {!existingOrder && offer.status === 4 ? (
+              <p className="muted-text">
+                Dieses Angebot wurde abgelehnt und kann nicht direkt in einen Auftrag
+                umgewandelt werden.
+              </p>
+            ) : null}
+
+            {conversionErrorMessage && (
+              <p className="form-message form-message--error">
+                {conversionErrorMessage}
+              </p>
+            )}
+          </section>
+
           <section className="offer-form-card">
             <h3>Position hinzufügen</h3>
 
-            {activeOfferedServices.length === 0 ? (
+            {isOfferReadOnly ? (
+              <p className="muted-text">
+                Dieses Angebot ist abgeschlossen und kann nicht mehr verändert werden.
+              </p>
+            ) : activeOfferedServices.length === 0 ? (
               <p className="muted-text">
                 Es sind keine aktiven Leistungen vorhanden.
               </p>
@@ -255,10 +392,7 @@ export function OfferDetailsPage() {
                       <option value="">Leistung auswählen</option>
 
                       {activeOfferedServices.map((offeredService) => (
-                        <option
-                          key={offeredService.id}
-                          value={offeredService.id}
-                        >
+                        <option key={offeredService.id} value={offeredService.id}>
                           {offeredService.name} ·{' '}
                           {formatCurrency(offeredService.basePrice)} /{' '}
                           {offeredService.unit}
@@ -271,7 +405,7 @@ export function OfferDetailsPage() {
                     <span>Menge</span>
                     <input
                       type="number"
-                      min="0"
+                      min="0.01"
                       step="0.01"
                       value={formData.quantity}
                       onChange={(event) =>
