@@ -1,0 +1,36 @@
+.animated-number {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1em;
+  vertical-align: bottom;
+}
+
+.animated-number__roll {
+  display: flex;
+  flex-direction: column;
+  animation: animated-number-roll 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animated-number__row {
+  height: 1em;
+  line-height: 1em;
+  text-align: center;
+}
+
+@keyframes animated-number-roll {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(var(--animated-number-target) * -1em));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-number__roll {
+    animation: none;
+    transform: translateY(calc(var(--animated-number-target) * -1em));
+  }
+}

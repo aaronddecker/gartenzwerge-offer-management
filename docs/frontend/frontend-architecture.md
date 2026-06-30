@@ -384,14 +384,16 @@ Secondary and Admin-specific areas such as Analytics and Offered Services are ac
 
 ### Dashboard vs Analytics
 
-The dashboard is intended as an operational entry point.
+The dashboard is the operational entry point.
 
-It should later focus on:
+It currently shows:
 
-* upcoming work
-* important daily overview
-* quick access to core workflows
-* next recommended action
+* live counts for customers, open offers and upcoming orders
+* a list of the next planned orders sorted by planned date
+* animated statistics for a more lively overview
+* a quick action into the offer workflow
+
+Planned additions are a calendar field and a next-recommended-action hint.
 
 Analytics is intended for reporting and business insights.
 
@@ -480,8 +482,9 @@ src/Frontend/src/
 | Order details and planning            | Implemented |
 | Order status, planning and notes editing | Implemented |
 | Offer overview filters                | Implemented |
-| Dashboard                             | Placeholder |
-| Analytics                             | Placeholder |
+| Dashboard live counts and upcoming orders | Implemented |
+| Animated dashboard statistics         | Implemented |
+| Analytics / reporting                 | Placeholder |
 
 ---
 
@@ -492,7 +495,7 @@ src/Frontend/src/
 | No global AuthContext yet                                          | Auth state is currently handled through token storage and route guards |
 | No refresh token handling yet                                      | Token expiration is not handled automatically in the frontend          |
 | No full API client abstraction yet                                 | API calls are grouped by feature modules                               |
-| No real dashboard data yet                                         | Dashboard is still mostly placeholder-based                            |
+| Dashboard reporting not built yet                                  | Dashboard shows live operational counts; revenue and conversion reporting are planned |
 | No real analytics data yet                                         | Analytics is prepared but not connected to business data               |
 | Offered services currently support read and create in the frontend | Edit and delete UI can be added later                                  |
 | Customer lookup is client-side                                     | Acceptable for current project size                                    |

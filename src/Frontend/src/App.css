@@ -4,6 +4,7 @@
 
 @import './styles/components/buttons.css';
 @import './styles/components/forms.css';
+@import './styles/components/animated-number.css';
 
 @import './styles/pages/auth.css';
 @import './styles/pages/dashboard.css';

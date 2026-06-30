@@ -7,6 +7,11 @@ import {
 } from '../api/offersApi'
 import { getOrders, type OrderResponse } from '../api/ordersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import {
+  getRelatedOrder,
+  isArchivedOffer,
+  isOpenOffer,
+} from '../shared/businessRules'
 
 type OfferFilter = 'open' | 'archive' | 'all'
 
@@ -34,18 +39,6 @@ function getOfferStatusLabel(status: OfferStatus) {
     default:
       return 'Unbekannt'
   }
-}
-
-function getRelatedOrder(orders: OrderResponse[], offerId: string) {
-  return orders.find((order) => order.offerId === offerId)
-}
-
-function isOpenOffer(offer: OfferResponse, relatedOrder?: OrderResponse) {
-  return offer.status === 1 || offer.status === 2 || (offer.status === 3 && !relatedOrder)
-}
-
-function isArchivedOffer(offer: OfferResponse, relatedOrder?: OrderResponse) {
-  return offer.status === 4 || relatedOrder !== undefined
 }
 
 export function OffersPage() {
