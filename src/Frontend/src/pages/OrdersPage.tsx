@@ -7,6 +7,7 @@ import {
   type OrderStatus,
 } from '../api/ordersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { isActiveOrder, isDoneOrder } from '../shared/businessRules'
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('de-DE', {
@@ -55,14 +56,6 @@ function getOfferById(offers: OfferResponse[], offerId: string) {
 }
 
 type OrderFilter = 'active' | 'done' | 'all'
-
-function isActiveOrder(order: OrderResponse) {
-  return order.status === 1 || order.status === 2
-}
-
-function isDoneOrder(order: OrderResponse) {
-  return order.status === 3 || order.status === 4
-}
 
 export function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([])

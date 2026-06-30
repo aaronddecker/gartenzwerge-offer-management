@@ -1,11 +1,12 @@
 .stat-grid {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
   margin-top: 1.5rem;
 }
 
 .stat-card {
-  padding: 1rem;
+  padding: 0.7rem 0.6rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface-muted);
@@ -13,18 +14,22 @@
 
 .stat-card__title {
   margin: 0;
+  min-height: 2.4em;
   color: var(--color-accent);
+  font-size: 0.8rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .stat-card__value {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 2rem;
+  margin-top: 0.15rem;
+  font-size: 1.6rem;
   color: var(--color-text);
 }
 
 .stat-card__description {
+  display: none;
   margin: 0.5rem 0 0;
   color: var(--color-text-soft);
   line-height: 1.5;
@@ -76,9 +81,76 @@
   line-height: 1.5;
 }
 
+.dashboard-upcoming-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-upcoming-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard-upcoming-item:hover {
+  transform: translateY(-2px);
+  border-color: #c7d6bb;
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-upcoming-item__customer {
+  display: block;
+  font-weight: 700;
+}
+
+.dashboard-upcoming-item__meta {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-text-soft);
+  font-size: 0.85rem;
+}
+
+.dashboard-upcoming-item__date {
+  flex-shrink: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 @media (min-width: 768px) {
   .stat-grid {
-    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-card__title {
+    min-height: 0;
+    font-size: 1rem;
+  }
+
+  .stat-card__value {
+    margin-top: 0.5rem;
+    font-size: 2rem;
+  }
+
+  .stat-card__description {
+    display: block;
   }
 
   .quick-action-grid {
