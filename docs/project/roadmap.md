@@ -1,6 +1,6 @@
 # Project Roadmap
 
-This roadmap documents the completed and planned development milestones for the Gartenzwerge Außenservice management application.
+This roadmap documents the completed and planned development milestones for the Gartenzwerge Auï¿½enservice management application.
 
 The project is developed in small, focused milestones. Each milestone adds one meaningful part of the full business workflow instead of implementing unrelated features at once.
 
@@ -22,8 +22,8 @@ The project is developed in small, focused milestones. Each milestone adds one m
 | v0.10.0 | Authentication UI and Protected Frontend    | Completed   | Login and protected routes       |
 | v0.11.0 | Customer Management and Service Creation UI | Completed   | First connected business pages   |
 | v0.12.0 | Offer Creation Workflow UI                  | Completed   | Offer creation and offer items   |
-| v0.13.0 | Offer Acceptance and Order Conversion UI    | In progress | Offer-to-order workflow          |
-| v0.14.0 | Order Planning and Status Management UI     | Planned     | Operational order handling       |
+| v0.13.0 | Offer Acceptance and Order Conversion UI    | Completed   | Offer-to-order workflow          |
+| v0.14.0 | Order Planning and Status Management UI     | In progress | Operational order handling       |
 | v0.15.0 | Dashboard and Reporting UI                  | Planned     | Business overview                |
 | v0.16.0 | Fullstack Business Workflow MVP             | Planned     | Portfolio-ready MVP              |
 | v0.17.0 | CI Pipeline                                 | Planned     | Automated quality checks         |
@@ -50,7 +50,7 @@ flowchart LR
 
 ## Completed Milestones
 
-### v0.1.0 – Customer Management Foundation
+### v0.1.0 ï¿½ Customer Management Foundation
 
 Goal: Build the first core business entity and establish the backend structure.
 
@@ -65,7 +65,7 @@ Scope:
 
 ---
 
-### v0.2.0 – Service Management
+### v0.2.0 ï¿½ Service Management
 
 Goal: Add reusable offered services for pricing and future offer items.
 
@@ -79,7 +79,7 @@ Scope:
 
 ---
 
-### v0.3.0 – Offer Management
+### v0.3.0 ï¿½ Offer Management
 
 Goal: Introduce offers as the central sales document for customers.
 
@@ -93,7 +93,7 @@ Scope:
 
 ---
 
-### v0.4.0 – Offer Item Management
+### v0.4.0 ï¿½ Offer Item Management
 
 Goal: Add line items to offers and calculate offer totals.
 
@@ -108,7 +108,7 @@ Scope:
 
 ---
 
-### v0.5.0 – Request Validation
+### v0.5.0 ï¿½ Request Validation
 
 Goal: Improve request safety and prepare business rule validation.
 
@@ -121,7 +121,7 @@ Scope:
 
 ---
 
-### v0.6.0 – Order Management Foundation
+### v0.6.0 ï¿½ Order Management Foundation
 
 Goal: Convert accepted offers into orders on the backend.
 
@@ -136,7 +136,7 @@ Scope:
 
 ---
 
-### v0.7.0 – Authentication and Protected API Foundation
+### v0.7.0 ï¿½ Authentication and Protected API Foundation
 
 Goal: Add authentication and protect business endpoints.
 
@@ -153,7 +153,7 @@ Scope:
 
 ---
 
-### v0.8.0 – Authorization and User Roles
+### v0.8.0 ï¿½ Authorization and User Roles
 
 Goal: Add user roles and role-based endpoint protection.
 
@@ -167,7 +167,7 @@ Scope:
 
 ---
 
-### v0.9.0 – Frontend Foundation
+### v0.9.0 ï¿½ Frontend Foundation
 
 Goal: Create the React frontend foundation.
 
@@ -185,7 +185,7 @@ Scope:
 
 ---
 
-### v0.10.0 – Authentication UI and Protected Frontend
+### v0.10.0 ï¿½ Authentication UI and Protected Frontend
 
 Goal: Connect frontend authentication to the backend.
 
@@ -203,7 +203,7 @@ Scope:
 
 ---
 
-### v0.11.0 – Customer Management and Service Creation UI
+### v0.11.0 ï¿½ Customer Management and Service Creation UI
 
 Goal: Connect the first business management screens to the backend.
 
@@ -220,7 +220,7 @@ Scope:
 
 ---
 
-### v0.12.0 – Offer Creation Workflow UI
+### v0.12.0 ï¿½ Offer Creation Workflow UI
 
 Goal: Build the first realistic offer creation workflow in the frontend.
 
@@ -237,9 +237,7 @@ Scope:
 
 ---
 
-## Current Milestone
-
-### v0.13.0 – Offer Acceptance and Order Conversion UI
+### v0.13.0 ï¿½ Offer Acceptance and Order Conversion UI
 
 Goal: Turn accepted offers into operational orders and separate offer work from order work.
 
@@ -253,6 +251,29 @@ Scope:
 * Offer overview filters for open offers, archive and all offers
 * Clear separation between `/offers` and `/orders`
 
+Status:
+
+```text
+Completed and released.
+```
+
+---
+
+## Current Milestone
+
+### v0.14.0 ï¿½ Order Planning and Status Management UI
+
+Goal: Make orders operationally useful after creation.
+
+Scope:
+
+* Edit order status, planned date and notes on the order details page
+* Save changes through `PUT /api/orders/{id}` and reload the order
+* Filter orders by active, completed and all
+* Show colored order status badges
+* Keep the completed date backend-managed and read-only in the frontend
+* Leave offer items unchanged
+
 Current status:
 
 ```text
@@ -264,21 +285,7 @@ Documentation and release preparation in progress.
 
 ## Planned Milestones
 
-### v0.14.0 – Order Planning and Status Management UI
-
-Goal: Make orders operationally useful after creation.
-
-Planned scope:
-
-* Edit order planned date
-* Update order status
-* Add and update order notes
-* Show order lifecycle more clearly
-* Prepare upcoming orders for the dashboard
-
----
-
-### v0.15.0 – Dashboard and Reporting UI
+### v0.15.0 ï¿½ Dashboard and Reporting UI
 
 Goal: Turn the dashboard into a useful business overview.
 
@@ -293,7 +300,7 @@ Planned scope:
 
 ---
 
-### v0.16.0 – Fullstack Business Workflow MVP
+### v0.16.0 ï¿½ Fullstack Business Workflow MVP
 
 Goal: Polish the core workflow into a portfolio-ready MVP.
 
@@ -307,7 +314,7 @@ Planned scope:
 
 ---
 
-### v0.17.0 – CI Pipeline
+### v0.17.0 ï¿½ CI Pipeline
 
 Goal: Add automated quality checks.
 
@@ -321,7 +328,7 @@ Planned scope:
 
 ---
 
-### v1.0.0 – Full Business Workflow MVP
+### v1.0.0 ï¿½ Full Business Workflow MVP
 
 Goal: Release a stable portfolio-ready full-stack MVP.
 
