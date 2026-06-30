@@ -1,12 +1,32 @@
 .animated-number {
-  display: inline-block;
-  height: 1em;
-  overflow: hidden;
-  line-height: 1em;
-  vertical-align: bottom;
+  display: inline-flex;
+  align-items: flex-end;
 }
 
-.animated-number__roll {
+/* Heights and the roll distance are snapped to whole pixels with round().
+   At fractional em sizes (e.g. 1.6rem = 25.6px) some digit offsets would
+   otherwise land on half pixels, leaving individual digits looking shifted.
+   The plain `1em` lines are fallbacks for browsers without round(). */
+
+.animated-number__static {
+  display: inline-block;
+  height: 1em;
+  height: round(1em, 1px);
+  line-height: 1em;
+  line-height: round(1em, 1px);
+  white-space: pre;
+}
+
+.animated-number__digit {
+  display: inline-block;
+  height: 1em;
+  height: round(1em, 1px);
+  overflow: hidden;
+  line-height: 1em;
+  line-height: round(1em, 1px);
+}
+
+.animated-number__strip {
   display: flex;
   flex-direction: column;
   animation: animated-number-roll 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -14,7 +34,9 @@
 
 .animated-number__row {
   height: 1em;
+  height: round(1em, 1px);
   line-height: 1em;
+  line-height: round(1em, 1px);
   text-align: center;
 }
 
@@ -24,13 +46,15 @@
   }
 
   to {
-    transform: translateY(calc(var(--animated-number-target) * -1em));
+    transform: translateY(calc(var(--animated-number-digit) * -1em));
+    transform: translateY(calc(var(--animated-number-digit) * round(1em, 1px) * -1));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animated-number__roll {
+  .animated-number__strip {
     animation: none;
-    transform: translateY(calc(var(--animated-number-target) * -1em));
+    transform: translateY(calc(var(--animated-number-digit) * -1em));
+    transform: translateY(calc(var(--animated-number-digit) * round(1em, 1px) * -1));
   }
 }
