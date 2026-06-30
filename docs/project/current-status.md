@@ -21,10 +21,10 @@ The project is developed in small, versioned milestones with a focus on realisti
 ## Current Milestone
 
 ```text
-v0.15.0 – Dashboard and Reporting UI (in progress)
+v0.15.0 – Dashboard and Reporting UI
 ```
 
-The current milestone turns the dashboard into a real operational overview. The first slice is implemented: live counts for customers, open offers and upcoming orders, plus a list of the next planned orders. The reporting side of this milestone (revenue, conversion insights, calendar) is still planned.
+The current milestone turns the dashboard into a real operational overview and adds a reporting layer. The dashboard shows live counts for customers, open offers and upcoming orders plus the next planned orders. The analytics page reports order volume, completed volume, an offer-to-order conversion rate, the average order value, the open-offer pipeline and a 12-month revenue trend with a trend line.
 
 ## Current Business Workflow
 
@@ -54,8 +54,8 @@ flowchart LR
 | Orders Overview | ✅ | ✅ | Usable |
 | Order Details | ✅ | ✅ Editable | Usable |
 | Order Planning & Status | ✅ | ✅ | Usable |
-| Dashboard | ✅ | 🟡 Live counts + upcoming orders | Partly usable |
-| Analytics / Reporting | ⏭ | 🟡 Placeholder | Planned |
+| Dashboard | ✅ | ✅ Live counts + upcoming orders | Usable |
+| Analytics / Reporting | ✅ | ✅ Revenue, conversion, 12-month trend | Usable |
 
 ---
 
@@ -108,6 +108,8 @@ The frontend currently provides:
 * Dashboard with live counts for customers, open offers and upcoming orders
 * Dashboard list of the next planned orders sorted by planned date
 * Animated dashboard statistics
+* Analytics page with order volume, completed volume, conversion rate, average order value and open-offer pipeline
+* 12-month revenue trend chart with a trend line (DIY SVG, no charting library)
 * Structured mobile-first CSS architecture
 
 ---
@@ -156,8 +158,9 @@ The project is not yet a finished business application. The following limitation
 
 * No global `AuthContext` yet
 * No refresh token flow yet
-* Dashboard shows live operational counts, but reporting (revenue, conversion, calendar) is not built yet
-* Analytics are not connected to real business data yet
+* No invoicing or payments yet, so receivables metrics (outstanding, DSO, aging) are not available
+* No cost tracking yet, so profit and margin are not reported
+* A calendar view for upcoming orders is not built yet
 * Offered services currently support read and create in the frontend
 * Customer lookup during offer creation is currently performed client-side after loading all customers
 * The Customers page still contains a visible creation form and may later be refined into a clearer master data area
@@ -167,14 +170,18 @@ The project is not yet a finished business application. The following limitation
 
 ## Next Planned Step
 
-The current milestone (v0.15.0) is completed once the reporting slice is added.
+The next logical milestone is:
 
-Remaining focus for v0.15.0:
+```text
+v0.16.0 – Fullstack Business Workflow MVP
+```
 
-* simple calendar field for upcoming orders
-* completed order statistics
-* revenue overview
-* offer-to-order conversion insights
+Planned focus:
+
+* polish the end-to-end customer-to-offer-to-order workflow
+* improve UI consistency across pages
+* local full-stack setup documentation
+* a final MVP documentation pass
 
 ---
 

@@ -17,14 +17,14 @@ Customer
 ## Current Status
 
 ```text
-v0.15.0 – Dashboard and Reporting UI (in progress)
+v0.15.0 – Dashboard and Reporting UI
 ```
 
 The application is currently in active development.
 
 The backend provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the offer-to-order workflow including order updates.
 
-The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance, order conversion, operational order planning and an operational dashboard with live counts and upcoming orders. The reporting side of the dashboard is still in progress.
+The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance, order conversion, operational order planning, an operational dashboard with live counts and upcoming orders, and an Admin analytics page with revenue, conversion and a 12-month revenue trend chart.
 
 ---
 
@@ -79,6 +79,13 @@ The frontend provides a protected mobile-first React client with authentication,
 * show live counts for customers, open offers and upcoming orders
 * list the next planned orders sorted by planned date
 * animate the dashboard statistics
+
+### Analytics (Admin)
+
+* order volume and completed volume
+* offer-to-order conversion rate and average order value
+* open-offer pipeline value
+* 12-month revenue trend chart with a trend line (DIY SVG, no charting library)
 
 ### Authentication and Authorization
 
@@ -355,8 +362,9 @@ Current limitations include:
 * no password reset flow yet
 * no email confirmation flow yet
 * no production deployment yet
-* dashboard reporting (revenue, conversion, calendar) not built yet
-* analytics still placeholder-based
+* no invoicing or receivables metrics yet (DSO, outstanding, aging)
+* no cost tracking, so no profit or margin reporting
+* no calendar view for upcoming orders yet
 * offered service editing and deletion are not exposed in the frontend yet
 * no PDF generation for offers yet
 
@@ -368,7 +376,6 @@ The next planned milestones are:
 
 | Version | Focus                           |
 | ------- | ------------------------------- |
-| v0.15.0 | Dashboard and Reporting UI      |
 | v0.16.0 | Fullstack Business Workflow MVP |
 | v0.17.0 | CI Pipeline                     |
 | v1.0.0  | Stable portfolio-ready MVP      |
