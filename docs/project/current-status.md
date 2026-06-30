@@ -21,10 +21,10 @@ The project is developed in small, versioned milestones with a focus on realisti
 ## Current Milestone
 
 ```text
-v0.14.0 – Order Planning and Status Management UI
+v0.15.0 – Dashboard and Reporting UI (in progress)
 ```
 
-The current milestone makes orders operationally useful after creation: order status, planned date and notes can be edited, and orders can be filtered by their lifecycle stage.
+The current milestone turns the dashboard into a real operational overview. The first slice is implemented: live counts for customers, open offers and upcoming orders, plus a list of the next planned orders. The reporting side of this milestone (revenue, conversion insights, calendar) is still planned.
 
 ## Current Business Workflow
 
@@ -54,8 +54,8 @@ flowchart LR
 | Orders Overview | ✅ | ✅ | Usable |
 | Order Details | ✅ | ✅ Editable | Usable |
 | Order Planning & Status | ✅ | ✅ | Usable |
-| Dashboard | 🟡 | 🟡 Placeholder | Planned |
-| Analytics | ⏭ | 🟡 Placeholder | Planned |
+| Dashboard | ✅ | 🟡 Live counts + upcoming orders | Partly usable |
+| Analytics / Reporting | ⏭ | 🟡 Placeholder | Planned |
 
 ---
 
@@ -105,6 +105,9 @@ The frontend currently provides:
 * Editable order detail view for status, planned date and notes
 * Automatic completed date handling through the backend
 * Offer filters for open offers, archived offers and all offers
+* Dashboard with live counts for customers, open offers and upcoming orders
+* Dashboard list of the next planned orders sorted by planned date
+* Animated dashboard statistics
 * Structured mobile-first CSS architecture
 
 ---
@@ -125,7 +128,7 @@ Open offers are shown by default under `/offers`.
 
 Converted or rejected offers are available through the archive filter. Converted offers remain available as historical records and link to the related order.
 
-Orders are shown under `/orders` and can be opened through a read-only order detail page.
+Orders are shown under `/orders` and can be opened through an editable order detail page for status, planned date and notes.
 
 ---
 
@@ -153,7 +156,7 @@ The project is not yet a finished business application. The following limitation
 
 * No global `AuthContext` yet
 * No refresh token flow yet
-* Dashboard data is still mostly placeholder-based
+* Dashboard shows live operational counts, but reporting (revenue, conversion, calendar) is not built yet
 * Analytics are not connected to real business data yet
 * Offered services currently support read and create in the frontend
 * Customer lookup during offer creation is currently performed client-side after loading all customers
@@ -164,17 +167,12 @@ The project is not yet a finished business application. The following limitation
 
 ## Next Planned Step
 
-The next logical milestone is:
+The current milestone (v0.15.0) is completed once the reporting slice is added.
 
-```text
-v0.15.0 – Dashboard and Reporting UI
-```
+Remaining focus for v0.15.0:
 
-Planned focus:
-
-* dashboard with upcoming orders
 * simple calendar field for upcoming orders
-* customer and completed order statistics
+* completed order statistics
 * revenue overview
 * offer-to-order conversion insights
 

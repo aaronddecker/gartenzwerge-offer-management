@@ -17,14 +17,14 @@ Customer
 ## Current Status
 
 ```text
-v0.14.0 – Order Planning and Status Management UI
+v0.15.0 – Dashboard and Reporting UI (in progress)
 ```
 
 The application is currently in active development.
 
 The backend provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the offer-to-order workflow including order updates.
 
-The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance, order conversion and operational order planning.
+The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance, order conversion, operational order planning and an operational dashboard with live counts and upcoming orders. The reporting side of the dashboard is still in progress.
 
 ---
 
@@ -73,6 +73,12 @@ The frontend provides a protected mobile-first React client with authentication,
 * show original offer items
 * track order status, planned date and completion date
 * handle the completion date automatically in the backend
+
+### Dashboard
+
+* show live counts for customers, open offers and upcoming orders
+* list the next planned orders sorted by planned date
+* animate the dashboard statistics
 
 ### Authentication and Authorization
 
@@ -349,7 +355,7 @@ Current limitations include:
 * no password reset flow yet
 * no email confirmation flow yet
 * no production deployment yet
-* dashboard still mostly placeholder-based
+* dashboard reporting (revenue, conversion, calendar) not built yet
 * analytics still placeholder-based
 * offered service editing and deletion are not exposed in the frontend yet
 * no PDF generation for offers yet
