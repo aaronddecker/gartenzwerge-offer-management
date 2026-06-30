@@ -395,16 +395,21 @@ It currently shows:
 
 Planned additions are a calendar field and a next-recommended-action hint.
 
-Analytics is intended for reporting and business insights.
+Analytics is the Admin-only reporting area.
 
-It can later include:
+It currently shows:
 
-* customer statistics
-* completed order statistics
-* revenue overview
-* revenue charts
-* offer-to-order conversion insights
-* top services
+* order volume and completed volume
+* offer-to-order conversion rate and average order value
+* open-offer pipeline value
+* a 12-month revenue trend chart with a linear trend line
+
+The trend chart is a DIY SVG component (no charting library): bars per month,
+a least-squares trend line, hover on desktop and tap on touch for monthly
+values, and a euro y-axis that is shown only on desktop.
+
+Future reporting ideas (need new features) include receivables and DSO once
+invoicing exists, profit once cost tracking exists, and top services.
 
 Analytics is currently treated as an Admin-only area.
 
@@ -484,7 +489,8 @@ src/Frontend/src/
 | Offer overview filters                | Implemented |
 | Dashboard live counts and upcoming orders | Implemented |
 | Animated dashboard statistics         | Implemented |
-| Analytics / reporting                 | Placeholder |
+| Analytics: revenue, conversion, average order value, pipeline | Implemented |
+| Analytics: 12-month revenue trend chart | Implemented |
 
 ---
 
@@ -495,8 +501,9 @@ src/Frontend/src/
 | No global AuthContext yet                                          | Auth state is currently handled through token storage and route guards |
 | No refresh token handling yet                                      | Token expiration is not handled automatically in the frontend          |
 | No full API client abstraction yet                                 | API calls are grouped by feature modules                               |
-| Dashboard reporting not built yet                                  | Dashboard shows live operational counts; revenue and conversion reporting are planned |
-| No real analytics data yet                                         | Analytics is prepared but not connected to business data               |
+| No invoicing or receivables metrics yet                            | DSO, outstanding and aging need an invoicing feature that does not exist yet |
+| No profit or margin reporting yet                                  | Only revenue is tracked; there is no cost data                          |
+| Analytics aggregates on the client                                 | Offers and orders are summed in the frontend; acceptable for current data size |
 | Offered services currently support read and create in the frontend | Edit and delete UI can be added later                                  |
 | Customer lookup is client-side                                     | Acceptable for current project size                                    |
 | Customers page can be refined                                      | It may later become a clearer master data area                         |

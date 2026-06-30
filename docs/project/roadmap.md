@@ -288,19 +288,21 @@ Goal: Turn the dashboard into a useful business overview.
 
 Scope:
 
-* Dashboard with live customer, open offer and upcoming order counts (done)
-* Dashboard list of the next planned orders sorted by date (done)
-* Animated dashboard statistics (done)
-* Completed order statistics (planned)
-* Revenue overview (planned)
-* Offer-to-order conversion insights (planned)
-* Simple calendar field for upcoming orders (planned)
+* Dashboard with live customer, open offer and upcoming order counts
+* Dashboard list of the next planned orders sorted by date
+* Animated dashboard statistics
+* Analytics: order volume and completed volume
+* Analytics: offer-to-order conversion rate and average order value
+* Analytics: open-offer pipeline value
+* Analytics: 12-month revenue trend chart with a trend line (DIY SVG)
+
+A calendar view for upcoming orders was deferred to a later milestone.
 
 Current status:
 
 ```text
-Operational dashboard slice implemented on develop.
-Reporting and analytics slice still planned.
+Implementation completed on develop.
+Documentation and release preparation in progress.
 ```
 
 ---
