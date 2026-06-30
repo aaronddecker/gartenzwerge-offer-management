@@ -54,9 +54,20 @@ function getOfferById(offers: OfferResponse[], offerId: string) {
   return offers.find((offer) => offer.id === offerId)
 }
 
+type OrderFilter = 'active' | 'done' | 'all'
+
+function isActiveOrder(order: OrderResponse) {
+  return order.status === 1 || order.status === 2
+}
+
+function isDoneOrder(order: OrderResponse) {
+  return order.status === 3 || order.status === 4
+}
+
 export function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([])
   const [offers, setOffers] = useState<OfferResponse[]>([])
+  const [activeFilter, setActiveFilter] = useState<OrderFilter>('active')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -97,12 +108,68 @@ export function OrdersPage() {
     }
   }, [])
 
+  const activeOrders = orders.filter(isActiveOrder)
+  const doneOrders = orders.filter(isDoneOrder)
+
+  const filteredOrders = orders.filter((order) => {
+    if (activeFilter === 'active') {
+      return isActiveOrder(order)
+    }
+
+    if (activeFilter === 'done') {
+      return isDoneOrder(order)
+    }
+
+    return true
+  })
+
   return (
     <section className="page">
       <PageHeader
         title="Aufträge"
         description="Verwalte angenommene Angebote, die als Aufträge weiterbearbeitet werden."
       />
+
+      <div className="order-filter-tabs" aria-label="Auftragsfilter">
+        <button
+          type="button"
+          className={
+            activeFilter === 'active'
+              ? 'order-filter-tab order-filter-tab--active'
+              : 'order-filter-tab'
+          }
+          onClick={() => setActiveFilter('active')}
+        >
+          Aktiv
+          <span>{activeOrders.length}</span>
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeFilter === 'done'
+              ? 'order-filter-tab order-filter-tab--active'
+              : 'order-filter-tab'
+          }
+          onClick={() => setActiveFilter('done')}
+        >
+          Abgeschlossen
+          <span>{doneOrders.length}</span>
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeFilter === 'all'
+              ? 'order-filter-tab order-filter-tab--active'
+              : 'order-filter-tab'
+          }
+          onClick={() => setActiveFilter('all')}
+        >
+          Alle
+          <span>{orders.length}</span>
+        </button>
+      </div>
 
       {isLoading && <p className="muted-text">Aufträge werden geladen...</p>}
 
@@ -124,9 +191,25 @@ export function OrdersPage() {
         </section>
       )}
 
-      {!isLoading && !errorMessage && orders.length > 0 && (
+      {!isLoading && !errorMessage && orders.length > 0 && filteredOrders.length === 0 && (
+        <section className="empty-state-card">
+          {activeFilter === 'active' ? (
+            <>
+              <h3>Keine aktiven Aufträge</h3>
+              <p>Geplante oder in Bearbeitung befindliche Aufträge erscheinen hier.</p>
+            </>
+          ) : (
+            <>
+              <h3>Keine abgeschlossenen Aufträge</h3>
+              <p>Abgeschlossene oder stornierte Aufträge erscheinen hier.</p>
+            </>
+          )}
+        </section>
+      )}
+
+      {!isLoading && !errorMessage && filteredOrders.length > 0 && (
         <div className="order-list">
-          {orders.map((order) => {
+          {filteredOrders.map((order) => {
             const relatedOffer = getOfferById(offers, order.offerId)
 
             return (
@@ -147,7 +230,7 @@ export function OrdersPage() {
                     </p>
                   </div>
 
-                  <span className="order-status-badge">
+                  <span className={`order-status-badge order-status-badge--${order.status}`}>
                     {getOrderStatusLabel(order.status)}
                   </span>
                 </div>

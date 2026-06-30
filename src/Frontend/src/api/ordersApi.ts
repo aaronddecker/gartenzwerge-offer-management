@@ -54,6 +54,37 @@ export async function getOrderById(orderId: string): Promise<OrderResponse> {
   return response.json()
 }
 
+export type UpdateOrderRequest = {
+  status: OrderStatus
+  plannedDate: string | null
+  notes: string | null
+}
+
+export async function updateOrder(
+  orderId: string,
+  request: UpdateOrderRequest
+): Promise<OrderResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+    method: 'PUT',
+    headers: {
+      ...getAuthorizationHeader(),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
+
+  if (!response.ok) {
+    const responseText = await response.text()
+
+    throw new Error(
+      responseText ||
+        `Auftrag konnte nicht gespeichert werden. Statuscode: ${response.status}`
+    )
+  }
+
+  return response.json()
+}
+
 export async function createOrderFromOffer(
   offerId: string
 ): Promise<OrderResponse> {

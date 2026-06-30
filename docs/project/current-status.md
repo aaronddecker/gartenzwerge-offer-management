@@ -21,10 +21,10 @@ The project is developed in small, versioned milestones with a focus on realisti
 ## Current Milestone
 
 ```text
-v0.13.0 – Offer Acceptance and Order Conversion UI
+v0.14.0 – Order Planning and Status Management UI
 ```
 
-The current milestone focuses on turning accepted offers into real service orders and separating offer work from operational order handling.
+The current milestone makes orders operationally useful after creation: order status, planned date and notes can be edited, and orders can be filtered by their lifecycle stage.
 
 ## Current Business Workflow
 
@@ -34,7 +34,8 @@ flowchart LR
     Offer --> OfferItems[Offer Items]
     OfferItems --> AcceptedOffer[Accepted Offer]
     AcceptedOffer --> Order[Order]
-    Order --> OrderDetails[Read-only Order Details]
+    Order --> OrderDetails[Order Details and Planning]
+    OrderDetails --> Lifecycle[Status, Planned Date, Notes]
 
     Offer --> OfferArchive[Offer Archive]
     OfferArchive --> Order
@@ -51,7 +52,8 @@ flowchart LR
 | Offer Acceptance | ✅ | ✅ | Usable |
 | Order Creation | ✅ | ✅ | Usable |
 | Orders Overview | ✅ | ✅ | Usable |
-| Order Details | ✅ | ✅ Read-only | Read-only |
+| Order Details | ✅ | ✅ Editable | Usable |
+| Order Planning & Status | ✅ | ✅ | Usable |
 | Dashboard | 🟡 | 🟡 Placeholder | Planned |
 | Analytics | ⏭ | 🟡 Placeholder | Planned |
 
@@ -98,7 +100,10 @@ The frontend currently provides:
 * Offer item creation
 * Offer acceptance and order conversion
 * Orders overview with real backend data
-* Read-only order detail view
+* Order filters for active, completed and all orders
+* Colored order status badges
+* Editable order detail view for status, planned date and notes
+* Automatic completed date handling through the backend
 * Offer filters for open offers, archived offers and all offers
 * Structured mobile-first CSS architecture
 
@@ -150,10 +155,6 @@ The project is not yet a finished business application. The following limitation
 * No refresh token flow yet
 * Dashboard data is still mostly placeholder-based
 * Analytics are not connected to real business data yet
-* Orders are currently read-only in the frontend
-* Order planning is not editable in the frontend yet
-* Order status updates are not editable in the frontend yet
-* Order notes are not editable in the frontend yet
 * Offered services currently support read and create in the frontend
 * Customer lookup during offer creation is currently performed client-side after loading all customers
 * The Customers page still contains a visible creation form and may later be refined into a clearer master data area
@@ -166,16 +167,16 @@ The project is not yet a finished business application. The following limitation
 The next logical milestone is:
 
 ```text
-v0.14.0 – Order Planning and Status Management UI
+v0.15.0 – Dashboard and Reporting UI
 ```
 
 Planned focus:
 
-* edit order planned date
-* update order status
-* update order notes
-* improve order lifecycle visibility
-* prepare upcoming order data for the dashboard
+* dashboard with upcoming orders
+* simple calendar field for upcoming orders
+* customer and completed order statistics
+* revenue overview
+* offer-to-order conversion insights
 
 ---
 

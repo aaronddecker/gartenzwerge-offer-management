@@ -1,3 +1,63 @@
+.order-filter-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.order-filter-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.6rem 0.4rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.order-filter-tab span {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  min-height: 1.4rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .order-filter-tab {
+    gap: 0.4rem;
+    padding: 0.65rem 0.75rem;
+    font-size: 1rem;
+  }
+
+  .order-filter-tab span {
+    display: inline-flex;
+  }
+}
+
+.order-filter-tab--active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
 .order-list {
   display: grid;
   gap: 1rem;
@@ -49,6 +109,21 @@
 .order-card__details dd {
   margin: 0;
   font-weight: 600;
+}
+
+.order-status-badge--2 {
+  background: #fff3cd;
+  color: #7a5c00;
+}
+
+.order-status-badge--3 {
+  background: var(--color-green-soft);
+  color: var(--color-success);
+}
+
+.order-status-badge--4 {
+  background: var(--color-danger-surface);
+  color: var(--color-danger-text);
 }
 
 .order-detail-card {

@@ -85,7 +85,7 @@ The frontend keeps backend communication in dedicated API modules.
 | `offeredServicesApi` | Offered service read and create                       |
 | `offersApi`          | Offer overview, detail, create and update             |
 | `offerItemsApi`      | Offer item read and create                            |
-| `ordersApi`          | Order overview, detail and order creation from offers |
+| `ordersApi`          | Order overview, detail, update and order creation from offers |
 
 This keeps API logic separate from page components.
 
@@ -116,8 +116,8 @@ Current frontend routes:
 | `/offers`           | Offer overview with filters          | Authenticated |
 | `/offers/new`       | Create a new offer                   | Authenticated |
 | `/offers/:offerId`  | Offer details and conversion actions | Authenticated |
-| `/orders`           | Orders overview                      | Authenticated |
-| `/orders/:orderId`  | Read-only order details              | Authenticated |
+| `/orders`           | Orders overview with filters         | Authenticated |
+| `/orders/:orderId`  | Order details and planning           | Authenticated |
 | `/more`             | Secondary navigation                 | Authenticated |
 | `/analytics`        | Future reporting area                | Admin-only    |
 | `/offered-services` | Offered service management           | Admin-only    |
@@ -230,7 +230,7 @@ flowchart TD
     E -->|Yes| G[Accept offer]
     G --> H[Create order]
     H --> I[Show order in /orders]
-    I --> J[Open read-only order details]
+    I --> J[Open order details and manage planning]
     H --> K[Offer becomes historical record]
 ```
 
@@ -306,7 +306,9 @@ Responsibilities:
 * load offers to enrich the order overview
 * show customer name, offer number and total amount from the related offer
 * show order status, planned date and completed date
-* navigate to read-only order details
+* filter orders by active, completed and all
+* show a colored status badge per order
+* navigate to order details and planning
 * navigate back to the related offer
 
 Because the current `OrderDto` is lightweight, the frontend combines order data with related offer data for a more useful overview.
@@ -320,6 +322,14 @@ Because the current `OrderDto` is lightweight, the frontend combines order data 
 | Offer number          | Related offer |
 | Total amount          | Related offer |
 
+Order filters:
+
+| Filter       | Shows                                   |
+| ------------ | --------------------------------------- |
+| Active       | Planned and in-progress orders          |
+| Completed    | Completed and cancelled orders          |
+| All          | All orders                              |
+
 ### `/orders/:orderId`
 
 Responsibilities:
@@ -327,14 +337,16 @@ Responsibilities:
 * load a single order
 * load the related offer
 * load the related offer items
-* display order data
+* edit the order status, planned date and notes
+* save changes through `PUT /api/orders/{id}`
+* reload the order from the backend after saving
+* display the read-only completed date when the order is completed
 * display the offer foundation
 * display positions from the original offer
 * link back to `/orders`
 * link to the related offer
-* stay read-only for now
 
-The order details page is intentionally read-only in the current milestone. Editing order planning, notes and status is planned for a later milestone.
+The order details page lets employees manage operational order data while the backend stays the source of truth. The `completedAt` timestamp is not edited directly: the backend sets it automatically when an order becomes completed and clears it when the status changes back.
 
 ---
 
@@ -464,7 +476,9 @@ src/Frontend/src/
 | Offer acceptance and order conversion | Implemented |
 | Duplicate order creation prevention   | Implemented |
 | Orders overview                       | Implemented |
-| Read-only order details               | Implemented |
+| Order overview filters                | Implemented |
+| Order details and planning            | Implemented |
+| Order status, planning and notes editing | Implemented |
 | Offer overview filters                | Implemented |
 | Dashboard                             | Placeholder |
 | Analytics                             | Placeholder |
@@ -480,9 +494,6 @@ src/Frontend/src/
 | No full API client abstraction yet                                 | API calls are grouped by feature modules                               |
 | No real dashboard data yet                                         | Dashboard is still mostly placeholder-based                            |
 | No real analytics data yet                                         | Analytics is prepared but not connected to business data               |
-| Orders are currently read-only in the frontend                     | Editing is planned for a later milestone                               |
-| Order planned date is not editable yet                             | Planned for order planning milestone                                   |
-| Order status updates are not editable yet                          | Planned for order lifecycle milestone                                  |
 | Offered services currently support read and create in the frontend | Edit and delete UI can be added later                                  |
 | Customer lookup is client-side                                     | Acceptable for current project size                                    |
 | Customers page can be refined                                      | It may later become a clearer master data area                         |
@@ -501,8 +512,8 @@ Planned screenshots:
 | Offer overview with filters            | `docs/assets/screenshots/offers-overview-filters.png`      |
 | Offer creation with customer lookup    | `docs/assets/screenshots/offer-create-customer-lookup.png` |
 | Offer details with existing order link | `docs/assets/screenshots/offer-details-converted.png`      |
-| Orders overview                        | `docs/assets/screenshots/orders-overview.png`              |
-| Read-only order details                | `docs/assets/screenshots/order-details.png`                |
+| Orders overview with filters           | `docs/assets/screenshots/orders-overview.png`              |
+| Order details with planning form       | `docs/assets/screenshots/order-details.png`                |
 
 ---
 
@@ -517,9 +528,6 @@ Planned frontend improvements:
 * backend-supported customer search endpoint if customer volume grows
 * improve Customers page into a clearer master data management area
 * Offered Service edit and delete UI
-* order planning UI
-* order status management UI
-* order notes editing
 * dashboard with upcoming orders
 * calendar field for upcoming orders
 * analytics with real business data

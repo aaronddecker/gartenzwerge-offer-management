@@ -4,6 +4,7 @@ import { getOfferItems, type OfferItemResponse } from '../api/offerItemsApi'
 import { getOfferById, type OfferResponse } from '../api/offersApi'
 import {
   getOrderById,
+  updateOrder,
   type OrderResponse,
   type OrderStatus,
 } from '../api/ordersApi'
@@ -18,7 +19,7 @@ function formatCurrency(value: number) {
 
 function formatDate(value: string | null) {
   if (!value) {
-    return 'Noch nicht geplant'
+    return '–'
   }
 
   return new Intl.DateTimeFormat('de-DE').format(new Date(value))
@@ -39,6 +40,18 @@ function getOrderStatusLabel(status: OrderStatus) {
   }
 }
 
+function toDateInputValue(value: string | null): string {
+  if (!value) return ''
+  return value.slice(0, 10)
+}
+
+const ORDER_STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
+  { value: 1, label: 'Geplant' },
+  { value: 2, label: 'In Bearbeitung' },
+  { value: 3, label: 'Abgeschlossen' },
+  { value: 4, label: 'Storniert' },
+]
+
 export function OrderDetailsPage() {
   const { orderId } = useParams<{ orderId: string }>()
 
@@ -48,62 +61,102 @@ export function OrderDetailsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  const [formStatus, setFormStatus] = useState<OrderStatus>(1)
+  const [formPlannedDate, setFormPlannedDate] = useState('')
+  const [formNotes, setFormNotes] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
   useEffect(() => {
     let isMounted = true
 
     if (!orderId) {
-        return
+      return
     }
 
     const currentOrderId = orderId
 
     async function loadOrderDetails() {
-        try {
+      try {
         const loadedOrder = await getOrderById(currentOrderId)
 
         const [loadedOffer, loadedOfferItems] = await Promise.all([
-            getOfferById(loadedOrder.offerId),
-            getOfferItems(loadedOrder.offerId),
+          getOfferById(loadedOrder.offerId),
+          getOfferItems(loadedOrder.offerId),
         ])
 
         if (!isMounted) {
-            return
+          return
         }
 
         setOrder(loadedOrder)
         setOffer(loadedOffer)
         setOfferItems(loadedOfferItems)
+        setFormStatus(loadedOrder.status)
+        setFormPlannedDate(toDateInputValue(loadedOrder.plannedDate))
+        setFormNotes(loadedOrder.notes ?? '')
         setErrorMessage(null)
-        } catch (error) {
+      } catch (error) {
         if (!isMounted) {
-            return
+          return
         }
 
         setErrorMessage(
-            error instanceof Error
+          error instanceof Error
             ? error.message
             : 'Ein unbekannter Fehler ist aufgetreten.'
         )
-        } finally {
+      } finally {
         if (isMounted) {
-            setIsLoading(false)
+          setIsLoading(false)
         }
-        }
+      }
     }
 
     loadOrderDetails()
 
     return () => {
-        isMounted = false
+      isMounted = false
     }
-    }, [orderId])
+  }, [orderId])
+
+  async function handleSave() {
+    if (!orderId) return
+
+    setIsSaving(true)
+    setSaveError(null)
+    setSaveSuccess(false)
+
+    try {
+      const updatedOrder = await updateOrder(orderId, {
+        status: formStatus,
+        plannedDate: formPlannedDate ? `${formPlannedDate}T00:00:00.000Z` : null,
+        notes: formNotes.trim() || null,
+      })
+
+      setOrder(updatedOrder)
+      setFormStatus(updatedOrder.status)
+      setFormPlannedDate(toDateInputValue(updatedOrder.plannedDate))
+      setFormNotes(updatedOrder.notes ?? '')
+      setSaveSuccess(true)
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Auftrag konnte nicht gespeichert werden.'
+      )
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (!orderId) {
     return (
       <section className="page">
         <PageHeader
           title="Auftragsdetails"
-          description="Prüfe die Auftragsdaten und die zugehörige Angebotsgrundlage."
+          description="Prüfe die Auftragsdaten und bearbeite den Planungsstand."
         />
 
         <p className="form-message form-message--error">
@@ -117,7 +170,7 @@ export function OrderDetailsPage() {
     <section className="page">
       <PageHeader
         title="Auftragsdetails"
-        description="Prüfe die Auftragsdaten und die zugehörige Angebotsgrundlage."
+        description="Prüfe die Auftragsdaten und bearbeite den Planungsstand."
       />
 
       <div className="page-actions page-actions--left">
@@ -141,23 +194,84 @@ export function OrderDetailsPage() {
                 <p className="muted-text">{offer.customerName}</p>
               </div>
 
-              <span className="order-status-badge">
+              <span className={`order-status-badge order-status-badge--${order.status}`}>
                 {getOrderStatusLabel(order.status)}
               </span>
             </div>
 
-            <dl className="order-card__details">
-              <dt>Geplant für</dt>
-              <dd>{formatDate(order.plannedDate)}</dd>
+            <div className="form-field">
+              <label htmlFor="order-status">Status</label>
+              <select
+                id="order-status"
+                value={formStatus}
+                onChange={(e) => {
+                  setFormStatus(Number(e.target.value) as OrderStatus)
+                  setSaveSuccess(false)
+                }}
+              >
+                {ORDER_STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <dt>Abgeschlossen am</dt>
-              <dd>{formatDate(order.completedAt)}</dd>
+            <div className="form-field">
+              <label htmlFor="order-planned-date">Geplant für</label>
+              <input
+                id="order-planned-date"
+                type="date"
+                value={formPlannedDate}
+                onChange={(e) => {
+                  setFormPlannedDate(e.target.value)
+                  setSaveSuccess(false)
+                }}
+              />
+            </div>
 
-              <dt>Gesamt netto</dt>
-              <dd>{formatCurrency(offer.totalNet)}</dd>
-            </dl>
+            {order.completedAt && (
+              <dl className="order-card__details">
+                <dt>Abgeschlossen am</dt>
+                <dd>{formatDate(order.completedAt)}</dd>
+              </dl>
+            )}
 
-            {order.notes && <p className="muted-text">{order.notes}</p>}
+            <div className="form-field">
+              <label htmlFor="order-notes">Notizen</label>
+              <textarea
+                id="order-notes"
+                value={formNotes}
+                rows={4}
+                maxLength={1000}
+                placeholder="Interne Notizen zum Auftrag..."
+                onChange={(e) => {
+                  setFormNotes(e.target.value)
+                  setSaveSuccess(false)
+                }}
+              />
+            </div>
+
+            {saveError && (
+              <p className="form-message form-message--error">{saveError}</p>
+            )}
+
+            {saveSuccess && (
+              <p className="form-message form-message--success">
+                Auftrag wurde gespeichert.
+              </p>
+            )}
+
+            <div className="page-actions page-actions--left">
+              <button
+                type="button"
+                className="primary-button"
+                disabled={isSaving}
+                onClick={handleSave}
+              >
+                {isSaving ? 'Wird gespeichert...' : 'Speichern'}
+              </button>
+            </div>
           </section>
 
           <section className="order-detail-card">

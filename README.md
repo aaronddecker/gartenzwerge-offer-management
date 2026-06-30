@@ -17,14 +17,14 @@ Customer
 ## Current Status
 
 ```text
-v0.13.0 – Offer Acceptance and Order Conversion UI
+v0.14.0 – Order Planning and Status Management UI
 ```
 
 The application is currently in active development.
 
-The backend provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the foundational offer-to-order workflow.
+The backend provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the offer-to-order workflow including order updates.
 
-The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance and order conversion.
+The frontend provides a protected mobile-first React client with authentication, role-aware navigation, customer management, offered service creation, offer creation, offer item handling, offer acceptance, order conversion and operational order planning.
 
 ---
 
@@ -66,10 +66,13 @@ The frontend provides a protected mobile-first React client with authentication,
 ### Order Management
 
 * view all orders
-* view read-only order details
+* filter orders by active, completed and all
+* show colored order status badges
+* edit order status, planned date and notes
 * show related offer information
 * show original offer items
 * track order status, planned date and completion date
+* handle the completion date automatically in the backend
 
 ### Authentication and Authorization
 
@@ -348,8 +351,6 @@ Current limitations include:
 * no production deployment yet
 * dashboard still mostly placeholder-based
 * analytics still placeholder-based
-* order details are currently read-only
-* order planning and status editing are planned for a future milestone
 * offered service editing and deletion are not exposed in the frontend yet
 * no PDF generation for offers yet
 
@@ -359,13 +360,12 @@ Current limitations include:
 
 The next planned milestones are:
 
-| Version | Focus                                   |
-| ------- | --------------------------------------- |
-| v0.14.0 | Order Planning and Status Management UI |
-| v0.15.0 | Dashboard and Reporting UI              |
-| v0.16.0 | Fullstack Business Workflow MVP         |
-| v0.17.0 | CI Pipeline                             |
-| v1.0.0  | Stable portfolio-ready MVP              |
+| Version | Focus                           |
+| ------- | ------------------------------- |
+| v0.15.0 | Dashboard and Reporting UI      |
+| v0.16.0 | Fullstack Business Workflow MVP |
+| v0.17.0 | CI Pipeline                     |
+| v1.0.0  | Stable portfolio-ready MVP      |
 
 See the full roadmap here:
 
@@ -396,6 +396,17 @@ docs: update documentation
 test: add or update tests
 chore: update tooling, configuration or maintenance tasks
 ```
+
+---
+
+## Development Approach
+
+This project is built as a hands-on learning project in full-stack development.
+
+AI tools (Claude Code and ChatGPT) were used as pair-programming and mentoring
+assistants — for reviewing approaches, discussing trade-offs and accelerating
+boilerplate. All architecture and business decisions were made and reviewed by
+me, with a focus on understanding each step rather than just generating code.
 
 ---
 
