@@ -211,6 +211,10 @@ gartenzwerge-management/
 
 ## Local Development Setup
 
+> For a full walkthrough from a fresh clone to a working login, including ports,
+> environment variables and troubleshooting, see the
+> [Local Full-Stack Setup guide](docs/project/local-setup.md).
+
 ### Prerequisites
 
 * .NET 9 SDK
@@ -322,6 +326,7 @@ Detailed project documentation is available in the `docs` folder.
 
 ### Project Documentation
 
+* [Local Full-Stack Setup](docs/project/local-setup.md)
 * [Current Project Status](docs/project/current-status.md)
 * [Project Roadmap](docs/project/roadmap.md)
 
