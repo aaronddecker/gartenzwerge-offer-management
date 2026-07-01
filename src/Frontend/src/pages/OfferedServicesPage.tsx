@@ -6,6 +6,7 @@ import {
   type OfferedServiceResponse,
 } from '../api/offeredServicesApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 
 type OfferedServiceFormState = {
   name: string
@@ -233,17 +234,19 @@ export function OfferedServicesPage() {
         </form>
       </section>
 
-      {isLoading && <p className="muted-text">Leistungen werden geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
+      <PageState
+        isLoading={isLoading}
+        loadingText="Leistungen werden geladen..."
+        error={errorMessage}
+      >
+      {offeredServices.length === 0 && (
+        <section className="empty-state-card">
+          <h3>Noch keine Leistungen vorhanden</h3>
+          <p>Angelegte Leistungen erscheinen hier.</p>
+        </section>
       )}
 
-      {!isLoading && !errorMessage && offeredServices.length === 0 && (
-        <p className="muted-text">Es sind noch keine Leistungen vorhanden.</p>
-      )}
-
-      {!isLoading && !errorMessage && offeredServices.length > 0 && (
+      {offeredServices.length > 0 && (
         <div className="service-list">
           {offeredServices.map((offeredService) => (
             <article key={offeredService.id} className="service-card">
@@ -269,6 +272,7 @@ export function OfferedServicesPage() {
           ))}
         </div>
       )}
+      </PageState>
     </section>
   )
 }

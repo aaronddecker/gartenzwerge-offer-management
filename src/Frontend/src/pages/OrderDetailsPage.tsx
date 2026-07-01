@@ -9,6 +9,7 @@ import {
   type OrderStatus,
 } from '../api/ordersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('de-DE', {
@@ -179,13 +180,12 @@ export function OrderDetailsPage() {
         </Link>
       </div>
 
-      {isLoading && <p className="muted-text">Auftrag wird geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && order && offer && (
+      <PageState
+        isLoading={isLoading}
+        loadingText="Auftrag wird geladen..."
+        error={errorMessage}
+      >
+      {order && offer && (
         <>
           <section className="order-detail-card">
             <div className="order-card__header">
@@ -330,6 +330,7 @@ export function OrderDetailsPage() {
           </section>
         </>
       )}
+      </PageState>
     </section>
   )
 }

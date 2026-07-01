@@ -7,6 +7,7 @@ import {
 } from '../api/offersApi'
 import { getOrders, type OrderResponse } from '../api/ordersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 import {
   getRelatedOrder,
   isArchivedOffer,
@@ -161,13 +162,12 @@ export function OffersPage() {
         </button>
       </div>
 
-      {isLoading && <p className="muted-text">Angebote werden geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && filteredOffers.length === 0 && (
+      <PageState
+        isLoading={isLoading}
+        loadingText="Angebote werden geladen..."
+        error={errorMessage}
+      >
+      {filteredOffers.length === 0 && (
         <section className="empty-state-card">
           {activeFilter === 'open' ? (
             <>
@@ -190,10 +190,16 @@ export function OffersPage() {
               <p>Erstelle dein erstes Angebot für einen Kunden.</p>
             </>
           )}
+
+          {activeFilter !== 'archive' && (
+            <Link to="/offers/new" className="primary-button">
+              Neues Angebot
+            </Link>
+          )}
         </section>
       )}
 
-      {!isLoading && !errorMessage && filteredOffers.length > 0 && (
+      {filteredOffers.length > 0 && (
         <div className="offer-list">
           {filteredOffers.map((offer) => {
             const relatedOrder = getRelatedOrder(orders, offer.id)
@@ -247,6 +253,7 @@ export function OffersPage() {
           })}
         </div>
       )}
+      </PageState>
     </section>
   )
 }

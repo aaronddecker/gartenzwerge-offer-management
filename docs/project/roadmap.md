@@ -24,8 +24,8 @@ The project is developed in small, focused milestones. Each milestone adds one m
 | v0.12.0 | Offer Creation Workflow UI                  | Completed   | Offer creation and offer items   |
 | v0.13.0 | Offer Acceptance and Order Conversion UI    | Completed   | Offer-to-order workflow          |
 | v0.14.0 | Order Planning and Status Management UI     | Completed   | Operational order handling       |
-| v0.15.0 | Dashboard and Reporting UI                  | In progress | Business overview                |
-| v0.16.0 | Fullstack Business Workflow MVP             | Planned     | Portfolio-ready MVP              |
+| v0.15.0 | Dashboard and Reporting UI                  | Completed   | Business overview                |
+| v0.16.0 | Fullstack Business Workflow MVP             | In Progress | Portfolio-ready MVP              |
 | v0.17.0 | CI Pipeline                                 | Planned     | Automated quality checks         |
 | v1.0.0  | Full Business Workflow MVP                  | Planned     | Stable release                   |
 
@@ -280,8 +280,6 @@ Completed and released.
 
 ---
 
-## Current Milestone
-
 ### v0.15.0 � Dashboard and Reporting UI
 
 Goal: Turn the dashboard into a useful business overview.
@@ -298,11 +296,10 @@ Scope:
 
 A calendar view for upcoming orders was deferred to a later milestone.
 
-Current status:
+Status:
 
 ```text
-Implementation completed on develop.
-Documentation and release preparation in progress.
+Completed and released.
 ```
 
 ---
@@ -320,6 +317,15 @@ Planned scope:
 * Improved UI consistency
 * Local full-stack setup documentation
 * Final MVP documentation pass
+
+Status:
+
+```text
+In progress. The empty-state and create/edit polish, a shared PageState
+component for consistent loading and error states, app branding (favicon and
+title) and a local full-stack setup guide are done. End-to-end browser
+verification of the customer-to-offer-to-order workflow is still open.
+```
 
 ---
 

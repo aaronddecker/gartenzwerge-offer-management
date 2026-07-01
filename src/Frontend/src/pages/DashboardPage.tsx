@@ -5,6 +5,7 @@ import { getOffers, type OfferResponse } from '../api/offersApi'
 import { getOrders, type OrderResponse } from '../api/ordersApi'
 import { AnimatedNumber } from '../shared/components/AnimatedNumber'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 import { QuickActionLink } from '../shared/components/QuickActionLink'
 import { StatCard } from '../shared/components/StatCard'
 import {
@@ -95,14 +96,11 @@ export function DashboardPage() {
         description="Dein Überblick über Kunden, Angebote und anstehende Aufträge."
       />
 
-      {isLoading && <p className="muted-text">Dashboard wird geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && (
-        <>
+      <PageState
+        isLoading={isLoading}
+        loadingText="Dashboard wird geladen..."
+        error={errorMessage}
+      >
           <div className="stat-grid">
             <StatCard
               title="Kunden"
@@ -173,8 +171,7 @@ export function DashboardPage() {
               </ul>
             )}
           </section>
-        </>
-      )}
+      </PageState>
     </section>
   )
 }
