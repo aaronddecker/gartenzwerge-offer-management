@@ -21,10 +21,10 @@ The project is developed in small, versioned milestones with a focus on realisti
 ## Current Milestone
 
 ```text
-v0.15.0 – Dashboard and Reporting UI
+v0.16.0 – Fullstack Business Workflow MVP (in progress)
 ```
 
-The current milestone turns the dashboard into a real operational overview and adds a reporting layer. The dashboard shows live counts for customers, open offers and upcoming orders plus the next planned orders. The analytics page reports order volume, completed volume, an offer-to-order conversion rate, the average order value, the open-offer pipeline and a 12-month revenue trend with a trend line.
+The current milestone polishes the application into a portfolio-ready MVP. It refines the empty states and create/edit flows, unifies the loading and error handling across all pages behind a shared `PageState` component, replaces the default Vite favicon and page title with the app's own branding, and adds a dedicated local full-stack setup guide. The previous milestone (v0.15.0 – Dashboard and Reporting UI) turned the dashboard into an operational overview and added the analytics reporting layer.
 
 ## Current Business Workflow
 
@@ -110,6 +110,8 @@ The frontend currently provides:
 * Animated dashboard statistics
 * Analytics page with order volume, completed volume, conversion rate, average order value and open-offer pipeline
 * 12-month revenue trend chart with a trend line (DIY SVG, no charting library)
+* Consistent loading and error states across pages through a shared `PageState` component
+* Branded favicon and browser tab title
 * Structured mobile-first CSS architecture
 
 ---
@@ -170,18 +172,23 @@ The project is not yet a finished business application. The following limitation
 
 ## Next Planned Step
 
-The next logical milestone is:
+The current milestone (v0.16.0) is nearly complete. The empty-state and
+create/edit polish, the shared `PageState` component, the branding and the
+local full-stack setup guide are done. The remaining work is:
+
+* verify the end-to-end customer-to-offer-to-order workflow in the browser
+
+The next milestone after v0.16.0 is:
 
 ```text
-v0.16.0 – Fullstack Business Workflow MVP
+v0.17.0 – CI Pipeline
 ```
 
 Planned focus:
 
-* polish the end-to-end customer-to-offer-to-order workflow
-* improve UI consistency across pages
-* local full-stack setup documentation
-* a final MVP documentation pass
+* GitHub Actions workflow
+* automated backend build and tests
+* automated frontend build and linting on pull requests
 
 ---
 

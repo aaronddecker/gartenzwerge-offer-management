@@ -17,10 +17,13 @@ Customer
 ## Current Status
 
 ```text
-v0.15.0 – Dashboard and Reporting UI
+v0.16.0 – Fullstack Business Workflow MVP (in progress)
 ```
 
-The application is currently in active development.
+The application is currently in active development. The current milestone
+polishes the end-to-end workflow, unifies the loading and error states across
+pages behind a shared component, adds a branded favicon and app title, and
+ships a dedicated local full-stack setup guide.
 
 The backend provides the core business API, authentication, JWT-based authorization, role-based endpoint protection and the offer-to-order workflow including order updates.
 
