@@ -8,6 +8,7 @@ import {
 } from '../api/customersApi'
 import { createOffer, type CreateOfferRequest } from '../api/offersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 
 type OfferCreateFormState = {
   customerSearchTerm: string
@@ -262,17 +263,11 @@ export function OfferCreatePage() {
           <section className="offer-form-section">
             <h3>Kunde</h3>
 
-            {isLoadingCustomers && (
-              <p className="muted-text">Kunden werden geladen...</p>
-            )}
-
-            {!isLoadingCustomers && customerErrorMessage && (
-              <p className="form-message form-message--error">
-                {customerErrorMessage}
-              </p>
-            )}
-
-            {!isLoadingCustomers && !customerErrorMessage && (
+            <PageState
+              isLoading={isLoadingCustomers}
+              loadingText="Kunden werden geladen..."
+              error={customerErrorMessage}
+            >
               <>
                 <label className="form-field">
                   <span>Kunde suchen oder neu anlegen</span>
@@ -461,7 +456,7 @@ export function OfferCreatePage() {
                   </>
                 )}
               </>
-            )}
+            </PageState>
           </section>
 
           <section className="offer-form-section">

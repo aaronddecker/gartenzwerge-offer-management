@@ -7,6 +7,7 @@ import {
   type OrderStatus,
 } from '../api/ordersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 import { isActiveOrder, isDoneOrder } from '../shared/businessRules'
 
 function formatCurrency(value: number) {
@@ -164,13 +165,12 @@ export function OrdersPage() {
         </button>
       </div>
 
-      {isLoading && <p className="muted-text">Aufträge werden geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && orders.length === 0 && (
+      <PageState
+        isLoading={isLoading}
+        loadingText="Aufträge werden geladen..."
+        error={errorMessage}
+      >
+      {orders.length === 0 && (
         <section className="empty-state-card">
           <h3>Noch keine Aufträge vorhanden</h3>
           <p>
@@ -184,7 +184,7 @@ export function OrdersPage() {
         </section>
       )}
 
-      {!isLoading && !errorMessage && orders.length > 0 && filteredOrders.length === 0 && (
+      {orders.length > 0 && filteredOrders.length === 0 && (
         <section className="empty-state-card">
           {activeFilter === 'active' ? (
             <>
@@ -200,7 +200,7 @@ export function OrdersPage() {
         </section>
       )}
 
-      {!isLoading && !errorMessage && filteredOrders.length > 0 && (
+      {filteredOrders.length > 0 && (
         <div className="order-list">
           {filteredOrders.map((order) => {
             const relatedOffer = getOfferById(offers, order.offerId)
@@ -268,6 +268,7 @@ export function OrdersPage() {
           })}
         </div>
       )}
+      </PageState>
     </section>
   )
 }

@@ -10,6 +10,7 @@ import {
   type CustomerResponse,
 } from '../api/customersApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 import { CustomerForm, type CustomerFormState } from './CustomerForm'
 
 type AppLayoutOutletContext = {
@@ -266,20 +267,19 @@ export function CustomersPage() {
         <p className="form-message form-message--error">{deleteErrorMessage}</p>
       )}
 
-      {isLoading && <p className="muted-text">Kunden werden geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && customers.length === 0 && (
+      <PageState
+        isLoading={isLoading}
+        loadingText="Kunden werden geladen..."
+        error={errorMessage}
+      >
+      {customers.length === 0 && (
         <section className="empty-state-card">
           <h3>Noch keine Kunden vorhanden</h3>
           <p>Angelegte Kunden erscheinen hier.</p>
         </section>
       )}
 
-      {!isLoading && !errorMessage && customers.length > 0 && (
+      {customers.length > 0 && (
         <div className="customer-list">
           {customers.map((customer) => (
             <Fragment key={customer.id}>
@@ -358,6 +358,7 @@ export function CustomersPage() {
           ))}
         </div>
       )}
+      </PageState>
     </section>
   )
 }

@@ -21,6 +21,7 @@ import {
   type OfferedServiceResponse,
 } from '../api/offeredServicesApi'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 
 type OfferItemFormState = {
   offeredServiceId: string
@@ -271,13 +272,12 @@ export function OfferDetailsPage() {
         </Link>
       </div>
 
-      {isLoading && <p className="muted-text">Angebot wird geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && offer && (
+      <PageState
+        isLoading={isLoading}
+        loadingText="Angebot wird geladen..."
+        error={errorMessage}
+      >
+      {offer && (
         <>
           <section className="offer-summary-card">
             <div>
@@ -470,6 +470,7 @@ export function OfferDetailsPage() {
           </section>
         </>
       )}
+      </PageState>
     </section>
   )
 }

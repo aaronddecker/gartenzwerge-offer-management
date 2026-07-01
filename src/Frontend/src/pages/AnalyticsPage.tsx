@@ -3,6 +3,7 @@ import { getOffers, type OfferResponse } from '../api/offersApi'
 import { getOrders, type OrderResponse } from '../api/ordersApi'
 import { AnimatedNumber } from '../shared/components/AnimatedNumber'
 import { PageHeader } from '../shared/components/PageHeader'
+import { PageState } from '../shared/components/PageState'
 import { TrendBarChart, type ChartPoint } from '../shared/components/TrendBarChart'
 import { getRelatedOrder, isOpenOffer } from '../shared/businessRules'
 
@@ -149,14 +150,11 @@ export function AnalyticsPage() {
         description="Auswertungen zu Aufträgen, Angeboten und Umsatz."
       />
 
-      {isLoading && <p className="muted-text">Auswertungen werden geladen...</p>}
-
-      {!isLoading && errorMessage && (
-        <p className="form-message form-message--error">{errorMessage}</p>
-      )}
-
-      {!isLoading && !errorMessage && (
-        <>
+      <PageState
+        isLoading={isLoading}
+        loadingText="Auswertungen werden geladen..."
+        error={errorMessage}
+      >
           <section className="analytics-section">
             <h3>Umsatz</h3>
             <div className="report-grid">
@@ -231,9 +229,7 @@ export function AnalyticsPage() {
               </article>
             </div>
           </section>
-
-        </>
-      )}
+      </PageState>
     </section>
   )
 }
