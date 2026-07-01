@@ -2,6 +2,18 @@ import { getAuthToken } from '../auth/authStorage'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5041'
 
+/**
+ * Thrown when the backend actively rejects the current token (HTTP 401).
+ * Only this error should end the session — transient network failures or
+ * requests aborted by a page reload must not log the user out.
+ */
+export class UnauthorizedError extends Error {
+  constructor(message = 'Die aktuelle Sitzung ist ungültig oder abgelaufen.') {
+    super(message)
+    this.name = 'UnauthorizedError'
+  }
+}
+
 type LoginRequest = {
   email: string
   password: string
@@ -38,7 +50,7 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
   const token = getAuthToken()
 
   if (!token) {
-    throw new Error('Kein Authentifizierungs-Token vorhanden.')
+    throw new UnauthorizedError('Kein Authentifizierungs-Token vorhanden.')
   }
 
   const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
@@ -47,8 +59,12 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
     },
   })
 
+  if (response.status === 401 || response.status === 403) {
+    throw new UnauthorizedError()
+  }
+
   if (!response.ok) {
-    throw new Error('Die aktuelle Sitzung ist ungültig oder abgelaufen.')
+    throw new Error('Der aktuelle Benutzer konnte nicht geladen werden.')
   }
 
   return response.json()

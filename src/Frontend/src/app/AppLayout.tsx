@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { getCurrentUser, type CurrentUserResponse } from '../api/authApi'
+import {
+  UnauthorizedError,
+  getCurrentUser,
+  type CurrentUserResponse,
+} from '../api/authApi'
 import { removeAuthToken } from '../auth/authStorage'
 
 export function AppLayout() {
@@ -17,9 +21,14 @@ export function AppLayout() {
         if (isMounted) {
           setCurrentUser(user)
         }
-      } catch {
-        removeAuthToken()
-        navigate('/login', { replace: true })
+      } catch (error) {
+        // Only end the session when the token was actively rejected. A
+        // transient network error or a request aborted by a page reload
+        // must not log the user out.
+        if (isMounted && error instanceof UnauthorizedError) {
+          removeAuthToken()
+          navigate('/login', { replace: true })
+        }
       }
     }
 
