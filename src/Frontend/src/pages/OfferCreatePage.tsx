@@ -492,9 +492,23 @@ export function OfferCreatePage() {
             </div>
           </section>
 
-          <button type="submit" className="primary-button" disabled={isCreating}>
-            {isCreating ? 'Angebot wird gespeichert...' : 'Angebot anlegen'}
-          </button>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => navigate('/offers')}
+            >
+              Abbrechen
+            </button>
+
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={isCreating}
+            >
+              {isCreating ? 'Angebot wird gespeichert...' : 'Angebot anlegen'}
+            </button>
+          </div>
 
           {createErrorMessage && (
             <p className="form-message form-message--error">

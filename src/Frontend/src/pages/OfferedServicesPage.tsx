@@ -240,7 +240,10 @@ export function OfferedServicesPage() {
       )}
 
       {!isLoading && !errorMessage && offeredServices.length === 0 && (
-        <p className="muted-text">Es sind noch keine Leistungen vorhanden.</p>
+        <section className="empty-state-card">
+          <h3>Noch keine Leistungen vorhanden</h3>
+          <p>Angelegte Leistungen erscheinen hier.</p>
+        </section>
       )}
 
       {!isLoading && !errorMessage && offeredServices.length > 0 && (

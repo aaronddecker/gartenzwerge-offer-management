@@ -56,6 +56,11 @@
   background: var(--color-surface-muted);
 }
 
+.customer-form-card--inline {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
 .customer-form-card h3 {
   margin: 0;
   color: var(--color-text);

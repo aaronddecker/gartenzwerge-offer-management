@@ -190,6 +190,12 @@ export function OffersPage() {
               <p>Erstelle dein erstes Angebot für einen Kunden.</p>
             </>
           )}
+
+          {activeFilter !== 'archive' && (
+            <Link to="/offers/new" className="primary-button">
+              Neues Angebot
+            </Link>
+          )}
         </section>
       )}
 

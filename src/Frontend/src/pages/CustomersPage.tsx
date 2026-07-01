@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useState, type FormEvent } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { CurrentUserResponse } from '../api/authApi'
 import {
@@ -10,19 +10,7 @@ import {
   type CustomerResponse,
 } from '../api/customersApi'
 import { PageHeader } from '../shared/components/PageHeader'
-
-type CustomerFormState = {
-  firstName: string
-  lastName: string
-  company: string
-  phoneNumber: string
-  email: string
-  street: string
-  houseNumber: string
-  postalCode: string
-  city: string
-  notes: string
-}
+import { CustomerForm, type CustomerFormState } from './CustomerForm'
 
 type AppLayoutOutletContext = {
   currentUser: CurrentUserResponse | null
@@ -93,6 +81,10 @@ export function CustomersPage() {
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null)
   const isEditing = editingCustomerId !== null
 
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const showForm = isFormOpen || isEditing
+  const isCreateFormOpen = isFormOpen && !isEditing
+
   useEffect(() => {
     let isMounted = true
 
@@ -143,8 +135,17 @@ export function CustomersPage() {
     })
   }
 
+  function handleOpenCreateForm() {
+    setEditingCustomerId(null)
+    setFormData(initialCustomerFormData)
+    setCreateErrorMessage(null)
+    setCreateSuccessMessage(null)
+    setIsFormOpen(true)
+  }
+
   function handleStartEditCustomer(customer: CustomerResponse) {
     setEditingCustomerId(customer.id)
+    setIsFormOpen(true)
 
     setFormData({
       firstName: customer.firstName ?? '',
@@ -168,6 +169,7 @@ export function CustomersPage() {
     setFormData(initialCustomerFormData)
     setCreateErrorMessage(null)
     setCreateSuccessMessage(null)
+    setIsFormOpen(false)
   }
 
   async function handleSaveCustomer(event: FormEvent<HTMLFormElement>) {
@@ -193,6 +195,7 @@ export function CustomersPage() {
 
       setFormData(initialCustomerFormData)
       await refreshCustomers()
+      setIsFormOpen(false)
     } catch (error) {
       setCreateErrorMessage(
         error instanceof Error
@@ -234,152 +237,30 @@ export function CustomersPage() {
         description="Verwalte Kundenstammdaten für Angebote und Aufträge."
       />
 
-      <section className="customer-form-card">
-        <h3>{isEditing ? 'Kunden bearbeiten' : 'Neuen Kunden anlegen'}</h3>
+      {!showForm && (
+        <div className="page-actions page-actions--left">
+          <button
+            type="button"
+            className="primary-button"
+            onClick={handleOpenCreateForm}
+          >
+            Neuen Kunden anlegen
+          </button>
+        </div>
+      )}
 
-        <form className="customer-form" onSubmit={handleSaveCustomer}>
-          <div className="customer-form-grid">
-            <label className="form-field">
-              <span>Vorname</span>
-              <input
-                value={formData.firstName}
-                onChange={(event) =>
-                  handleFormChange('firstName', event.target.value)
-                }
-                required
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Nachname</span>
-              <input
-                value={formData.lastName}
-                onChange={(event) =>
-                  handleFormChange('lastName', event.target.value)
-                }
-                required
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Firma</span>
-              <input
-                value={formData.company}
-                onChange={(event) =>
-                  handleFormChange('company', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>E-Mail</span>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(event) =>
-                  handleFormChange('email', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Telefon</span>
-              <input
-                value={formData.phoneNumber}
-                onChange={(event) =>
-                  handleFormChange('phoneNumber', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Ort</span>
-              <input
-                value={formData.city}
-                onChange={(event) =>
-                  handleFormChange('city', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Straße</span>
-              <input
-                value={formData.street}
-                onChange={(event) =>
-                  handleFormChange('street', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Hausnummer</span>
-              <input
-                value={formData.houseNumber}
-                onChange={(event) =>
-                  handleFormChange('houseNumber', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field">
-              <span>Postleitzahl</span>
-              <input
-                value={formData.postalCode}
-                onChange={(event) =>
-                  handleFormChange('postalCode', event.target.value)
-                }
-              />
-            </label>
-
-            <label className="form-field customer-form__full">
-              <span>Notizen</span>
-              <textarea
-                value={formData.notes}
-                onChange={(event) =>
-                  handleFormChange('notes', event.target.value)
-                }
-              />
-            </label>
-          </div>
-
-          <div className="customer-form-actions">
-            {isEditing && (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleCancelEdit}
-              >
-                Abbrechen
-              </button>
-            )}
-
-            <button
-              type="submit"
-              className="primary-button"
-              disabled={isCreating}
-            >
-              {isCreating
-                ? 'Kunde wird gespeichert...'
-                : isEditing
-                  ? 'Speichern'
-                  : 'Kunde anlegen'}
-            </button>
-          </div>
-
-          {createErrorMessage && (
-            <p className="form-message form-message--error">
-              {createErrorMessage}
-            </p>
-          )}
-
-          {createSuccessMessage && (
-            <p className="form-message form-message--success">
-              {createSuccessMessage}
-            </p>
-          )}
-        </form>
-      </section>
+      {isCreateFormOpen && (
+        <CustomerForm
+          formData={formData}
+          isEditing={isEditing}
+          isSaving={isCreating}
+          errorMessage={createErrorMessage}
+          successMessage={createSuccessMessage}
+          onFieldChange={handleFormChange}
+          onSubmit={handleSaveCustomer}
+          onCancel={handleCancelEdit}
+        />
+      )}
 
       {deleteErrorMessage && (
         <p className="form-message form-message--error">{deleteErrorMessage}</p>
@@ -392,13 +273,17 @@ export function CustomersPage() {
       )}
 
       {!isLoading && !errorMessage && customers.length === 0 && (
-        <p className="muted-text">Es sind noch keine Kunden vorhanden.</p>
+        <section className="empty-state-card">
+          <h3>Noch keine Kunden vorhanden</h3>
+          <p>Angelegte Kunden erscheinen hier.</p>
+        </section>
       )}
 
       {!isLoading && !errorMessage && customers.length > 0 && (
         <div className="customer-list">
           {customers.map((customer) => (
-            <article key={customer.id} className="customer-card">
+            <Fragment key={customer.id}>
+            <article className="customer-card">
               <div>
                 <h3>
                   {customer.company ||
@@ -455,6 +340,21 @@ export function CustomersPage() {
                 )}
               </div>
             </article>
+
+            {editingCustomerId === customer.id && (
+              <CustomerForm
+                formData={formData}
+                isEditing={isEditing}
+                isSaving={isCreating}
+                isInline
+                errorMessage={createErrorMessage}
+                successMessage={createSuccessMessage}
+                onFieldChange={handleFormChange}
+                onSubmit={handleSaveCustomer}
+                onCancel={handleCancelEdit}
+              />
+            )}
+            </Fragment>
           ))}
         </div>
       )}

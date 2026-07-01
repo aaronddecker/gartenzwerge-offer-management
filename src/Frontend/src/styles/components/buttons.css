@@ -1,7 +1,7 @@
 .primary-button {
   margin-top: 0.5rem;
   padding: 0.9rem 1rem;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--radius-pill);
   background: var(--color-primary);
   color: var(--color-surface);
@@ -22,7 +22,7 @@
 
 .secondary-button {
   justify-self: start;
-  padding: 0.65rem 0.9rem;
+  padding: 0.9rem 1rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-pill);
   background: var(--color-surface);
@@ -38,7 +38,7 @@
 
 .secondary-danger-button {
   justify-self: start;
-  padding: 0.65rem 0.9rem;
+  padding: 0.9rem 1rem;
   border: 1px solid var(--color-danger-border);
   border-radius: var(--radius-pill);
   background: var(--color-danger-surface);
